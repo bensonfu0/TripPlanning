@@ -170,10 +170,12 @@
         <p class="text-slate-500">&copy; 2026 行程規劃器. All rights reserved.</p>
     </footer>
 
-    <!-- Add/Edit Spot Modal -->
-    <div id="spot-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden transform scale-95 transition-transform duration-200" id="spot-modal-card">
-            <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+    <!-- Add/Edit Spot Modal (Optimized with independent scroll and sticky footer actions) -->
+    <div id="spot-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transform scale-95 transition-transform duration-200 flex flex-col max-h-[85vh]" id="spot-modal-card">
+            
+            <!-- Modal Header (Sticky) -->
+            <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between flex-shrink-0 border-b border-slate-800">
                 <h3 id="modal-title" class="font-bold text-base flex items-center gap-2">
                     <i class="fa-solid fa-location-dot text-teal-400"></i> 新增 / 編輯景點
                 </h3>
@@ -182,76 +184,80 @@
                 </button>
             </div>
 
-            <form id="spot-form" onsubmit="handleSpotFormSubmit(event)" class="p-6 space-y-4">
-                <input type="hidden" id="spot-id">
-                <input type="hidden" id="spot-target-day">
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">預估時間</label>
-                        <input type="text" id="spot-time" required placeholder="如 10:00 或 上午" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+            <!-- Modal Form Body (Scrollable) -->
+            <form id="spot-form" onsubmit="handleSpotFormSubmit(event)" class="flex flex-col flex-1 overflow-hidden">
+                <div class="p-6 space-y-4 overflow-y-auto flex-1">
+                    <input type="hidden" id="spot-id">
+                    <input type="hidden" id="spot-target-day">
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">預估時間</label>
+                            <input type="text" id="spot-time" required placeholder="如 10:00 或 上午" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">分類標籤</label>
+                            <select id="spot-category" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                                <option value="Flight">航班 / 交通</option>
+                                <option value="Hotel">住宿 / 飯店</option>
+                                <option value="Sightseeing">景點 / 慢步</option>
+                                <option value="Dining">美食 / 咖啡</option>
+                                <option value="Shopping">購物 / 選物</option>
+                                <option value="Experience">特色體驗</option>
+                            </select>
+                        </div>
                     </div>
+
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">分類標籤</label>
-                        <select id="spot-category" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
-                            <option value="Flight">航班 / 交通</option>
-                            <option value="Hotel">住宿 / 飯店</option>
-                            <option value="Sightseeing">景點 / 慢步</option>
-                            <option value="Dining">美食 / 咖啡</option>
-                            <option value="Shopping">購物 / 選物</option>
-                            <option value="Experience">特色體驗</option>
-                        </select>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">景點 / 項目名稱</label>
+                        <input type="text" id="spot-title" required placeholder="例如：大館 Tai Kwun" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">預計花費金額</label>
+                            <input type="number" step="any" id="spot-cost" placeholder="0" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">幣別</label>
+                            <select id="spot-currency" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                                <option value="RMB">RMB (人民幣)</option>
+                                <option value="HKD">HKD (港幣)</option>
+                                <option value="TWD">TWD (新台幣)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">緯度 (Latitude)</label>
+                            <input type="number" step="any" id="spot-lat" placeholder="如 22.5342" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">經度 (Longitude)</label>
+                            <input type="number" step="any" id="spot-lng" placeholder="如 114.0624" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">代表圖片網址 (卡片展示用)</label>
+                        <input type="url" id="spot-img" placeholder="https://images.unsplash.com/..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">地圖網址 (選填，點擊可前往導航)</label>
+                        <input type="url" id="spot-map-url" placeholder="https://ditu.amap.com/..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">亮點說明與貼心提醒</label>
+                        <textarea id="spot-notes" rows="2" placeholder="詳細介紹或備註..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">景點 / 項目名稱</label>
-                    <input type="text" id="spot-title" required placeholder="例如：大館 Tai Kwun" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">預計花費金額</label>
-                        <input type="number" step="any" id="spot-cost" placeholder="0" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">幣別</label>
-                        <select id="spot-currency" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
-                            <option value="RMB">RMB (人民幣)</option>
-                            <option value="HKD">HKD (港幣)</option>
-                            <option value="TWD">TWD (新台幣)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">緯度 (Latitude)</label>
-                        <input type="number" step="any" id="spot-lat" placeholder="如 22.5342" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">經度 (Longitude)</label>
-                        <input type="number" step="any" id="spot-lng" placeholder="如 114.0624" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">代表圖片網址 (卡片展示用)</label>
-                    <input type="url" id="spot-img" placeholder="https://images.unsplash.com/..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">地圖網址 (選填，點擊可前往導航)</label>
-                    <input type="url" id="spot-map-url" placeholder="https://ditu.amap.com/..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">亮點說明與貼心提醒</label>
-                    <textarea id="spot-notes" rows="2" placeholder="詳細介紹或備註..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
-                </div>
-
-                <div class="pt-2 flex justify-end space-x-2">
-                    <button type="button" onclick="closeSpotModal()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition">取消</button>
+                <!-- Modal Footer Actions (Sticky Bottom) -->
+                <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-end space-x-2 flex-shrink-0">
+                    <button type="button" onclick="closeSpotModal()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-lg transition">取消</button>
                     <button type="submit" class="px-5 py-2 text-sm font-semibold text-slate-950 bg-teal-400 hover:bg-teal-300 rounded-lg shadow transition">儲存行程</button>
                 </div>
             </form>
@@ -413,7 +419,7 @@
         };
 
         function loadTripData() {
-            const saved = localStorage.getItem('hk_sz_itinerary_2026_v12');
+            const saved = localStorage.getItem('hk_sz_itinerary_2026_v13');
             if (saved) {
                 try {
                     tripData = JSON.parse(saved);
@@ -426,7 +432,7 @@
         }
 
         function saveTripData() {
-            localStorage.setItem('hk_sz_itinerary_2026_v12', JSON.stringify(tripData));
+            localStorage.setItem('hk_sz_itinerary_2026_v13', JSON.stringify(tripData));
         }
 
         async function fetchDateMatchedWeather() {
@@ -837,7 +843,6 @@
                 day.spots.forEach((spot, index) => {
                     const meta = categoryMeta[spot.category] || categoryMeta.Sightseeing;
                     
-                    // 根據設定的經緯度精準標註
                     const lat = spot.lat || day.lat;
                     const lng = spot.lng || day.lng;
                     const latLng = [lat, lng];
