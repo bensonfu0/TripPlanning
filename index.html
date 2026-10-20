@@ -402,7 +402,7 @@
         };
 
         function loadTripData() {
-            const saved = localStorage.getItem('hk_sz_itinerary_2026_v9');
+            const saved = localStorage.getItem('hk_sz_itinerary_2026_v10');
             if (saved) {
                 try {
                     tripData = JSON.parse(saved);
@@ -415,7 +415,7 @@
         }
 
         function saveTripData() {
-            localStorage.setItem('hk_sz_itinerary_2026_v9', JSON.stringify(tripData));
+            localStorage.setItem('hk_sz_itinerary_2026_v10', JSON.stringify(tripData));
         }
 
         async function fetchDateMatchedWeather() {
@@ -840,8 +840,9 @@
 
                     const marker = L.marker(latLng, { icon: customIcon }).addTo(map);
                     
+                    // 根據填寫的地圖網址綁定彈跳視窗按鈕
                     const popupMapLinkHtml = (spot.mapUrl && spot.mapUrl.trim() !== "")
-                        ? `<a href="${spot.mapUrl}" target="_blank" class="text-teal-600 font-bold hover:underline"><i class="fa-solid fa-diamond-turn-right me-0.5"></i>前往地圖</a>`
+                        ? `<a href="${spot.mapUrl}" target="_blank" rel="noopener noreferrer" class="text-teal-600 font-bold hover:underline"><i class="fa-solid fa-diamond-turn-right me-0.5"></i>前往地圖</a>`
                         : '';
 
                     const cleanPopupContent = `
