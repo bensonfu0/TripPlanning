@@ -88,9 +88,14 @@
         <div class="max-w-7xl mx-auto relative z-10">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <!-- Travel Badge -->
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/20 border border-teal-400/30 text-teal-300 text-xs font-semibold mb-3">
-                        <i class="fa-solid fa-plane-arrival"></i> <span id="header-badge-text">雙城移動慢活漫遊 • 6天5夜全記錄</span>
+                    <!-- Travel Badge & Sheet Status -->
+                    <div class="flex flex-wrap items-center gap-2 mb-3">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/20 border border-teal-400/30 text-teal-300 text-xs font-semibold">
+                            <i class="fa-solid fa-plane-arrival"></i> <span id="header-badge-text">雙城移動慢活漫遊 • 6天5夜全記錄</span>
+                        </div>
+                        <div id="sheet-sync-status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold">
+                            <i class="fa-solid fa-file-excel"></i> <span>已串接 Google Sheet</span>
+                        </div>
                     </div>
                     
                     <h1 id="main-title" class="text-2xl md:text-4xl font-extrabold tracking-tight text-white flex items-center gap-3">
@@ -101,6 +106,13 @@
                         <span class="text-slate-600">•</span>
                         <span><i class="fa-solid fa-location-dot text-rose-400 me-1.5"></i>深圳 (福田/南山) &amp; 香港 (中環/上環)</span>
                     </p>
+                </div>
+
+                <!-- Refresh Sheet Button -->
+                <div class="flex items-center gap-2">
+                    <button onclick="fetchGoogleSheetData()" class="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-arrows-rotate" id="refresh-icon"></i> 從 Google Sheet 重新同步
+                    </button>
                 </div>
             </div>
 
@@ -269,8 +281,10 @@
 
     <script>
         // ==========================================
-        // 🛠️ 天數與標題統一設定區 (方便未來維護調整)
+        // 📊 GOOGLE SHEET 連結設定
         // ==========================================
+        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1_ahVcayqH7ptZtJJa-YukQF7HDum12hMUU3R5y4dn5E/export?format=csv";
+
         const TRIP_CONFIG = {
             destination: "香港與深圳",
             daysCount: 6,
@@ -279,130 +293,27 @@
             dateRangeStr: "1月18日 - 1月23日"
         };
 
-        // 🎨 每天對應的專屬色彩設定檔
         const DAY_COLOR_PALETTE = {
-            1: "#059669", // DAY 1: 翡翠綠
-            2: "#2563eb", // DAY 2: 寶藍色
-            3: "#d97706", // DAY 3: 琥珀金
-            4: "#9333ea", // DAY 4: 紫羅蘭
-            5: "#e11d48", // DAY 5: 玫瑰紅
-            6: "#4f46e5"  // DAY 6: 靛青色
+            1: "#059669",
+            2: "#2563eb",
+            3: "#d97706",
+            4: "#9333ea",
+            5: "#e11d48",
+            6: "#4f46e5"
         };
 
         const fullTitleString = `${TRIP_CONFIG.destination} ${TRIP_CONFIG.daysCount}天${TRIP_CONFIG.nightsCount}夜 ${TRIP_CONFIG.themeName}`;
-
-        document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById('page-title').textContent = `${fullTitleString} - 行程規劃`;
-            document.getElementById('main-title').textContent = fullTitleString;
-            document.getElementById('header-badge-text').textContent = `雙城移動慢活漫遊 • ${TRIP_CONFIG.daysCount}天${TRIP_CONFIG.nightsCount}夜全記錄`;
-            document.getElementById('header-date-range').textContent = TRIP_CONFIG.dateRangeStr;
-            document.getElementById('footer-title-text').textContent = fullTitleString;
-        });
 
         const originalItineraryData = {
             title: fullTitleString,
             dateRange: TRIP_CONFIG.dateRangeStr,
             days: [
-                {
-                    dayNum: 1,
-                    date: "1/18, 週一",
-                    dateString: "2027-01-18",
-                    theme: "雙城移動 x 頂級水療",
-                    area: "深圳 (福田)",
-                    lat: 22.5431, lng: 114.0579,
-                    weather: { temp: "--", status: "尚未預測", icon: "fa-clock", sunrise: "尚未預測", sunset: "尚未預測", rainProb: "尚未預測" },
-                    estimatedBudget: { currency: "RMB", amount: 980 },
-                    spots: [
-                        { id: "d1_1", time: "10:30", title: "香港國際機場抵達", category: "Flight", cost: 0, currency: "RMB", lat: 22.309761, lng: 113.920541, img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80", mapUrl: "https://ditu.amap.com/ssr/place/B073C02XX4?id=B073C02XX4&name=%E9%A6%99%E6%B8%AF%E5%9B%BD%E9%99%85%E6%9C%BA%E5%9C%BA&source=sug", notes: "搭乘班機抵達香港國際機場，準備開啟雙城漫遊之旅。" },
-                        { id: "d1_2", time: "13:00", title: "通關 & 入住深圳酒店", category: "Hotel", cost: 450, currency: "RMB", lat: 22.5333, lng: 114.0558, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "經陸路口岸快捷通關，至福田區優質酒店辦理入住與寄放行李。" },
-                        { id: "d1_3", time: "17:30", title: "福田 COCO Park 晚餐", category: "Dining", cost: 180, currency: "RMB", lat: 22.5367, lng: 114.0559, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "深圳熱門時尚商圈，聚集各式特色餐飲與網紅美食甜品。" },
-                        { id: "d1_4", time: "20:00", title: "艾沐春天 SPA 按摩", category: "Experience", cost: 350, currency: "RMB", lat: 22.534209, lng: 114.062478, img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=80", mapUrl: "https://ditu.amap.com/ssr/search?query_type=TQUERY&query=%E8%89%BE%E6%B2%90%E6%98%A5%E5%A4%A9&city=440300&geoobj=114.048256%7C22.529753%7C114.060635%7C22.535871&zoom=16.47", notes: "位於福田金中環國際商務大廈，享受頂級奢華的水療放鬆與專業按摩體驗。" }
-                    ]
-                },
-                {
-                    dayNum: 2,
-                    date: "1/19, 週二",
-                    dateString: "2027-01-19",
-                    theme: "古城慢活 x 科技體驗",
-                    area: "深圳 (南山)",
-                    lat: 22.5330, lng: 113.9304,
-                    weather: { temp: "--", status: "尚未預測", icon: "fa-clock", sunrise: "尚未預測", sunset: "尚未預測", rainProb: "尚未預測" },
-                    estimatedBudget: { currency: "RMB", amount: 460 },
-                    spots: [
-                        { id: "d2_1", time: "09:30", title: "南頭古城", category: "Sightseeing", cost: 50, currency: "RMB", lat: 22.5392, lng: 113.9189, img: "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "千年歷史古城改造為文創藝術街區，古今交融的慢活風格。" },
-                        { id: "d2_2", time: "12:00", title: "華僑城文創 (OCT-LOFT)", category: "Shopping", cost: 120, currency: "RMB", lat: 22.5363, lng: 113.9829, img: "https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "舊廠房改建的當代藝術園區，充滿獨立咖啡館、藝廊與手作選物。" },
-                        { id: "d2_3", time: "15:00", title: "無人駕駛體驗 (Robotaxi)", category: "Experience", cost: 40, currency: "RMB", lat: 22.5208, lng: 113.9388, img: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "親身搭乘科技感十足的自動駕駛計程車，感受前沿科技生活。" },
-                        { id: "d2_4", time: "16:30", title: "人才公園 / 深圳灣公園", category: "Sightseeing", cost: 0, currency: "RMB", lat: 22.5122, lng: 113.9472, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "遠眺深圳灣大橋與春筍大樓，漫步於海岸綠廊與夕陽餘暉中。" },
-                        { id: "d2_5", time: "18:30", title: "無人機外賣體驗 (美團)", category: "Dining", cost: 250, currency: "RMB", lat: 22.5150, lng: 113.9490, img: "https://images.unsplash.com/photo-1527977966376-1c8408f9f108?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "在公園空投降落點下單，體驗無人機幾分鐘內高空送達的飲料與美味晚餐。" }
-                    ]
-                },
-                {
-                    dayNum: 3,
-                    date: "1/20, 週三",
-                    dateString: "2027-01-20",
-                    theme: "古董老街 x 人文咖啡",
-                    area: "香港 (上環/中環)",
-                    lat: 22.2855, lng: 114.1577,
-                    weather: { temp: "--", status: "尚未預測", icon: "fa-clock", sunrise: "尚未預測", sunset: "尚未預測", rainProb: "尚未預測" },
-                    estimatedBudget: { currency: "HKD", amount: 820 },
-                    spots: [
-                        { id: "d3_1", time: "10:00", title: "返港 & 入住香港酒店", category: "Hotel", cost: 500, currency: "HKD", lat: 22.2868, lng: 114.1543, img: "https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "搭乘港鐵返港，入住中上環質感飯店。" },
-                        { id: "d3_2", time: "12:30", title: "港鐵馬賽克站拍照 (書法字)", category: "Sightseeing", cost: 20, currency: "HKD", lat: 22.2855, lng: 114.1515, img: "https://images.unsplash.com/photo-1534351590666-13e3e96b5017?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "經典港鐵站書法名牌牆打卡，感受極具特色的視覺文化。" },
-                        { id: "d3_3", time: "14:00", title: "上環摩羅上街 (Cat Street)", category: "Shopping", cost: 150, currency: "HKD", lat: 22.2842, lng: 114.1500, img: "https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "充滿古董雜貨、懷舊香港收藏品與文青小店的石板老街。" },
-                        { id: "d3_4", time: "15:30", title: "Halfway Coffee (半路咖啡)", category: "Dining", cost: 70, currency: "HKD", lat: 22.2839, lng: 114.1492, img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "以萬壽無疆中式陶瓷彩杯盛裝精緻特調精品咖啡，極具中西合璧魅力。" },
-                        { id: "d3_5", time: "19:00", title: "維港夜景 (Victoria Harbour)", category: "Sightseeing", cost: 80, currency: "HKD", lat: 22.2820, lng: 114.1580, img: "https://images.unsplash.com/photo-1506970845246-18f21d533b20?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "世界級摩天大樓璀璨天際線，欣賞璀璨迷人的維多利亞港夜景。" }
-                    ]
-                },
-                {
-                    dayNum: 4,
-                    date: "1/21, 週四",
-                    dateString: "2027-01-21",
-                    theme: "歷史藝文 x 質感選物",
-                    area: "香港 (中環/灣仔/鰂魚涌)",
-                    lat: 22.2783, lng: 114.1747,
-                    weather: { temp: "--", status: "尚未預測", icon: "fa-clock", sunrise: "尚未預測", sunset: "尚未預測", rainProb: "尚未預測" },
-                    estimatedBudget: { currency: "HKD", amount: 650 },
-                    spots: [
-                        { id: "d4_1", time: "10:00", title: "大館 (Tai Kwun)", category: "Sightseeing", cost: 0, currency: "HKD", lat: 22.2816, lng: 114.1537, img: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "前警署古蹟群華麗轉身為當代藝術中心，建築宏偉古樸。" },
-                        { id: "d4_2", time: "12:30", title: "PMQ 元創方 & G.O.D. 選物", category: "Shopping", cost: 250, currency: "HKD", lat: 22.2833, lng: 114.1517, img: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "前已婚警察宿舍改建的設計聚落，探索香港在地原創設計品牌。" },
-                        { id: "d4_3", time: "14:30", title: "Meanwhile Coffee", category: "Dining", cost: 65, currency: "HKD", lat: 22.2838, lng: 114.1510, img: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "藏身於古老巷弄中的高品質手沖咖啡館，放慢步伐品嚐香醇。" },
-                        { id: "d4_4", time: "16:00", title: "怪獸大廈 賽博朋克景 (益昌大廈)", category: "Sightseeing", cost: 15, currency: "HKD", lat: 22.2842, lng: 114.2128, img: "https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8a?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "變形金剛取景地，極具震撼感與香港濃密特色的巨型蜂巢住宅建築群。" },
-                        { id: "d4_5", time: "18:30", title: "灣仔星街 & Kapok選物", category: "Shopping", cost: 320, currency: "HKD", lat: 22.2764, lng: 114.1695, img: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "充滿歐陸悠閒風情的星街小區，文青必訪時尚選物店 Kapok。" }
-                    ]
-                },
-                {
-                    dayNum: 5,
-                    date: "1/22, 週五",
-                    dateString: "2027-01-22",
-                    theme: "海濱慢步 x 在地美食",
-                    area: "香港 (堅尼地城/西營盤)",
-                    lat: 22.2828, lng: 114.1283,
-                    weather: { temp: "--", status: "尚未預測", icon: "fa-clock", sunrise: "尚未預測", sunset: "尚未預測", rainProb: "尚未預測" },
-                    estimatedBudget: { currency: "HKD", amount: 780 },
-                    spots: [
-                        { id: "d5_1", time: "10:00", title: "堅尼地城海濱", category: "Sightseeing", cost: 0, currency: "HKD", lat: 22.2828, lng: 114.1283, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "絕美海景籃球場與絕佳海濱景觀步道，感受港島蔚藍海岸。" },
-                        { id: "d5_2", time: "11:30", title: "海景 & 叮叮車拍照", category: "Experience", cost: 10, currency: "HKD", lat: 22.2831, lng: 114.1290, img: "https://images.unsplash.com/photo-1534351590666-13e3e96b5017?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "捕捉百年雙層叮叮車與蔚藍大海交會的絕美復古畫面。" },
-                        { id: "d5_3", time: "14:00", title: "西營盤慢步", category: "Sightseeing", cost: 30, currency: "HKD", lat: 22.2862, lng: 114.1418, img: "https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8a?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "錯落有致的斜坡街道、懷舊老海味街與繽紛藝文壁畫彩繪牆。" },
-                        { id: "d5_4", time: "17:30", title: "在地美食 (避風塘炒蟹 / 雞蛋仔)", category: "Dining", cost: 700, currency: "HKD", lat: 22.2825, lng: 114.1488, img: "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "享用香辣過癮的正宗避風塘蒜香炒蟹，搭配外酥內軟的地道街頭雞蛋仔。" },
-                        { id: "d5_5", time: "20:00", title: "天星小輪維港遊", category: "Experience", cost: 40, currency: "HKD", lat: 22.2871, lng: 114.1615, img: "https://images.unsplash.com/photo-1506970845246-18f21d533b20?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "搭乘國家地理雜誌推薦的百年天星小輪，徜徉於海風與雙岸璀璨燈火間。" }
-                    ]
-                },
-                {
-                    dayNum: 6,
-                    date: "1/23, 週六",
-                    dateString: "2027-01-23",
-                    theme: "正宗早茶 x 輕鬆返台",
-                    area: "香港 (中環/機場)",
-                    lat: 22.3080, lng: 113.9185,
-                    weather: { temp: "--", status: "尚未預測", icon: "fa-clock", sunrise: "尚未預測", sunset: "尚未預測", rainProb: "尚未預測" },
-                    estimatedBudget: { currency: "HKD", amount: 950 },
-                    spots: [
-                        { id: "d6_1", time: "09:00", title: "港式早茶 (添好運 / 蓮香樓)", category: "Dining", cost: 220, currency: "HKD", lat: 22.2852, lng: 114.1582, img: "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "享用晶瑩蝦餃、酥皮叉燒包與燒賣，體驗最接地氣的經典一盅兩件早茶。" },
-                        { id: "d6_2", time: "11:00", title: "質感伴手採買 (Two Girls 廣生堂)", category: "Shopping", cost: 600, currency: "HKD", lat: 22.2835, lng: 114.1530, img: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "採買百年懷舊復古雙妹嚜花露水、雪花膏等最具香港特色的質感伴手禮。" },
-                        { id: "d6_3", time: "13:30", title: "機場快線 (香港站)", category: "Flight", cost: 130, currency: "HKD", lat: 22.2856, lng: 114.1585, img: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "於中環香港站輕鬆辦理預辦登機與托運，搭乘機場快線24分鐘直達機場。" },
-                        { id: "d6_4", time: "16:30", title: "HX282 航班返台", category: "Flight", cost: 0, currency: "HKD", lat: 22.3080, lng: 113.9185, img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "搭乘 HX282 班機滿載美好旅遊回憶順利返回台灣。" }
-                    ]
-                }
+                { dayNum: 1, date: "1/18, 週一", dateString: "2027-01-18", theme: "雙城移動 x 頂級水療", area: "深圳 (福田)", lat: 22.5431, lng: 114.0579, spots: [] },
+                { dayNum: 2, date: "1/19, 週二", dateString: "2027-01-19", theme: "古城慢活 x 科技體驗", area: "深圳 (南山)", lat: 22.5330, lng: 113.9304, spots: [] },
+                { dayNum: 3, date: "1/20, 週三", dateString: "2027-01-20", theme: "古董老街 x 人文咖啡", area: "香港 (上環/中環)", lat: 22.2855, lng: 114.1577, spots: [] },
+                { dayNum: 4, date: "1/21, 週四", dateString: "2027-01-21", theme: "歷史藝文 x 質感選物", area: "香港 (中環/灣仔/鰂魚涌)", lat: 22.2783, lng: 114.1747, spots: [] },
+                { dayNum: 5, date: "1/22, 週五", dateString: "2027-01-22", theme: "海濱慢步 x 在地美食", area: "香港 (堅尼地城/西營盤)", lat: 22.2828, lng: 114.1283, spots: [] },
+                { dayNum: 6, date: "1/23, 週六", dateString: "2027-01-23", theme: "正宗早茶 x 輕鬆返台", area: "香港 (中環/機場)", lat: 22.3080, lng: 113.9185, spots: [] }
             ]
         };
 
@@ -421,98 +332,16 @@
         let mapMarkers = [];
         let routePolylines = [];
 
-        window.onload = function() {
-            loadTripData();
-            initGaodeMap();
-            renderApp();
-            fetchDateMatchedWeather();
-        };
-
-        function loadTripData() {
-            const saved = localStorage.getItem('hk_sz_itinerary_2026_v15');
-            if (saved) {
-                try {
-                    tripData = JSON.parse(saved);
-                } catch(e) {
-                    tripData = JSON.parse(JSON.stringify(originalItineraryData));
-                }
-            } else {
-                tripData = JSON.parse(JSON.stringify(originalItineraryData));
-            }
-        }
-
-        function saveTripData() {
-            localStorage.setItem('hk_sz_itinerary_2026_v15', JSON.stringify(tripData));
-        }
-
-        async function fetchDateMatchedWeather() {
-            const todayObj = new Date();
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById('page-title').textContent = `${fullTitleString} - 行程規劃`;
+            document.getElementById('main-title').textContent = fullTitleString;
+            document.getElementById('header-badge-text').textContent = `雙城移動慢活漫遊 • ${TRIP_CONFIG.daysCount}天${TRIP_CONFIG.nightsCount}夜全記錄`;
+            document.getElementById('header-date-range').textContent = TRIP_CONFIG.dateRangeStr;
+            document.getElementById('footer-title-text').textContent = fullTitleString;
             
-            for (let day of tripData.days) {
-                if (!day.dateString) continue;
-                
-                const targetDate = new Date(day.dateString);
-                const diffTime = targetDate - todayObj;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-                if (diffDays < 0 || diffDays > 14) {
-                    day.weather = {
-                        temp: "--",
-                        status: "尚未預測",
-                        icon: "fa-clock",
-                        sunrise: "尚未預測",
-                        sunset: "尚未預測",
-                        rainProb: "尚未預測"
-                    };
-                    continue;
-                }
-
-                try {
-                    const lat = day.lat || 22.35;
-                    const lng = day.lng || 114.15;
-                    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,weather_code&timezone=auto`;
-                    
-                    const res = await fetch(url);
-                    const data = await res.json();
-
-                    if (data && data.daily && data.daily.time) {
-                        const index = data.daily.time.findIndex(t => t === day.dateString);
-                        if (index !== -1) {
-                            const tMax = Math.round(data.daily.temperature_2m_max[index]);
-                            const tMin = Math.round(data.daily.temperature_2m_min[index]);
-                            const wcode = data.daily.weather_code[index];
-                            
-                            let status = "晴朗";
-                            let icon = "fa-sun";
-                            if (wcode >= 1 && wcode <= 3) { status = "多雲"; icon = "fa-cloud-sun"; }
-                            else if (wcode >= 45 && wcode <= 48) { status = "有霧"; icon = "fa-smog"; }
-                            else if (wcode >= 51 && wcode <= 67) { status = "陣雨"; icon = "fa-cloud-rain"; }
-                            else if (wcode >= 71) { status = "降雪/雨"; icon = "fa-snowflake"; }
-
-                            let sunrise = data.daily.sunrise[index] ? data.daily.sunrise[index].substring(11, 16) : "尚未預測";
-                            let sunset = data.daily.sunset[index] ? data.daily.sunset[index].substring(11, 16) : "尚未預測";
-                            let rainProb = (data.daily.precipitation_probability_max[index] !== null && data.daily.precipitation_probability_max[index] !== undefined) 
-                                ? data.daily.precipitation_probability_max[index] + "%" 
-                                : "尚未預測";
-
-                            day.weather = {
-                                temp: `${tMin}°C - ${tMax}°C`,
-                                status: status,
-                                icon: icon,
-                                sunrise: sunrise,
-                                sunset: sunset,
-                                rainProb: rainProb
-                            };
-                        }
-                    }
-                } catch (err) {
-                    console.error("氣象資料讀取錯誤", err);
-                }
-            }
-
-            renderItineraryWrapper();
-            renderHeaderBudgetSummary();
-        }
+            initGaodeMap();
+            loadTripData();
+        });
 
         function initGaodeMap() {
             map = L.map('map', {
@@ -532,6 +361,100 @@
             L.control.zoom({ position: 'bottomright' }).addTo(map);
         }
 
+        async function loadTripData() {
+            tripData = JSON.parse(JSON.stringify(originalItineraryData));
+            await fetchGoogleSheetData();
+        }
+
+        async function fetchGoogleSheetData() {
+            const refreshIcon = document.getElementById('refresh-icon');
+            if (refreshIcon) refreshIcon.classList.add('fa-spin');
+
+            try {
+                const response = await fetch(GOOGLE_SHEET_CSV_URL + "&t=" + new Date().getTime());
+                if (!response.ok) throw new Error("網絡回應錯誤");
+                
+                const csvText = await response.text();
+                parseAndApplyCSV(csvText);
+
+                document.getElementById('sheet-sync-status').className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold";
+                document.getElementById('sheet-sync-status').innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> <span>已即時同步 Google Sheet</span>';
+
+                showToast("已成功更新 Google Sheet 行程！", "success");
+            } catch (error) {
+                console.warn("無法從 Google Sheet 抓取資料，改用內建快取：", error);
+                document.getElementById('sheet-sync-status').className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-xs font-semibold";
+                document.getElementById('sheet-sync-status').innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span>Google Sheet 連線受限 (使用內建資料)</span>';
+            } finally {
+                if (refreshIcon) refreshIcon.classList.remove('fa-spin');
+                renderApp();
+                fetchDateMatchedWeather();
+            }
+        }
+
+        function parseAndApplyCSV(csvText) {
+            const lines = csvText.split(/\r\n|\n/);
+            if (lines.length <= 1) return;
+
+            // 清空當前 spots
+            tripData.days.forEach(d => d.spots = []);
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+
+                // 簡單處理 CSV 欄位拆分
+                const cols = parseCSVRow(line);
+                if (cols.length < 5) continue;
+
+                const dayNum = parseInt(cols[0]) || 1;
+                const timeStr = cols[2] || "10:00";
+                const catStr = cols[3] || "Sightseeing";
+                const titleStr = cols[4] || "";
+                const costVal = parseFloat(cols[5]) || 0;
+                const currStr = cols[6] || (dayNum <= 2 ? "RMB" : "HKD");
+                const latVal = parseFloat(cols[7]) || 0;
+                const lngVal = parseFloat(cols[8]) || 0;
+                const mapUrlStr = cols[9] || "";
+                const notesStr = cols[10] || "";
+
+                const targetDay = tripData.days.find(d => d.dayNum === dayNum);
+                if (targetDay && titleStr) {
+                    targetDay.spots.push({
+                        id: `sheet_${dayNum}_${i}`,
+                        time: timeStr,
+                        category: catStr,
+                        title: titleStr,
+                        cost: costVal,
+                        currency: currStr,
+                        lat: latVal || targetDay.lat,
+                        lng: lngVal || targetDay.lng,
+                        mapUrl: mapUrlStr,
+                        notes: notesStr,
+                        img: ""
+                    });
+                }
+            }
+        }
+
+        function parseCSVRow(text) {
+            let p = '', c = '', r = [];
+            let q = false;
+            for (let i = 0; i < text.length; i++) {
+                c = text[i];
+                if (c === '"') {
+                    q = !q;
+                } else if (c === ',' && !q) {
+                    r.push(p.trim().replace(/^"|"$/g, ''));
+                    p = '';
+                } else {
+                    p += c;
+                }
+            }
+            r.push(p.trim().replace(/^"|"$/g, ''));
+            return r;
+        }
+
         function renderApp() {
             renderHeaderBudgetSummary();
             renderDayTabs();
@@ -539,10 +462,58 @@
             updateMapMarkersAndRoute();
         }
 
-        function renderHeaderBudgetSummary() {
-            let totalRMB = 0;
-            let totalHKD = 0;
+        async function fetchDateMatchedWeather() {
+            const todayObj = new Date();
+            
+            for (let day of tripData.days) {
+                if (!day.dateString) continue;
+                
+                const targetDate = new Date(day.dateString);
+                const diffTime = targetDate - todayObj;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
+                if (diffDays < 0 || diffDays > 14) {
+                    day.weather = { temp: "--", status: "尚未預測", icon: "fa-clock", sunrise: "尚未預測", sunset: "尚未預測", rainProb: "尚未預測" };
+                    continue;
+                }
+
+                try {
+                    const lat = day.lat || 22.35;
+                    const lng = day.lng || 114.15;
+                    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,weather_code&timezone=auto`;
+                    
+                    const res = await fetch(url);
+                    const data = await res.json();
+
+                    if (data && data.daily && data.daily.time) {
+                        const index = data.daily.time.findIndex(t => t === day.dateString);
+                        if (index !== -1) {
+                            const tMax = Math.round(data.daily.temperature_2m_max[index]);
+                            const tMin = Math.round(data.daily.temperature_2m_min[index]);
+                            const wcode = data.daily.weather_code[index];
+                            
+                            let status = "晴朗", icon = "fa-sun";
+                            if (wcode >= 1 && wcode <= 3) { status = "多雲"; icon = "fa-cloud-sun"; }
+                            else if (wcode >= 45 && wcode <= 48) { status = "有霧"; icon = "fa-smog"; }
+                            else if (wcode >= 51 && wcode <= 67) { status = "陣雨"; icon = "fa-cloud-rain"; }
+
+                            day.weather = {
+                                temp: `${tMin}°C - ${tMax}°C`,
+                                status: status,
+                                icon: icon,
+                                sunrise: data.daily.sunrise[index] ? data.daily.sunrise[index].substring(11, 16) : "尚未預測",
+                                sunset: data.daily.sunset[index] ? data.daily.sunset[index].substring(11, 16) : "尚未預測",
+                                rainProb: (data.daily.precipitation_probability_max[index] !== null) ? data.daily.precipitation_probability_max[index] + "%" : "尚未預測"
+                            };
+                        }
+                    }
+                } catch (err) {}
+            }
+            renderItineraryWrapper();
+        }
+
+        function renderHeaderBudgetSummary() {
+            let totalRMB = 0, totalHKD = 0;
             tripData.days.forEach(day => {
                 if (day.spots) {
                     day.spots.forEach(s => {
@@ -556,43 +527,20 @@
             const container = document.getElementById('trip-budget-summary');
             container.innerHTML = `
                 <div class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-2.5 px-3.5">
-                    <div class="w-8 h-8 rounded-lg bg-teal-500/20 text-teal-300 flex items-center justify-center font-bold text-sm">
-                        <i class="fa-solid fa-coins"></i>
-                    </div>
-                    <div>
-                        <p class="text-[11px] text-slate-400 uppercase font-semibold">深圳預計花費</p>
-                        <p class="text-xs font-bold text-teal-300">¥ ${totalRMB.toLocaleString()} RMB</p>
-                    </div>
+                    <div class="w-8 h-8 rounded-lg bg-teal-500/20 text-teal-300 flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-coins"></i></div>
+                    <div><p class="text-[11px] text-slate-400 uppercase font-semibold">深圳預計花費</p><p class="text-xs font-bold text-teal-300">¥ ${totalRMB.toLocaleString()} RMB</p></div>
                 </div>
-
                 <div class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-2.5 px-3.5">
-                    <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-sm">
-                        <i class="fa-solid fa-money-bill-wave"></i>
-                    </div>
-                    <div>
-                        <p class="text-[11px] text-slate-400 uppercase font-semibold">香港預計花費</p>
-                        <p class="text-xs font-bold text-amber-300">HK$ ${totalHKD.toLocaleString()} HKD</p>
-                    </div>
+                    <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-money-bill-wave"></i></div>
+                    <div><p class="text-[11px] text-slate-400 uppercase font-semibold">香港預計花費</p><p class="text-xs font-bold text-amber-300">HK$ ${totalHKD.toLocaleString()} HKD</p></div>
                 </div>
-
                 <div class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-2.5 px-3.5">
-                    <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-300 flex items-center justify-center font-bold text-sm">
-                        <i class="fa-solid fa-hotel"></i>
-                    </div>
-                    <div>
-                        <p class="text-[11px] text-slate-400 uppercase font-semibold">飯店住宿規畫</p>
-                        <p class="text-xs font-bold text-slate-200">全程僅換飯店 1 次</p>
-                    </div>
+                    <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-300 flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-hotel"></i></div>
+                    <div><p class="text-[11px] text-slate-400 uppercase font-semibold">飯店住宿規畫</p><p class="text-xs font-bold text-slate-200">全程僅換飯店 1 次</p></div>
                 </div>
-
                 <div class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-2.5 px-3.5">
-                    <div class="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-300 flex items-center justify-center font-bold text-sm">
-                        <i class="fa-solid fa-calendar-check"></i>
-                    </div>
-                    <div>
-                        <p class="text-[11px] text-slate-400 uppercase font-semibold">氣象預報狀態</p>
-                        <p class="text-xs font-bold text-teal-300">日期動態對應</p>
-                    </div>
+                    <div class="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-300 flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-calendar-check"></i></div>
+                    <div><p class="text-[11px] text-slate-400 uppercase font-semibold">氣象預報狀態</p><p class="text-xs font-bold text-teal-300">日期動態對應</p></div>
                 </div>
             `;
         }
@@ -605,9 +553,7 @@
             const allBtn = document.createElement('button');
             allBtn.onclick = () => switchDayFilter("ALL");
             allBtn.className = `px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 flex items-center space-x-1.5 border ${
-                isAll 
-                ? 'bg-slate-900 text-teal-300 border-slate-800 shadow-md scale-[1.02]' 
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+                isAll ? 'bg-slate-900 text-teal-300 border-slate-800 shadow-md scale-[1.02]' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
             }`;
             allBtn.innerHTML = `<i class="fa-solid fa-layer-group text-teal-500"></i> <span>全部行程 (DAY 1-${TRIP_CONFIG.daysCount})</span>`;
             container.appendChild(allBtn);
@@ -616,28 +562,15 @@
                 const isActive = selectedDayFilter === day.dayNum;
                 const btn = document.createElement('button');
                 btn.onclick = () => switchDayFilter(day.dayNum);
-                
                 btn.className = `px-3.5 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 flex items-center space-x-2 border ${
-                    isActive 
-                    ? 'bg-slate-900 text-teal-300 border-slate-800 shadow-md scale-[1.02]' 
-                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+                    isActive ? 'bg-slate-900 text-teal-300 border-slate-800 shadow-md scale-[1.02]' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
                 }`;
-
-                btn.innerHTML = `
-                    <span class="${isActive ? 'text-teal-400 font-extrabold' : 'text-slate-500'}">D${day.dayNum}</span>
-                    <span>•</span>
-                    <span class="${isActive ? 'text-white' : 'text-slate-800'}">${day.theme}</span>
-                `;
+                btn.innerHTML = `<span class="${isActive ? 'text-teal-400 font-extrabold' : 'text-slate-500'}">D${day.dayNum}</span><span>•</span><span class="${isActive ? 'text-white' : 'text-slate-800'}">${day.theme}</span>`;
                 container.appendChild(btn);
             });
 
             const subtitle = document.getElementById('active-day-subtitle');
-            if (isAll) {
-                subtitle.textContent = `全覽模式 (顯示 ${TRIP_CONFIG.dateRangeStr} 所有細節)`;
-            } else {
-                const current = tripData.days.find(d => d.dayNum === selectedDayFilter);
-                subtitle.textContent = current ? `${current.date} (${current.area})` : '';
-            }
+            subtitle.textContent = isAll ? `全覽模式 (顯示 ${TRIP_CONFIG.dateRangeStr} 所有細節)` : (tripData.days.find(d => d.dayNum === selectedDayFilter)?.date || '');
         }
 
         function switchDayFilter(filter) {
@@ -650,99 +583,48 @@
         function renderItineraryWrapper() {
             const wrapper = document.getElementById('daily-itinerary-wrapper');
             wrapper.innerHTML = '';
-
-            const daysToRender = selectedDayFilter === "ALL" 
-                ? tripData.days 
-                : tripData.days.filter(d => d.dayNum === selectedDayFilter);
-
-            daysToRender.forEach(day => {
-                const dayCard = createDayCardElement(day);
-                wrapper.appendChild(dayCard);
-            });
+            const daysToRender = selectedDayFilter === "ALL" ? tripData.days : tripData.days.filter(d => d.dayNum === selectedDayFilter);
+            daysToRender.forEach(day => wrapper.appendChild(createDayCardElement(day)));
         }
 
         function createDayCardElement(day) {
             const dayCard = document.createElement('div');
             dayCard.className = "bg-white rounded-2xl border border-slate-200 p-5 md:p-6 shadow-sm space-y-6 overflow-hidden";
-            
             let dayTotalCost = 0;
-            const currency = day.estimatedBudget ? day.estimatedBudget.currency : (day.dayNum <= 2 ? "RMB" : "HKD");
-            if (day.spots) {
-                day.spots.forEach(s => {
-                    dayTotalCost += (Number(s.cost) || 0);
-                });
-            }
+            const currency = day.dayNum <= 2 ? "RMB" : "HKD";
+            if (day.spots) day.spots.forEach(s => dayTotalCost += (Number(s.cost) || 0));
 
-            const weather = day.weather || {
-                temp: "--",
-                status: "尚未預測",
-                icon: "fa-clock",
-                sunrise: "尚未預測",
-                sunset: "尚未預測",
-                rainProb: "尚未預測"
-            };
+            const weather = day.weather || { temp: "--", status: "尚未預測", icon: "fa-clock", sunrise: "尚未預測", sunset: "尚未預測", rainProb: "尚未預測" };
 
             dayCard.innerHTML = `
                 <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl p-5 shadow-lg border border-slate-800 space-y-4">
                     <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-700/60">
                         <div class="flex items-center space-x-3.5">
-                            <div class="w-12 h-12 rounded-2xl bg-teal-500/20 text-teal-300 border border-teal-400/30 flex items-center justify-center text-xl font-black">
-                                D${day.dayNum}
-                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-teal-500/20 text-teal-300 border border-teal-400/30 flex items-center justify-center text-xl font-black">D${day.dayNum}</div>
                             <div>
-                                <h3 class="text-lg md:text-xl font-bold flex items-center gap-2">
-                                    ${day.theme}
-                                    <span class="text-xs bg-slate-800 text-slate-300 font-semibold px-2.5 py-0.5 rounded-full border border-slate-700">${day.area}</span>
-                                </h3>
+                                <h3 class="text-lg md:text-xl font-bold flex items-center gap-2">${day.theme} <span class="text-xs bg-slate-800 text-slate-300 font-semibold px-2.5 py-0.5 rounded-full border border-slate-700">${day.area}</span></h3>
                                 <p class="text-xs text-slate-400 mt-0.5"><i class="fa-regular fa-calendar text-teal-400 me-1"></i>${day.date}</p>
                             </div>
                         </div>
-                        <button onclick="openSpotModal(null, ${day.dayNum})" class="px-3.5 py-1.5 text-xs font-bold text-slate-900 bg-teal-400 hover:bg-teal-300 rounded-xl transition shadow flex items-center gap-1.5">
-                            <i class="fa-solid fa-plus"></i> 新增此日景點
-                        </button>
+                        <button onclick="openSpotModal(null, ${day.dayNum})" class="px-3.5 py-1.5 text-xs font-bold text-slate-900 bg-teal-400 hover:bg-teal-300 rounded-xl transition shadow flex items-center gap-1.5"><i class="fa-solid fa-plus"></i> 新增此日景點</button>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2.5 text-xs">
                         <div class="bg-slate-800/80 rounded-xl p-2 px-3 border border-slate-700/70 flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center text-sm">
-                                <i class="fa-solid ${weather.icon}"></i>
-                            </div>
-                            <div>
-                                <p class="text-[10px] text-slate-400 font-medium">氣象預報</p>
-                                <p class="font-bold text-amber-200">${weather.status} • ${weather.temp}</p>
-                            </div>
+                            <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center text-sm"><i class="fa-solid ${weather.icon}"></i></div>
+                            <div><p class="text-[10px] text-slate-400 font-medium">氣象預報</p><p class="font-bold text-amber-200">${weather.status} • ${weather.temp}</p></div>
                         </div>
-
                         <div class="bg-slate-800/80 rounded-xl p-2 px-3 border border-slate-700/70 flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-300 flex items-center justify-center text-sm">
-                                <i class="fa-solid fa-sun"></i>
-                            </div>
-                            <div>
-                                <p class="text-[10px] text-slate-400 font-medium">日出 / 日落</p>
-                                <p class="font-bold text-slate-200">${weather.sunrise === '尚未預測' ? '尚未預測' : `🌅 ${weather.sunrise} / 🌇 ${weather.sunset}`}</p>
-                            </div>
+                            <div class="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-300 flex items-center justify-center text-sm"><i class="fa-solid fa-sun"></i></div>
+                            <div><p class="text-[10px] text-slate-400 font-medium">日出 / 日落</p><p class="font-bold text-slate-200">${weather.sunrise === '尚未預測' ? '尚未預測' : `🌅 ${weather.sunrise} / 🌇 ${weather.sunset}`}</p></div>
                         </div>
-
                         <div class="bg-slate-800/80 rounded-xl p-2 px-3 border border-slate-700/70 flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-300 flex items-center justify-center text-sm">
-                                <i class="fa-solid fa-cloud-showers-heavy"></i>
-                            </div>
-                            <div>
-                                <p class="text-[10px] text-slate-400 font-medium">降雨機率</p>
-                                <p class="font-bold text-sky-200">${weather.rainProb === '尚未預測' ? '尚未預測' : `💧 ${weather.rainProb}`}</p>
-                            </div>
+                            <div class="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-300 flex items-center justify-center text-sm"><i class="fa-solid fa-cloud-showers-heavy"></i></div>
+                            <div><p class="text-[10px] text-slate-400 font-medium">降雨機率</p><p class="font-bold text-sky-200">${weather.rainProb === '尚未預測' ? '尚未預測' : `💧 ${weather.rainProb}`}</p></div>
                         </div>
-
                         <div class="bg-slate-800/80 rounded-xl p-2 px-3 border border-slate-700/70 flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-sm">
-                                <i class="fa-solid fa-wallet"></i>
-                            </div>
-                            <div>
-                                <p class="text-[10px] text-slate-400 font-medium">預計花費總額</p>
-                                <p class="font-extrabold text-emerald-300 text-xs">
-                                    ${currency === 'RMB' ? '¥' : 'HK$'} ${dayTotalCost.toLocaleString()} ${currency}
-                                </p>
-                            </div>
+                            <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-sm"><i class="fa-solid fa-wallet"></i></div>
+                            <div><p class="text-[10px] text-slate-400 font-medium">預計花費總額</p><p class="font-extrabold text-emerald-300 text-xs">${currency === 'RMB' ? '¥' : 'HK$'} ${dayTotalCost.toLocaleString()} ${currency}</p></div>
                         </div>
                     </div>
                 </div>
@@ -751,84 +633,52 @@
                     ${renderTimelineSpotItems(day)}
                 </div>
             `;
-
             return dayCard;
         }
 
         function renderTimelineSpotItems(day) {
             if (!day.spots || day.spots.length === 0) {
-                return `
-                    <div class="text-center py-8 px-4 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                        <p class="text-sm text-slate-500 font-medium">此天尚無安排行程項目</p>
-                    </div>
-                `;
+                return `<div class="text-center py-8 px-4 bg-slate-50 rounded-2xl border border-dashed border-slate-200"><p class="text-sm text-slate-500 font-medium">此天尚無安排行程項目</p></div>`;
             }
 
             return day.spots.map((spot, index) => {
                 const meta = categoryMeta[spot.category] || categoryMeta.Sightseeing;
                 const costDisplay = (spot.cost && Number(spot.cost) > 0)
-                    ? `<span class="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200">
-                         <i class="fa-solid fa-receipt text-emerald-600 me-1"></i>${spot.currency === 'RMB' ? '¥' : 'HK$'} ${spot.cost}
-                       </span>`
+                    ? `<span class="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200"><i class="fa-solid fa-receipt text-emerald-600 me-1"></i>${spot.currency === 'RMB' ? '¥' : 'HK$'} ${spot.cost}</span>`
                     : `<span class="text-xs text-slate-400 bg-slate-50 px-2 py-0.5 rounded-lg border border-slate-100">免費 / 已內含</span>`;
 
                 const mapButtonHtml = (spot.mapUrl && spot.mapUrl.trim() !== "")
-                    ? `<a href="${spot.mapUrl}" target="_blank" rel="noopener noreferrer" class="text-teal-700 hover:text-teal-900 font-bold flex items-center gap-1.5 bg-teal-500/10 hover:bg-teal-500/20 px-3 py-1 rounded-xl border border-teal-300/60 transition">
-                         <i class="fa-solid fa-diamond-turn-right text-teal-600"></i> 前往地圖
-                       </a>`
+                    ? `<a href="${spot.mapUrl}" target="_blank" rel="noopener noreferrer" class="text-teal-700 hover:text-teal-900 font-bold flex items-center gap-1.5 bg-teal-500/10 hover:bg-teal-500/20 px-3 py-1 rounded-xl border border-teal-300/60 transition"><i class="fa-solid fa-diamond-turn-right text-teal-600"></i> 前往地圖</a>`
                     : '';
 
                 return `
                     <div id="spot-card-${spot.id}" class="relative flex items-start space-x-3 group transition-all duration-200">
-                        <div class="relative z-10 flex-shrink-0 w-8 h-8 md:w-9 md:h-9 rounded-full bg-slate-900 text-teal-300 font-extrabold text-xs flex items-center justify-center shadow-md border-2 border-white group-hover:scale-110 transition">
-                            ${index + 1}
-                        </div>
+                        <div class="relative z-10 flex-shrink-0 w-8 h-8 md:w-9 md:h-9 rounded-full bg-slate-900 text-teal-300 font-extrabold text-xs flex items-center justify-center shadow-md border-2 border-white group-hover:scale-110 transition">${index + 1}</div>
 
                         <div class="flex-1 bg-white hover:bg-slate-50/90 rounded-2xl p-4 border border-slate-200/90 shadow-sm hover:shadow-md transition">
                             <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                                 <div class="flex-1">
                                     <div class="flex items-center space-x-2 flex-wrap gap-y-1">
-                                        <span class="text-xs font-extrabold text-slate-900 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200">
-                                            <i class="fa-regular fa-clock me-1 text-teal-600"></i>${spot.time}
-                                        </span>
-                                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full border ${meta.color}">
-                                            <i class="fa-solid ${meta.icon} me-1"></i>${meta.name}
-                                        </span>
+                                        <span class="text-xs font-extrabold text-slate-900 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200"><i class="fa-regular fa-clock me-1 text-teal-600"></i>${spot.time}</span>
+                                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full border ${meta.color}"><i class="fa-solid ${meta.icon} me-1"></i>${meta.name}</span>
                                         ${costDisplay}
                                     </div>
 
-                                    <h4 class="font-extrabold text-slate-900 text-base md:text-lg mt-2 group-hover:text-teal-700 transition cursor-pointer" onclick="focusMapSpot('${spot.id}', ${day.dayNum})">
-                                        ${spot.title}
-                                    </h4>
+                                    <h4 class="font-extrabold text-slate-900 text-base md:text-lg mt-2 group-hover:text-teal-700 transition cursor-pointer" onclick="focusMapSpot('${spot.id}', ${day.dayNum})">${spot.title}</h4>
 
-                                    ${spot.notes ? `
-                                        <p class="text-xs text-slate-600 bg-slate-50 rounded-xl p-2.5 mt-2.5 border border-slate-200/80 leading-relaxed">
-                                            <i class="fa-solid fa-circle-info text-teal-600 me-1.5"></i>${spot.notes}
-                                        </p>
-                                    ` : ''}
+                                    ${spot.notes ? `<p class="text-xs text-slate-600 bg-slate-50 rounded-xl p-2.5 mt-2.5 border border-slate-200/80 leading-relaxed"><i class="fa-solid fa-circle-info text-teal-600 me-1.5"></i>${spot.notes}</p>` : ''}
 
                                     <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs flex-wrap gap-2">
                                         <div class="flex items-center space-x-2">
-                                            <button onclick="focusMapSpot('${spot.id}', ${day.dayNum})" class="text-slate-900 hover:text-teal-700 font-bold flex items-center gap-1.5 bg-teal-50 hover:bg-teal-100/80 px-2.5 py-1 rounded-xl border border-teal-200/60 transition">
-                                                <i class="fa-solid fa-location-crosshairs text-teal-600"></i> 地圖定位
-                                            </button>
-                                            
+                                            <button onclick="focusMapSpot('${spot.id}', ${day.dayNum})" class="text-slate-900 hover:text-teal-700 font-bold flex items-center gap-1.5 bg-teal-50 hover:bg-teal-100/80 px-2.5 py-1 rounded-xl border border-teal-200/60 transition"><i class="fa-solid fa-location-crosshairs text-teal-600"></i> 地圖定位</button>
                                             ${mapButtonHtml}
                                         </div>
-
                                         <div class="flex items-center space-x-1">
-                                            <button onclick="openSpotModal('${spot.id}', ${day.dayNum})" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg transition" title="編輯"><i class="fa-solid fa-pen text-xs"></i></button>
-                                            <button onclick="deleteSpot('${spot.id}', ${day.dayNum})" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg transition" title="刪除"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                                            <button onclick="openSpotModal('${spot.id}', ${day.dayNum})" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg transition"><i class="fa-solid fa-pen text-xs"></i></button>
+                                            <button onclick="deleteSpot('${spot.id}', ${day.dayNum})" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg transition"><i class="fa-solid fa-trash-can text-xs"></i></button>
                                         </div>
                                     </div>
                                 </div>
-
-                                ${spot.img ? `
-                                    <div class="w-full sm:w-32 h-28 sm:h-24 rounded-xl overflow-hidden flex-shrink-0 border border-slate-200 relative shadow-sm">
-                                        <img src="${spot.img}" alt="${spot.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1506970845246-18f21d533b20?auto=format&fit=crop&w=600&q=80';">
-                                        <div class="absolute bottom-1 right-1 bg-slate-900/80 backdrop-blur-sm text-white px-1.5 py-0.5 rounded text-[9px] font-medium">實景示意</div>
-                                    </div>
-                                ` : ''}
                             </div>
                         </div>
                     </div>
@@ -842,23 +692,16 @@
             routePolylines.forEach(r => map.removeLayer(r));
             routePolylines = [];
 
-            const daysToInclude = selectedDayFilter === "ALL" 
-                ? tripData.days 
-                : tripData.days.filter(d => d.dayNum === selectedDayFilter);
+            const daysToInclude = selectedDayFilter === "ALL" ? tripData.days : tripData.days.filter(d => d.dayNum === selectedDayFilter);
 
             daysToInclude.forEach(day => {
                 if (!day.spots) return;
                 const dayLatLngs = [];
-
-                // 同一天統一使用該天專屬顏色
                 const dayColor = DAY_COLOR_PALETTE[day.dayNum] || "#059669";
 
                 day.spots.forEach((spot, index) => {
                     const meta = categoryMeta[spot.category] || categoryMeta.Sightseeing;
-                    
-                    const lat = spot.lat || day.lat;
-                    const lng = spot.lng || day.lng;
-                    const latLng = [lat, lng];
+                    const latLng = [spot.lat || day.lat, spot.lng || day.lng];
                     dayLatLngs.push(latLng);
 
                     const customIcon = L.divIcon({
@@ -869,7 +712,6 @@
                     });
 
                     const marker = L.marker(latLng, { icon: customIcon }).addTo(map);
-                    
                     const popupMapLinkHtml = (spot.mapUrl && spot.mapUrl.trim() !== "")
                         ? `<a href="${spot.mapUrl}" target="_blank" rel="noopener noreferrer" class="text-teal-600 font-bold hover:underline"><i class="fa-solid fa-diamond-turn-right me-0.5"></i>前往地圖</a>`
                         : '';
@@ -916,12 +758,7 @@
 
         function focusMapSpot(spotId, dayNum) {
             const marker = mapMarkers.find(m => m.spotId === spotId);
-            
-            if (window.innerWidth < 1024) {
-                const mapSection = document.getElementById('map-section');
-                mapSection.scrollIntoView({ behavior: 'smooth' });
-            }
-
+            if (window.innerWidth < 1024) document.getElementById('map-section').scrollIntoView({ behavior: 'smooth' });
             if (marker) {
                 setTimeout(() => {
                     map.setView(marker.getLatLng(), 15, { animate: true });
@@ -976,12 +813,9 @@
         function closeSpotModal() {
             const modal = document.getElementById('spot-modal');
             const modalCard = document.getElementById('spot-modal-card');
-
             modal.classList.add('opacity-0');
             modalCard.classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 200);
+            setTimeout(() => modal.classList.add('hidden'), 200);
         }
 
         function handleSpotFormSubmit(e) {
@@ -989,7 +823,6 @@
             const spotId = document.getElementById('spot-id').value;
             const dayNum = parseInt(document.getElementById('spot-target-day').value);
             const day = tripData.days.find(d => d.dayNum === dayNum);
-
             if (!day) return;
 
             const spotData = {
@@ -1008,19 +841,16 @@
 
             if (spotId) {
                 const index = day.spots.findIndex(s => s.id === spotId);
-                if (index !== -1) {
-                    day.spots[index] = spotData;
-                }
+                if (index !== -1) day.spots[index] = spotData;
             } else {
                 day.spots.push(spotData);
             }
 
-            saveTripData();
             closeSpotModal();
             renderHeaderBudgetSummary();
             renderItineraryWrapper();
             updateMapMarkersAndRoute();
-            showToast(spotId ? "行程點已成功更新！" : "新增景點成功！", "success");
+            showToast(spotId ? "行程點已更新！" : "新增景點成功！", "success");
         }
 
         function deleteSpot(spotId, dayNum) {
@@ -1028,7 +858,6 @@
                 const day = tripData.days.find(d => d.dayNum === dayNum);
                 if (day) {
                     day.spots = day.spots.filter(s => s.id !== spotId);
-                    saveTripData();
                     renderHeaderBudgetSummary();
                     renderItineraryWrapper();
                     updateMapMarkersAndRoute();
@@ -1040,13 +869,10 @@
         function showToast(message, type = "info") {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-
-            let bgClass = "bg-slate-900 text-white";
-            if (type === "success") bgClass = "bg-teal-600 text-white";
+            let bgClass = type === "success" ? "bg-teal-600 text-white" : "bg-slate-900 text-white";
 
             toast.className = `${bgClass} px-4 py-2.5 rounded-xl shadow-xl text-xs md:text-sm font-semibold flex items-center gap-2 transform transition-all duration-300 translate-y-4 opacity-0 pointer-events-auto border border-white/10`;
             toast.innerHTML = `<i class="fa-solid fa-circle-check"></i><span>${message}</span>`;
-
             container.appendChild(toast);
 
             setTimeout(() => toast.classList.remove('translate-y-4', 'opacity-0'), 10);
