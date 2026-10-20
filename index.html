@@ -230,8 +230,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">地圖網址 (選填，若未填則不顯示前往地圖按鈕)</label>
-                    <input type="url" id="spot-map-url" placeholder="https://uri.amap.com/... 或 https://maps.google.com/..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">地圖網址 (選填，點擊可前往導航)</label>
+                    <input type="url" id="spot-map-url" placeholder="https://uri.amap.com/..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
                 </div>
 
                 <div>
@@ -288,8 +288,8 @@
                     spots: [
                         { id: "d1_1", time: "10:30", title: "HX253 航班抵達", category: "Flight", cost: 0, currency: "RMB", lat: 22.6393, lng: 113.8107, img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80", mapUrl: "https://ditu.amap.com/ssr/place/B073C02XX4?id=B073C02XX4&maxHeight=536&mapOverviewRectPadding=%5Bobject%20Object%5D&fixedCloseButton=true&onlyShowSearchBar=true&hideDivider=true&fillInputFromParamsField=name&name=%E9%A6%99%E6%B8%AF%E5%9B%BD%E9%99%85%E6%9C%BA%E5%9C%BA&source=sug", notes: "搭乘香港航空 HX253 班機抵達，準備開啟雙城漫遊之旅。" },
                         { id: "d1_2", time: "13:00", title: "通關 & 入住深圳酒店", category: "Hotel", cost: 450, currency: "RMB", lat: 22.5333, lng: 114.0558, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "經陸路口岸快捷通關，至福田區優質酒店辦理入住與寄放行李。" },
-                        { id: "d1_3", time: "17:30", title: "福田 COCO Park 晚餐", category: "Dining", cost: 180, currency: "RMB", lat: 22.5367, lng: 114.0559, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80", mapUrl: "https://ditu.amap.com/ssr/place/B02F37UG37?id=B02F37UG37&maxHeight=536&mapOverviewRectPadding=%5Bobject%20Object%5D&fixedCloseButton=true&onlyShowSearchBar=true&hideDivider=true&fillInputFromParamsField=name&name=%E6%98%9F%E6%B2%B3COCO%20Park(%E7%A6%8F%E7%94%B0%E5%BA%97)", notes: "深圳熱門時尚商圈，聚集各式特色餐飲與網紅美食甜品。" },
-                        { id: "d1_4", time: "20:00", title: "水立方 水療按摩", category: "Experience", cost: 350, currency: "RMB", lat: 22.5255, lng: 114.0528, img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "享受頂級奢華的水療放鬆與專業按摩體驗，洗去旅途疲憊。" }
+                        { id: "d1_3", time: "17:30", title: "福田 COCO Park 晚餐", category: "Dining", cost: 180, currency: "RMB", lat: 22.5367, lng: 114.0559, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80", mapUrl: "https://ditu.amap.com/ssr/search?from=place&query=%E7%A6%8F%E7%94%B0+COCO+Park&query_type=TQUERY", notes: "深圳熱門時尚商圈，聚集各式特色餐飲與網紅美食甜品。" },
+                        { id: "d1_4", time: "20:00", title: "艾沐春天", category: "Experience", cost: 350, currency: "RMB", lat: 22.5255, lng: 114.0528, img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=80", mapUrl: "https://ditu.amap.com/ssr/search?query_type=TQUERY&query=%E8%89%BE%E6%B2%90%E6%98%A5%E5%A4%A9&city=440300&geoobj=114.048256%7C22.529753%7C114.060635%7C22.535871&zoom=16.47", notes: "享受頂級奢華的水療放鬆與專業按摩體驗，洗去旅途疲憊。" }
                     ]
                 },
                 {
@@ -402,7 +402,7 @@
         };
 
         function loadTripData() {
-            const saved = localStorage.getItem('hk_sz_itinerary_2026_v10');
+            const saved = localStorage.getItem('hk_sz_itinerary_2026_v11');
             if (saved) {
                 try {
                     tripData = JSON.parse(saved);
@@ -415,7 +415,7 @@
         }
 
         function saveTripData() {
-            localStorage.setItem('hk_sz_itinerary_2026_v10', JSON.stringify(tripData));
+            localStorage.setItem('hk_sz_itinerary_2026_v11', JSON.stringify(tripData));
         }
 
         async function fetchDateMatchedWeather() {
@@ -745,7 +745,6 @@
                        </span>`
                     : `<span class="text-xs text-slate-400 bg-slate-50 px-2 py-0.5 rounded-lg border border-slate-100">免費 / 已內含</span>`;
 
-                // 若有填寫地圖網址才顯示「前往地圖」按鈕，沒填則不出現
                 const mapButtonHtml = (spot.mapUrl && spot.mapUrl.trim() !== "")
                     ? `<a href="${spot.mapUrl}" target="_blank" rel="noopener noreferrer" class="text-teal-700 hover:text-teal-900 font-bold flex items-center gap-1.5 bg-teal-500/10 hover:bg-teal-500/20 px-3 py-1 rounded-xl border border-teal-300/60 transition">
                          <i class="fa-solid fa-diamond-turn-right text-teal-600"></i> 前往地圖
@@ -810,6 +809,42 @@
             }).join('');
         }
 
+        // ==========================================
+        // 🛠️ 智慧解析地圖網址與經緯度 (免手動填座標)
+        // ==========================================
+        function parseCoordinatesFromUrl(mapUrl, defaultLat, defaultLng) {
+            if (!mapUrl) return { lat: defaultLat, lng: defaultLng };
+            
+            try {
+                // 嘗試從網址中尋找常見的經緯度參數格式 (例如 lon=xxx&lat=yyy 或 position=xxx,yyy)
+                // 高德地圖網址常規格式解析
+                const latMatch = mapUrl.match(/[?&](?:lat|latitude)=([0-9.]+)/i);
+                const lngMatch = mapUrl.match(/[?&](?:lon|lng|longitude)=([0-9.]+)/i);
+                
+                if (latMatch && lngMatch) {
+                    return { lat: parseFloat(latMatch[1]), lng: parseFloat(lngMatch[1]) };
+                }
+
+                // 嘗試逗號隔開的坐標形式 (如 pos=114.05,22.54 或 coord=114.05,22.54)
+                const coordMatch = mapUrl.match(/(?:pos|coord|q)=([0-9.]+),([0-9.]+)/i);
+                if (coordMatch) {
+                    // 通常格式為 經度,緯度 或 緯度,經度
+                    const val1 = parseFloat(coordMatch[1]);
+                    const val2 = parseFloat(coordMatch[2]);
+                    if (val1 > 70 && val1 < 140) { // 判斷為經度在前
+                        return { lat: val2, lng: val1 };
+                    } else {
+                        return { lat: val1, lng: val2 };
+                    }
+                }
+            } catch(e) {
+                console.error("解析地圖網址坐標失敗", e);
+            }
+
+            // 若網址內無直接坐標，則回傳該天預設中心點 (系統自動平滑展開)
+            return { lat: defaultLat, lng: defaultLng };
+        }
+
         function updateMapMarkersAndRoute() {
             mapMarkers.forEach(m => map.removeLayer(m));
             mapMarkers = [];
@@ -826,8 +861,13 @@
 
                 day.spots.forEach((spot, index) => {
                     const meta = categoryMeta[spot.category] || categoryMeta.Sightseeing;
-                    const lat = spot.lat || (day.lat + (index * 0.003));
-                    const lng = spot.lng || (day.lng + (index * 0.003));
+                    
+                    // 🌟 自動從地圖網址解析座標，若無則依序自動微調展開，完全免手動填經緯度！
+                    const coords = parseCoordinatesFromUrl(spot.mapUrl, day.lat, day.lng);
+                    // 如果多個景點都沒有填網址，利用 index 做微幅位移避免標記疊在一起
+                    const lat = spot.mapUrl ? coords.lat : (day.lat + (index * 0.003));
+                    const lng = spot.mapUrl ? coords.lng : (day.lng + (index * 0.003));
+                    
                     const latLng = [lat, lng];
                     dayLatLngs.push(latLng);
 
@@ -840,7 +880,6 @@
 
                     const marker = L.marker(latLng, { icon: customIcon }).addTo(map);
                     
-                    // 根據填寫的地圖網址綁定彈跳視窗按鈕
                     const popupMapLinkHtml = (spot.mapUrl && spot.mapUrl.trim() !== "")
                         ? `<a href="${spot.mapUrl}" target="_blank" rel="noopener noreferrer" class="text-teal-600 font-bold hover:underline"><i class="fa-solid fa-diamond-turn-right me-0.5"></i>前往地圖</a>`
                         : '';
