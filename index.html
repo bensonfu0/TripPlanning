@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>香港與深圳 6天5夜 慢活之旅 - 行程規劃</title>
+    <title id="page-title">行程規劃</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Leaflet CSS & JS for map rendering -->
@@ -57,7 +57,6 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
-        /* Custom clean map popup without photos */
         .leaflet-popup-content-wrapper {
             border-radius: 14px;
             padding: 4px 6px;
@@ -91,14 +90,14 @@
                 <div>
                     <!-- Travel Badge -->
                     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/20 border border-teal-400/30 text-teal-300 text-xs font-semibold mb-3">
-                        <i class="fa-solid fa-plane-arrival"></i> 雙城移動慢活漫遊 • 6天5夜全記錄
+                        <i class="fa-solid fa-plane-arrival"></i> <span id="header-badge-text">雙城移動慢活漫遊 • 6天5夜全記錄</span>
                     </div>
                     
-                    <h1 class="text-2xl md:text-4xl font-extrabold tracking-tight text-white flex items-center gap-3">
+                    <h1 id="main-title" class="text-2xl md:text-4xl font-extrabold tracking-tight text-white flex items-center gap-3">
                         香港與深圳 6天5夜 慢活之旅
                     </h1>
                     <p class="text-sm md:text-base text-slate-300 mt-2 flex items-center gap-3 font-medium">
-                        <span><i class="fa-regular fa-calendar text-teal-400 me-1.5"></i>1月18日 - 1月23日</span>
+                        <span><i class="fa-regular fa-calendar text-teal-400 me-1.5"></i><span id="header-date-range">1月18日 - 1月23日</span></span>
                         <span class="text-slate-600">•</span>
                         <span><i class="fa-solid fa-location-dot text-rose-400 me-1.5"></i>深圳 (福田/南山) &amp; 香港 (中環/上環)</span>
                     </p>
@@ -138,7 +137,7 @@
                 <!-- Dynamic Daily Content Cards rendered here -->
             </div>
 
-            <!-- Right Column: Sticky Amap High-Definition Map (5 cols on Desktop, Stacked below on Mobile) -->
+            <!-- Right Column: Sticky Amap High-Definition Map (5 cols on Desktop) -->
             <section id="map-section" class="lg:col-span-5 lg:sticky lg:top-20 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden flex flex-col">
                 <div class="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
                     <div class="flex items-center gap-3">
@@ -167,7 +166,7 @@
 
     <!-- Footer -->
     <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 py-6 px-4 text-center text-xs space-y-1 mt-12">
-        <p class="font-medium text-slate-300">香港與深圳 6天5夜 慢活之旅 • 專屬高德導航版</p>
+        <p class="font-medium text-slate-350"><span id="footer-title-text">香港與深圳 6天5夜 慢活之旅</span> • 專屬高德導航版</p>
         <p class="text-slate-500">&copy; 2026 行程規劃器. All rights reserved.</p>
     </footer>
 
@@ -231,6 +230,11 @@
                 </div>
 
                 <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">高德地圖網址 (選填，可直接貼上地圖連結)</label>
+                    <input type="url" id="spot-map-url" placeholder="https://uri.amap.com/..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                </div>
+
+                <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">亮點說明與貼心提醒</label>
                     <textarea id="spot-notes" rows="2" placeholder="詳細介紹或備註..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
                 </div>
@@ -247,9 +251,31 @@
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
 
     <script>
+        // ==========================================
+        // 🛠️ 天數與標題統一設定區 (方便未來維護調整)
+        // ==========================================
+        const TRIP_CONFIG = {
+            destination: "香港與深圳拉拉拉拉",
+            daysCount: 6,
+            nightsCount: 5,
+            themeName: "慢活之旅",
+            dateRangeStr: "1月18日 - 1月23日"
+        };
+
+        const fullTitleString = `${TRIP_CONFIG.destination} ${TRIP_CONFIG.daysCount}天${TRIP_CONFIG.nightsCount}夜 ${TRIP_CONFIG.themeName}`;
+
+        // 自動代入頁面標題與開頭
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById('page-title').textContent = `${fullTitleString} - 行程規劃`;
+            document.getElementById('main-title').textContent = fullTitleString;
+            document.getElementById('header-badge-text').textContent = `雙城移動慢活漫遊 • ${TRIP_CONFIG.daysCount}天${TRIP_CONFIG.nightsCount}夜全記錄`;
+            document.getElementById('header-date-range').textContent = TRIP_CONFIG.dateRangeStr;
+            document.getElementById('footer-title-text').textContent = fullTitleString;
+        });
+
         const originalItineraryData = {
-            title: "香港與深圳 6天5夜 慢活之旅",
-            dateRange: "1月18日 - 1月23日",
+            title: fullTitleString,
+            dateRange: TRIP_CONFIG.dateRangeStr,
             days: [
                 {
                     dayNum: 1,
@@ -261,10 +287,10 @@
                     weather: { temp: "--", status: "尚未預測", icon: "fa-clock", sunrise: "尚未預測", sunset: "尚未預測", rainProb: "尚未預測" },
                     estimatedBudget: { currency: "RMB", amount: 980 },
                     spots: [
-                        { id: "d1_1", time: "10:30", title: "HX253 航班抵達", category: "Flight", cost: 0, currency: "RMB", lat: 22.6393, lng: 113.8107, img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80", notes: "搭乘香港航空 HX253 班機抵達，準備開啟雙城漫遊之旅。" },
-                        { id: "d1_2", time: "13:00", title: "通關 & 入住深圳酒店", category: "Hotel", cost: 450, currency: "RMB", lat: 22.5333, lng: 114.0558, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80", notes: "經陸路口岸快捷通關，至福田區優質酒店辦理入住與寄放行李。" },
-                        { id: "d1_3", time: "17:30", title: "福田 COCO Park 晚餐", category: "Dining", cost: 180, currency: "RMB", lat: 22.5367, lng: 114.0559, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80", notes: "深圳熱門時尚商圈，聚集各式特色餐飲與網紅美食甜品。" },
-                        { id: "d1_4", time: "20:00", title: "水立方 水療按摩", category: "Experience", cost: 350, currency: "RMB", lat: 22.5255, lng: 114.0528, img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=80", notes: "享受頂級奢華的水療放鬆與專業按摩體驗，洗去旅途疲憊。" }
+                        { id: "d1_1", time: "10:30", title: "HX253 航班抵達", category: "Flight", cost: 0, currency: "RMB", lat: 22.6393, lng: 113.8107, img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "搭乘香港航空 HX253 班機抵達，準備開啟雙城漫遊之旅。" },
+                        { id: "d1_2", time: "13:00", title: "通關 & 入住深圳酒店", category: "Hotel", cost: 450, currency: "RMB", lat: 22.5333, lng: 114.0558, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "經陸路口岸快捷通關，至福田區優質酒店辦理入住與寄放行李。" },
+                        { id: "d1_3", time: "17:30", title: "福田 COCO Park 晚餐", category: "Dining", cost: 180, currency: "RMB", lat: 22.5367, lng: 114.0559, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "深圳熱門時尚商圈，聚集各式特色餐飲與網紅美食甜品。" },
+                        { id: "d1_4", time: "20:00", title: "水立方 水療按摩", category: "Experience", cost: 350, currency: "RMB", lat: 22.5255, lng: 114.0528, img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "享受頂級奢華的水療放鬆與專業按摩體驗，洗去旅途疲憊。" }
                     ]
                 },
                 {
@@ -277,11 +303,11 @@
                     weather: { temp: "--", status: "尚未預測", icon: "fa-clock", sunrise: "尚未預測", sunset: "尚未預測", rainProb: "尚未預測" },
                     estimatedBudget: { currency: "RMB", amount: 460 },
                     spots: [
-                        { id: "d2_1", time: "09:30", title: "南頭古城", category: "Sightseeing", cost: 50, currency: "RMB", lat: 22.5392, lng: 113.9189, img: "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=600&q=80", notes: "千年歷史古城改造為文創藝術街區，古今交融的慢活風格。" },
-                        { id: "d2_2", time: "12:00", title: "華僑城文創 (OCT-LOFT)", category: "Shopping", cost: 120, currency: "RMB", lat: 22.5363, lng: 113.9829, img: "https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=600&q=80", notes: "舊廠房改建的當代藝術園區，充滿獨立咖啡館、藝廊與手作選物。" },
-                        { id: "d2_3", time: "15:00", title: "無人駕駛體驗 (Robotaxi)", category: "Experience", cost: 40, currency: "RMB", lat: 22.5208, lng: 113.9388, img: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=600&q=80", notes: "親身搭乘科技感十足的自動駕駛計程車，感受前沿科技生活。" },
-                        { id: "d2_4", time: "16:30", title: "人才公園 / 深圳灣公園", category: "Sightseeing", cost: 0, currency: "RMB", lat: 22.5122, lng: 113.9472, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80", notes: "遠眺深圳灣大橋與春筍大樓，漫步於海岸綠廊與夕陽餘暉中。" },
-                        { id: "d2_5", time: "18:30", title: "無人機外賣體驗 (美團)", category: "Dining", cost: 250, currency: "RMB", lat: 22.5150, lng: 113.9490, img: "https://images.unsplash.com/photo-1527977966376-1c8408f9f108?auto=format&fit=crop&w=600&q=80", notes: "在公園空投降落點下單，體驗無人機幾分鐘內高空送達的飲料與美味晚餐。" }
+                        { id: "d2_1", time: "09:30", title: "南頭古城", category: "Sightseeing", cost: 50, currency: "RMB", lat: 22.5392, lng: 113.9189, img: "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "千年歷史古城改造為文創藝術街區，古今交融的慢活風格。" },
+                        { id: "d2_2", time: "12:00", title: "華僑城文創 (OCT-LOFT)", category: "Shopping", cost: 120, currency: "RMB", lat: 22.5363, lng: 113.9829, img: "https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "舊廠房改建的當代藝術園區，充滿獨立咖啡館、藝廊與手作選物。" },
+                        { id: "d2_3", time: "15:00", title: "無人駕駛體驗 (Robotaxi)", category: "Experience", cost: 40, currency: "RMB", lat: 22.5208, lng: 113.9388, img: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "親身搭乘科技感十足的自動駕駛計程車，感受前沿科技生活。" },
+                        { id: "d2_4", time: "16:30", title: "人才公園 / 深圳灣公園", category: "Sightseeing", cost: 0, currency: "RMB", lat: 22.5122, lng: 113.9472, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "遠眺深圳灣大橋與春筍大樓，漫步於海岸綠廊與夕陽餘暉中。" },
+                        { id: "d2_5", time: "18:30", title: "無人機外賣體驗 (美團)", category: "Dining", cost: 250, currency: "RMB", lat: 22.5150, lng: 113.9490, img: "https://images.unsplash.com/photo-1527977966376-1c8408f9f108?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "在公園空投降落點下單，體驗無人機幾分鐘內高空送達的飲料與美味晚餐。" }
                     ]
                 },
                 {
@@ -294,11 +320,11 @@
                     weather: { temp: "--", status: "尚未預測", icon: "fa-clock", sunrise: "尚未預測", sunset: "尚未預測", rainProb: "尚未預測" },
                     estimatedBudget: { currency: "HKD", amount: 820 },
                     spots: [
-                        { id: "d3_1", time: "10:00", title: "返港 & 入住香港酒店", category: "Hotel", cost: 500, currency: "HKD", lat: 22.2868, lng: 114.1543, img: "https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=600&q=80", notes: "搭乘港鐵返港，入住中上環質感飯店。" },
-                        { id: "d3_2", time: "12:30", title: "港鐵馬賽克站拍照 (書法字)", category: "Sightseeing", cost: 20, currency: "HKD", lat: 22.2855, lng: 114.1515, img: "https://images.unsplash.com/photo-1534351590666-13e3e96b5017?auto=format&fit=crop&w=600&q=80", notes: "經典港鐵站書法名牌牆打卡，感受極具特色的視覺文化。" },
-                        { id: "d3_3", time: "14:00", title: "上環摩羅上街 (Cat Street)", category: "Shopping", cost: 150, currency: "HKD", lat: 22.2842, lng: 114.1500, img: "https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=600&q=80", notes: "充滿古董雜貨,懷舊香港收藏品與文青小店的石板老街。" },
-                        { id: "d3_4", time: "15:30", title: "Halfway Coffee (半路咖啡)", category: "Dining", cost: 70, currency: "HKD", lat: 22.2839, lng: 114.1492, img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=600&q=80", notes: "以萬壽無疆中式陶瓷彩杯盛裝精緻特調精品咖啡，極具中西合璧魅力。" },
-                        { id: "d3_5", time: "19:00", title: "維港夜景 (Victoria Harbour)", category: "Sightseeing", cost: 80, currency: "HKD", lat: 22.2820, lng: 114.1580, img: "https://images.unsplash.com/photo-1506970845246-18f21d533b20?auto=format&fit=crop&w=600&q=80", notes: "世界級摩天大樓璀璨天際線，欣賞璀璨迷人的維多利亞港夜景。" }
+                        { id: "d3_1", time: "10:00", title: "返港 & 入住香港酒店", category: "Hotel", cost: 500, currency: "HKD", lat: 22.2868, lng: 114.1543, img: "https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "搭乘港鐵返港，入住中上環質感飯店。" },
+                        { id: "d3_2", time: "12:30", title: "港鐵馬賽克站拍照 (書法字)", category: "Sightseeing", cost: 20, currency: "HKD", lat: 22.2855, lng: 114.1515, img: "https://images.unsplash.com/photo-1534351590666-13e3e96b5017?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "經典港鐵站書法名牌牆打卡，感受極具特色的視覺文化。" },
+                        { id: "d3_3", time: "14:00", title: "上環摩羅上街 (Cat Street)", category: "Shopping", cost: 150, currency: "HKD", lat: 22.2842, lng: 114.1500, img: "https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "充滿古董雜貨、懷舊香港收藏品與文青小店的石板老街。" },
+                        { id: "d3_4", time: "15:30", title: "Halfway Coffee (半路咖啡)", category: "Dining", cost: 70, currency: "HKD", lat: 22.2839, lng: 114.1492, img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "以萬壽無疆中式陶瓷彩杯盛裝精緻特調精品咖啡，極具中西合璧魅力。" },
+                        { id: "d3_5", time: "19:00", title: "維港夜景 (Victoria Harbour)", category: "Sightseeing", cost: 80, currency: "HKD", lat: 22.2820, lng: 114.1580, img: "https://images.unsplash.com/photo-1506970845246-18f21d533b20?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "世界級摩天大樓璀璨天際線，欣賞璀璨迷人的維多利亞港夜景。" }
                     ]
                 },
                 {
@@ -311,11 +337,11 @@
                     weather: { temp: "--", status: "尚未預測", icon: "fa-clock", sunrise: "尚未預測", sunset: "尚未預測", rainProb: "尚未預測" },
                     estimatedBudget: { currency: "HKD", amount: 650 },
                     spots: [
-                        { id: "d4_1", time: "10:00", title: "大館 (Tai Kwun)", category: "Sightseeing", cost: 0, currency: "HKD", lat: 22.2816, lng: 114.1537, img: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80", notes: "前警署古蹟群華麗轉身為當代藝術中心，建築宏偉古樸。" },
-                        { id: "d4_2", time: "12:30", title: "PMQ 元創方 & G.O.D. 選物", category: "Shopping", cost: 250, currency: "HKD", lat: 22.2833, lng: 114.1517, img: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=600&q=80", notes: "前已婚警察宿舍改建的設計聚落，探索香港在地原創設計品牌。" },
-                        { id: "d4_3", time: "14:30", title: "Meanwhile Coffee", category: "Dining", cost: 65, currency: "HKD", lat: 22.2838, lng: 114.1510, img: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&q=80", notes: "藏身於古老巷弄中的高品質手沖咖啡館，放慢步伐品嚐香醇。" },
-                        { id: "d4_4", time: "16:00", title: "怪獸大廈 賽博朋克景 (益昌大廈)", category: "Sightseeing", cost: 15, currency: "HKD", lat: 22.2842, lng: 114.2128, img: "https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8a?auto=format&fit=crop&w=600&q=80", notes: "變形金剛取景地，極具震撼感與香港濃密特色的巨型蜂巢住宅建築群。" },
-                        { id: "d4_5", time: "18:30", title: "灣仔星街 & Kapok選物", category: "Shopping", cost: 320, currency: "HKD", lat: 22.2764, lng: 114.1695, img: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=600&q=80", notes: "充滿歐陸悠閒風情的星街小區，文青必訪時尚選物店 Kapok。" }
+                        { id: "d4_1", time: "10:00", title: "大館 (Tai Kwun)", category: "Sightseeing", cost: 0, currency: "HKD", lat: 22.2816, lng: 114.1537, img: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "前警署古蹟群華麗轉身為當代藝術中心，建築宏偉古樸。" },
+                        { id: "d4_2", time: "12:30", title: "PMQ 元創方 & G.O.D. 選物", category: "Shopping", cost: 250, currency: "HKD", lat: 22.2833, lng: 114.1517, img: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "前已婚警察宿舍改建的設計聚落，探索香港在地原創設計品牌。" },
+                        { id: "d4_3", time: "14:30", title: "Meanwhile Coffee", category: "Dining", cost: 65, currency: "HKD", lat: 22.2838, lng: 114.1510, img: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "藏身於古老巷弄中的高品質手沖咖啡館，放慢步伐品嚐香醇。" },
+                        { id: "d4_4", time: "16:00", title: "怪獸大廈 賽博朋克景 (益昌大廈)", category: "Sightseeing", cost: 15, currency: "HKD", lat: 22.2842, lng: 114.2128, img: "https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8a?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "變形金剛取景地，極具震撼感與香港濃密特色的巨型蜂巢住宅建築群。" },
+                        { id: "d4_5", time: "18:30", title: "灣仔星街 & Kapok選物", category: "Shopping", cost: 320, currency: "HKD", lat: 22.2764, lng: 114.1695, img: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "充滿歐陸悠閒風情的星街小區，文青必訪時尚選物店 Kapok。" }
                     ]
                 },
                 {
@@ -328,11 +354,11 @@
                     weather: { temp: "--", status: "尚未預測", icon: "fa-clock", sunrise: "尚未預測", sunset: "尚未預測", rainProb: "尚未預測" },
                     estimatedBudget: { currency: "HKD", amount: 780 },
                     spots: [
-                        { id: "d5_1", time: "10:00", title: "堅尼地城海濱", category: "Sightseeing", cost: 0, currency: "HKD", lat: 22.2828, lng: 114.1283, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80", notes: "絕美海景籃球場與絕佳海濱景觀步道，感受港島蔚藍海岸。" },
-                        { id: "d5_2", time: "11:30", title: "海景 & 叮叮車拍照", category: "Experience", cost: 10, currency: "HKD", lat: 22.2831, lng: 114.1290, img: "https://images.unsplash.com/photo-1534351590666-13e3e96b5017?auto=format&fit=crop&w=600&q=80", notes: "捕捉百年雙層叮叮車與蔚藍大海交會的絕美復古畫面。" },
-                        { id: "d5_3", time: "14:00", title: "西營盤慢步", category: "Sightseeing", cost: 30, currency: "HKD", lat: 22.2862, lng: 114.1418, img: "https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8a?auto=format&fit=crop&w=600&q=80", notes: "錯落有致的斜坡街道、懷舊老海味街與繽紛藝文壁畫彩繪牆。" },
-                        { id: "d5_4", time: "17:30", title: "在地美食 (避風塘炒蟹 / 雞蛋仔)", category: "Dining", cost: 700, currency: "HKD", lat: 22.2825, lng: 114.1488, img: "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80", notes: "享用香辣過癮的正宗避風塘蒜香炒蟹，搭配外酥內軟的地道街頭雞蛋仔。" },
-                        { id: "d5_5", time: "20:00", title: "天星小輪維港遊", category: "Experience", cost: 40, currency: "HKD", lat: 22.2871, lng: 114.1615, img: "https://images.unsplash.com/photo-1506970845246-18f21d533b20?auto=format&fit=crop&w=600&q=80", notes: "搭乘國家地理雜誌推薦的百年天星小輪，徜徉於海風與雙岸璀璨燈火間。" }
+                        { id: "d5_1", time: "10:00", title: "堅尼地城海濱", category: "Sightseeing", cost: 0, currency: "HKD", lat: 22.2828, lng: 114.1283, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "絕美海景籃球場與絕佳海濱景觀步道，感受港島蔚藍海岸。" },
+                        { id: "d5_2", time: "11:30", title: "海景 & 叮叮車拍照", category: "Experience", cost: 10, currency: "HKD", lat: 22.2831, lng: 114.1290, img: "https://images.unsplash.com/photo-1534351590666-13e3e96b5017?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "捕捉百年雙層叮叮車與蔚藍大海交會的絕美復古畫面。" },
+                        { id: "d5_3", time: "14:00", title: "西營盤慢步", category: "Sightseeing", cost: 30, currency: "HKD", lat: 22.2862, lng: 114.1418, img: "https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8a?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "錯落有致的斜坡街道、懷舊老海味街與繽紛藝文壁畫彩繪牆。" },
+                        { id: "d5_4", time: "17:30", title: "在地美食 (避風塘炒蟹 / 雞蛋仔)", category: "Dining", cost: 700, currency: "HKD", lat: 22.2825, lng: 114.1488, img: "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "享用香辣過癮的正宗避風塘蒜香炒蟹，搭配外酥內軟的地道街頭雞蛋仔。" },
+                        { id: "d5_5", time: "20:00", title: "天星小輪維港遊", category: "Experience", cost: 40, currency: "HKD", lat: 22.2871, lng: 114.1615, img: "https://images.unsplash.com/photo-1506970845246-18f21d533b20?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "搭乘國家地理雜誌推薦的百年天星小輪，徜徉於海風與雙岸璀璨燈火間。" }
                     ]
                 },
                 {
@@ -345,10 +371,10 @@
                     weather: { temp: "--", status: "尚未預測", icon: "fa-clock", sunrise: "尚未預測", sunset: "尚未預測", rainProb: "尚未預測" },
                     estimatedBudget: { currency: "HKD", amount: 950 },
                     spots: [
-                        { id: "d6_1", time: "09:00", title: "港式早茶 (添好運 / 蓮香樓)", category: "Dining", cost: 220, currency: "HKD", lat: 22.2852, lng: 114.1582, img: "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80", notes: "享用晶瑩蝦餃、酥皮叉燒包與燒賣，體驗最接地氣的經典一盅兩件早茶。" },
-                        { id: "d6_2", time: "11:00", title: "質感伴手採買 (Two Girls 廣生堂)", category: "Shopping", cost: 600, currency: "HKD", lat: 22.2835, lng: 114.1530, img: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80", notes: "採買百年懷舊復古雙妹嚜花露水、雪花膏等最具香港特色的質感伴手禮。" },
-                        { id: "d6_3", time: "13:30", title: "機場快線 (香港站)", category: "Flight", cost: 130, currency: "HKD", lat: 22.2856, lng: 114.1585, img: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80", notes: "於中環香港站輕鬆辦理預辦登機與托運，搭乘機場快線24分鐘直達機場。" },
-                        { id: "d6_4", time: "16:30", title: "HX282 航班返台", category: "Flight", cost: 0, currency: "HKD", lat: 22.3080, lng: 113.9185, img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80", notes: "搭乘 HX282 班機滿載美好旅遊回憶順利返回台灣。" }
+                        { id: "d6_1", time: "09:00", title: "港式早茶 (添好運 / 蓮香樓)", category: "Dining", cost: 220, currency: "HKD", lat: 22.2852, lng: 114.1582, img: "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "享用晶瑩蝦餃、酥皮叉燒包與燒賣，體驗最接地氣的經典一盅兩件早茶。" },
+                        { id: "d6_2", time: "11:00", title: "質感伴手採買 (Two Girls 廣生堂)", category: "Shopping", cost: 600, currency: "HKD", lat: 22.2835, lng: 114.1530, img: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "採買百年懷舊復古雙妹嚜花露水、雪花膏等最具香港特色的質感伴手禮。" },
+                        { id: "d6_3", time: "13:30", title: "機場快線 (香港站)", category: "Flight", cost: 130, currency: "HKD", lat: 22.2856, lng: 114.1585, img: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "於中環香港站輕鬆辦理預辦登機與托運，搭乘機場快線24分鐘直達機場。" },
+                        { id: "d6_4", time: "16:30", title: "HX282 航班返台", category: "Flight", cost: 0, currency: "HKD", lat: 22.3080, lng: 113.9185, img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80", mapUrl: "", notes: "搭乘 HX282 班機滿載美好旅遊回憶順利返回台灣。" }
                     ]
                 }
             ]
@@ -377,7 +403,7 @@
         };
 
         function loadTripData() {
-            const saved = localStorage.getItem('hk_sz_itinerary_2026_v7');
+            const saved = localStorage.getItem('hk_sz_itinerary_2026_v8');
             if (saved) {
                 try {
                     tripData = JSON.parse(saved);
@@ -390,7 +416,7 @@
         }
 
         function saveTripData() {
-            localStorage.setItem('hk_sz_itinerary_2026_v7', JSON.stringify(tripData));
+            localStorage.setItem('hk_sz_itinerary_2026_v8', JSON.stringify(tripData));
         }
 
         async function fetchDateMatchedWeather() {
@@ -557,7 +583,7 @@
                 ? 'bg-slate-900 text-teal-300 border-slate-800 shadow-md scale-[1.02]' 
                 : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
             }`;
-            allBtn.innerHTML = `<i class="fa-solid fa-layer-group text-teal-500"></i> <span>全部行程 (DAY 1-6)</span>`;
+            allBtn.innerHTML = `<i class="fa-solid fa-layer-group text-teal-500"></i> <span>全部行程 (DAY 1-${TRIP_CONFIG.daysCount})</span>`;
             container.appendChild(allBtn);
 
             tripData.days.forEach((day) => {
@@ -581,7 +607,7 @@
 
             const subtitle = document.getElementById('active-day-subtitle');
             if (isAll) {
-                subtitle.textContent = "全覽模式 (顯示 1/18 - 1/23 所有細節)";
+                subtitle.textContent = `全覽模式 (顯示 ${TRIP_CONFIG.dateRangeStr} 所有細節)`;
             } else {
                 const current = tripData.days.find(d => d.dayNum === selectedDayFilter);
                 subtitle.textContent = current ? `${current.date} (${current.area})` : '';
@@ -720,8 +746,10 @@
                        </span>`
                     : `<span class="text-xs text-slate-400 bg-slate-50 px-2 py-0.5 rounded-lg border border-slate-100">免費 / 已內含</span>`;
 
-                // 產生高德地圖網頁版搜尋連結 (類似 Google Maps 的獨立查詢網址)
-                const amapSearchUrl = `https://uri.amap.com/search?keyword=${encodeURIComponent(spot.title)}&src=mypage&coordinate=gaode`;
+                // 優先使用自訂高德地圖網址，若無則自動產生搜尋網址
+                const amapSearchUrl = (spot.mapUrl && spot.mapUrl.trim() !== "") 
+                    ? spot.mapUrl 
+                    : `https://uri.amap.com/search?keyword=${encodeURIComponent(spot.title)}&src=mypage&coordinate=gaode`;
 
                 return `
                     <div id="spot-card-${spot.id}" class="relative flex items-start space-x-3 group transition-all duration-200">
@@ -813,7 +841,9 @@
                     });
 
                     const marker = L.marker(latLng, { icon: customIcon }).addTo(map);
-                    const amapSearchUrl = `https://uri.amap.com/search?keyword=${encodeURIComponent(spot.title)}&src=mypage&coordinate=gaode`;
+                    const amapSearchUrl = (spot.mapUrl && spot.mapUrl.trim() !== "") 
+                        ? spot.mapUrl 
+                        : `https://uri.amap.com/search?keyword=${encodeURIComponent(spot.title)}&src=mypage&coordinate=gaode`;
 
                     const cleanPopupContent = `
                         <div class="p-2 space-y-1.5 max-w-[210px]">
@@ -891,6 +921,7 @@
                     document.getElementById('spot-cost').value = spot.cost || 0;
                     document.getElementById('spot-currency').value = spot.currency || (dayNum <= 2 ? "RMB" : "HKD");
                     document.getElementById('spot-img').value = spot.img || '';
+                    document.getElementById('spot-map-url').value = spot.mapUrl || '';
                     document.getElementById('spot-notes').value = spot.notes || '';
                 }
             } else {
@@ -933,6 +964,7 @@
                 cost: parseFloat(document.getElementById('spot-cost').value) || 0,
                 currency: document.getElementById('spot-currency').value,
                 img: document.getElementById('spot-img').value,
+                mapUrl: document.getElementById('spot-map-url').value,
                 lat: day.lat,
                 lng: day.lng,
                 notes: document.getElementById('spot-notes').value
