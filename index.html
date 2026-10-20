@@ -147,9 +147,9 @@
                         <div>
                             <h3 class="font-bold text-sm md:text-base flex items-center gap-2">
                                 高德地圖 (Amap) 路線
-                                <span class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full font-medium">純淨地理資訊</span>
+                                <span class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full font-medium">按天色彩區分</span>
                             </h3>
-                            <p class="text-xs text-slate-400">電腦版右側固定對照，標籤完全不含照片</p>
+                            <p class="text-xs text-slate-400">同一天使用相同顏色，不同天以不同色彩呈現</p>
                         </div>
                     </div>
                     <button onclick="fitMapBounds()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1">
@@ -170,11 +170,11 @@
         <p class="text-slate-500">&copy; 2026 行程規劃器. All rights reserved.</p>
     </footer>
 
-    <!-- Add/Edit Spot Modal (Optimized with independent scroll and sticky footer actions) -->
+    <!-- Add/Edit Spot Modal (Scrollable Container) -->
     <div id="spot-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200 p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transform scale-95 transition-transform duration-200 flex flex-col max-h-[85vh]" id="spot-modal-card">
             
-            <!-- Modal Header (Sticky) -->
+            <!-- Modal Header (Sticky Top) -->
             <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between flex-shrink-0 border-b border-slate-800">
                 <h3 id="modal-title" class="font-bold text-base flex items-center gap-2">
                     <i class="fa-solid fa-location-dot text-teal-400"></i> 新增 / 編輯景點
@@ -184,7 +184,7 @@
                 </button>
             </div>
 
-            <!-- Modal Form Body (Scrollable) -->
+            <!-- Modal Form Body (Scrollable Body) -->
             <form id="spot-form" onsubmit="handleSpotFormSubmit(event)" class="flex flex-col flex-1 overflow-hidden">
                 <div class="p-6 space-y-4 overflow-y-auto flex-1">
                     <input type="hidden" id="spot-id">
@@ -277,6 +277,16 @@
             nightsCount: 5,
             themeName: "慢活之旅",
             dateRangeStr: "1月18日 - 1月23日"
+        };
+
+        // 🎨 每天對應的專屬色彩設定檔
+        const DAY_COLOR_PALETTE = {
+            1: "#059669", // DAY 1: 翡翠綠
+            2: "#2563eb", // DAY 2: 寶藍色
+            3: "#d97706", // DAY 3: 琥珀金
+            4: "#9333ea", // DAY 4: 紫羅蘭
+            5: "#e11d48", // DAY 5: 玫瑰紅
+            6: "#4f46e5"  // DAY 6: 靛青色
         };
 
         const fullTitleString = `${TRIP_CONFIG.destination} ${TRIP_CONFIG.daysCount}天${TRIP_CONFIG.nightsCount}夜 ${TRIP_CONFIG.themeName}`;
@@ -397,12 +407,12 @@
         };
 
         const categoryMeta = {
-            Flight: { name: "航班 / 交通", color: "bg-blue-100 text-blue-800 border-blue-200", markerBg: "#2563eb", icon: "fa-plane" },
-            Hotel: { name: "住宿 / 飯店", color: "bg-indigo-100 text-indigo-800 border-indigo-200", markerBg: "#4f46e5", icon: "fa-hotel" },
-            Sightseeing: { name: "景點 / 慢步", color: "bg-emerald-100 text-emerald-800 border-emerald-200", markerBg: "#059669", icon: "fa-camera" },
-            Dining: { name: "美食 / 咖啡", color: "bg-amber-100 text-amber-800 border-amber-200", markerBg: "#d97706", icon: "fa-utensils" },
-            Shopping: { name: "購物 / 選物", color: "bg-purple-100 text-purple-800 border-purple-200", markerBg: "#9333ea", icon: "fa-bag-shopping" },
-            Experience: { name: "特色體驗", color: "bg-rose-100 text-rose-800 border-rose-200", markerBg: "#e11d48", icon: "fa-wand-magic-sparkles" }
+            Flight: { name: "航班 / 交通", color: "bg-blue-100 text-blue-800 border-blue-200", icon: "fa-plane" },
+            Hotel: { name: "住宿 / 飯店", color: "bg-indigo-100 text-indigo-800 border-indigo-200", icon: "fa-hotel" },
+            Sightseeing: { name: "景點 / 慢步", color: "bg-emerald-100 text-emerald-800 border-emerald-200", icon: "fa-camera" },
+            Dining: { name: "美食 / 咖啡", color: "bg-amber-100 text-amber-800 border-amber-200", icon: "fa-utensils" },
+            Shopping: { name: "購物 / 選物", color: "bg-purple-100 text-purple-800 border-purple-200", icon: "fa-bag-shopping" },
+            Experience: { name: "特色體驗", color: "bg-rose-100 text-rose-800 border-rose-200", icon: "fa-wand-magic-sparkles" }
         };
 
         let tripData = null;
@@ -419,7 +429,7 @@
         };
 
         function loadTripData() {
-            const saved = localStorage.getItem('hk_sz_itinerary_2026_v13');
+            const saved = localStorage.getItem('hk_sz_itinerary_2026_v15');
             if (saved) {
                 try {
                     tripData = JSON.parse(saved);
@@ -432,7 +442,7 @@
         }
 
         function saveTripData() {
-            localStorage.setItem('hk_sz_itinerary_2026_v13', JSON.stringify(tripData));
+            localStorage.setItem('hk_sz_itinerary_2026_v15', JSON.stringify(tripData));
         }
 
         async function fetchDateMatchedWeather() {
@@ -840,6 +850,9 @@
                 if (!day.spots) return;
                 const dayLatLngs = [];
 
+                // 同一天統一使用該天專屬顏色
+                const dayColor = DAY_COLOR_PALETTE[day.dayNum] || "#059669";
+
                 day.spots.forEach((spot, index) => {
                     const meta = categoryMeta[spot.category] || categoryMeta.Sightseeing;
                     
@@ -850,7 +863,7 @@
 
                     const customIcon = L.divIcon({
                         className: 'custom-div-icon',
-                        html: `<div class="custom-marker-pin" style="background-color: ${meta.markerBg}; width: 32px; height: 32px;">${index + 1}</div>`,
+                        html: `<div class="custom-marker-pin" style="background-color: ${dayColor}; width: 32px; height: 32px;">${index + 1}</div>`,
                         iconSize: [32, 32],
                         iconAnchor: [16, 16]
                     });
@@ -881,7 +894,7 @@
 
                 if (dayLatLngs.length > 1) {
                     const poly = L.polyline(dayLatLngs, {
-                        color: day.dayNum % 2 === 0 ? '#059669' : '#0d9488',
+                        color: dayColor,
                         weight: 4,
                         opacity: 0.85,
                         dashArray: '6, 8',
