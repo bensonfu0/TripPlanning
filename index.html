@@ -149,24 +149,32 @@
                 <!-- Dynamic Daily Content Cards rendered here -->
             </div>
 
-            <!-- Right Column: Sticky Amap High-Definition Map (5 cols on Desktop) -->
+            <!-- Right Column: Sticky Map (5 cols on Desktop) -->
             <section id="map-section" class="lg:col-span-5 lg:sticky lg:top-20 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden flex flex-col">
-                <div class="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+                <div class="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800 gap-2 flex-wrap">
                     <div class="flex items-center gap-3">
                         <div class="w-9 h-9 rounded-xl bg-teal-500/20 text-teal-300 border border-teal-400/30 flex items-center justify-center">
                             <i class="fa-solid fa-map-location-dot"></i>
                         </div>
                         <div>
                             <h3 class="font-bold text-sm md:text-base flex items-center gap-2">
-                                高德地圖 (Amap) 路線
+                                <span id="current-map-title">高德地圖 (Amap)</span>
                                 <span class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full font-medium">按天色彩區分</span>
                             </h3>
                             <p class="text-xs text-slate-400">同一天使用相同顏色，不同天以不同色彩呈現</p>
                         </div>
                     </div>
-                    <button onclick="fitMapBounds()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1">
-                        <i class="fa-solid fa-expand"></i> 重置全景
-                    </button>
+                    
+                    <!-- Map Layer Switcher & Reset -->
+                    <div class="flex items-center gap-1.5">
+                        <div class="inline-flex bg-slate-800 p-1 rounded-xl border border-slate-700 text-xs">
+                            <button id="btn-map-amap" onclick="switchMapProvider('amap')" class="px-2.5 py-1 rounded-lg font-bold transition bg-teal-500 text-slate-950 shadow">高德</button>
+                            <button id="btn-map-google" onclick="switchMapProvider('google')" class="px-2.5 py-1 rounded-lg font-bold transition text-slate-400 hover:text-white">Google</button>
+                        </div>
+                        <button onclick="fitMapBounds()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1" title="重置全景">
+                            <i class="fa-solid fa-expand"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Map Canvas -->
@@ -329,8 +337,26 @@
         let tripData = null;
         let selectedDayFilter = "ALL";
         let map = null;
+        let currentMapProvider = 'amap'; // 'amap' 或 'google'
+        let currentTileLayer = null;
         let mapMarkers = [];
         let routePolylines = [];
+
+        // 地圖圖資網址配置
+        const MAP_PROVIDERS = {
+            amap: {
+                title: "高德地圖 (Amap)",
+                url: "https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}",
+                subdomains: ["1", "2", "3", "4"],
+                attribution: '&copy; 高德地圖 (Amap)'
+            },
+            google: {
+                title: "Google 地圖 (標準)",
+                url: "https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+                subdomains: [],
+                attribution: '&copy; Google Maps'
+            }
+        };
 
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('page-title').textContent = `${fullTitleString} - 行程規劃`;
@@ -339,26 +365,54 @@
             document.getElementById('header-date-range').textContent = TRIP_CONFIG.dateRangeStr;
             document.getElementById('footer-title-text').textContent = fullTitleString;
             
-            initGaodeMap();
+            initLeafletMap();
             loadTripData();
         });
 
-        function initGaodeMap() {
+        function initLeafletMap() {
             map = L.map('map', {
                 zoomControl: false,
                 scrollWheelZoom: false
             }).setView([22.35, 114.0], 11);
 
-            const gaodeTileUrl = 'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}';
+            applyTileLayer('amap');
+            L.control.zoom({ position: 'bottomright' }).addTo(map);
+        }
 
-            L.tileLayer(gaodeTileUrl, {
-                subdomains: ["1", "2", "3", "4"],
-                attribution: '&copy; 高德地圖 (Amap)',
+        function applyTileLayer(providerKey) {
+            if (currentTileLayer) {
+                map.removeLayer(currentTileLayer);
+            }
+
+            const config = MAP_PROVIDERS[providerKey];
+            currentMapProvider = providerKey;
+
+            currentTileLayer = L.tileLayer(config.url, {
+                subdomains: config.subdomains,
+                attribution: config.attribution,
                 maxZoom: 18,
                 minZoom: 4
             }).addTo(map);
 
-            L.control.zoom({ position: 'bottomright' }).addTo(map);
+            document.getElementById('current-map-title').textContent = config.title;
+
+            // 切換按鈕 UI 高亮狀態
+            const btnAmap = document.getElementById('btn-map-amap');
+            const btnGoogle = document.getElementById('btn-map-google');
+
+            if (providerKey === 'amap') {
+                btnAmap.className = "px-2.5 py-1 rounded-lg font-bold transition bg-teal-500 text-slate-950 shadow";
+                btnGoogle.className = "px-2.5 py-1 rounded-lg font-bold transition text-slate-400 hover:text-white";
+            } else {
+                btnGoogle.className = "px-2.5 py-1 rounded-lg font-bold transition bg-teal-500 text-slate-950 shadow";
+                btnAmap.className = "px-2.5 py-1 rounded-lg font-bold transition text-slate-400 hover:text-white";
+            }
+        }
+
+        function switchMapProvider(providerKey) {
+            if (currentMapProvider === providerKey) return;
+            applyTileLayer(providerKey);
+            showToast(`已切換為 ${MAP_PROVIDERS[providerKey].title}`, "info");
         }
 
         async function loadTripData() {
@@ -396,14 +450,12 @@
             const lines = csvText.split(/\r\n|\n/);
             if (lines.length <= 1) return;
 
-            // 清空當前 spots
             tripData.days.forEach(d => d.spots = []);
 
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i].trim();
                 if (!line) continue;
 
-                // 簡單處理 CSV 欄位拆分
                 const cols = parseCSVRow(line);
                 if (cols.length < 5) continue;
 
