@@ -113,7 +113,7 @@
                 </div>
             </div>
 
-            <!-- Total Trip Budget Summary Bar (動態依類別分類顯示) -->
+            <!-- Total Trip Budget Summary Bar (動態依類別分類加總顯示) -->
             <div id="trip-budget-summary" class="mt-6 pt-5 border-t border-white/10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 <!-- Dynamically injected -->
             </div>
@@ -466,7 +466,6 @@
 
             const headers = rows[0].map(h => h.trim().toLowerCase());
             
-            // 💡 強化對應邏輯：優先找標題名稱，若無則降級使用固定欄位索引
             const getCol = (row, names, fallbackIdx) => {
                 for (let name of names) {
                     const idx = headers.indexOf(name.toLowerCase());
@@ -483,7 +482,6 @@
                 if (!cols || cols.length === 0) continue;
 
                 const dayNum = parseInt(getCol(cols, ['day', '天數'], 0)) || 1;
-                // 強制抓取時間，如果沒對到標題直接取第 3 欄（索引 2）
                 const timeStr = getCol(cols, ['time', '時間', '時段', '行程時間'], 2) || "10:00";
                 const catStr = getCol(cols, ['category', '分類', '類別'], 3) || "Sightseeing";
                 const titleStr = getCol(cols, ['title', '景點', '名稱', '景點名稱'], 4) || "";
