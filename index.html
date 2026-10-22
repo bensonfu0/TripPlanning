@@ -200,7 +200,6 @@
         const DAYS_CSV_URL   = `https://docs.google.com/spreadsheets/d/${BASE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Days`; 
         const SPOTS_CSV_URL  = `https://docs.google.com/spreadsheets/d/${BASE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Spots`;
 
-        // 💡 預設備用匯率（若 API 斷線時備用）
         let EXCHANGE_RATES = {
             RMB: 4.5,
             HKD: 4.1,
@@ -466,10 +465,15 @@
             if (rows.length <= 1) return;
 
             const headers = rows[0].map(h => h.trim().toLowerCase());
-            const getCol = (row, names) => {
+            
+            // 💡 強化對應邏輯：優先找標題名稱，若無則降級使用固定欄位索引
+            const getCol = (row, names, fallbackIdx) => {
                 for (let name of names) {
                     const idx = headers.indexOf(name.toLowerCase());
                     if (idx !== -1 && row[idx] !== undefined) return row[idx].trim();
+                }
+                if (fallbackIdx !== undefined && row[fallbackIdx] !== undefined) {
+                    return row[fallbackIdx].trim();
                 }
                 return "";
             };
@@ -478,16 +482,17 @@
                 const cols = rows[i];
                 if (!cols || cols.length === 0) continue;
 
-                const dayNum = parseInt(getCol(cols, ['day', '天數'])) || 1;
-                const timeStr = getCol(cols, ['time', '時間']) || "10:00";
-                const catStr = getCol(cols, ['category', '分類', '類別']) || "Sightseeing";
-                const titleStr = getCol(cols, ['title', '景點', '名稱', '景點名稱']) || "";
-                const costVal = parseFloat(getCol(cols, ['cost', '花費', '金額'])) || 0;
-                const currStr = getCol(cols, ['currency', '幣別']) || (dayNum <= 2 ? "RMB" : "HKD");
-                const latVal = parseFloat(getCol(cols, ['latitude', 'lat', '緯度'])) || 0;
-                const lngVal = parseFloat(getCol(cols, ['longitude', 'lng', '經度'])) || 0;
-                const mapUrlStr = getCol(cols, ['mapurl', 'map', '地圖連結']) || "";
-                const notesStr = getCol(cols, ['notes', 'note', '備註']) || "";
+                const dayNum = parseInt(getCol(cols, ['day', '天數'], 0)) || 1;
+                // 強制抓取時間，如果沒對到標題直接取第 3 欄（索引 2）
+                const timeStr = getCol(cols, ['time', '時間', '時段', '行程時間'], 2) || "10:00";
+                const catStr = getCol(cols, ['category', '分類', '類別'], 3) || "Sightseeing";
+                const titleStr = getCol(cols, ['title', '景點', '名稱', '景點名稱'], 4) || "";
+                const costVal = parseFloat(getCol(cols, ['cost', '花費', '金額'], 5)) || 0;
+                const currStr = getCol(cols, ['currency', '幣別'], 6) || (dayNum <= 2 ? "RMB" : "HKD");
+                const latVal = parseFloat(getCol(cols, ['latitude', 'lat', '緯度'], 7)) || 0;
+                const lngVal = parseFloat(getCol(cols, ['longitude', 'lng', '經度'], 8)) || 0;
+                const mapUrlStr = getCol(cols, ['mapurl', 'map', '地圖連結'], 9) || "";
+                const notesStr = getCol(cols, ['notes', 'note', '備註'], 10) || "";
 
                 const targetDay = tripData.days.find(d => d.dayNum === dayNum);
                 if (targetDay && titleStr) {
@@ -564,7 +569,6 @@
             renderItineraryWrapper();
         }
 
-        // 💡 依據「行程類別」進行分門別類加總
         function renderHeaderBudgetSummary() {
             let totalRMB = 0, totalHKD = 0, totalTWD = 0;
             const categoryTotals = {
@@ -612,7 +616,6 @@
                 </div>
             `;
 
-            // 依據有花費的類別動態產生卡片
             Object.keys(categoryTotals).forEach(catKey => {
                 const twdAmt = categoryTotals[catKey];
                 if (twdAmt > 0) {
