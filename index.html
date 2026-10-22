@@ -270,7 +270,7 @@
                     }
                 }
             } catch (err) {
-                console.warn("無法取得即時匯率，使用預設匯率算力：", err);
+                console.warn("無法取得即時匯率，使用預設匯率：", err);
             }
         }
 
@@ -330,7 +330,7 @@
                         const configCsv = await configRes.text();
                         parseConfigCSV(configCsv);
                     }
-                } catch (e) { console.warn("Config 分頁讀取略過", e); }
+                } catch (e) { console.warn("Config 讀取略過", e); }
 
                 const daysRes = await fetch(DAYS_CSV_URL + "&t=" + new Date().getTime());
                 if (!daysRes.ok) throw new Error("讀取 Days 失敗");
@@ -362,7 +362,7 @@
                 console.warn("無法從 Google Sheet 抓取資料：", error);
                 document.getElementById('sheet-sync-status').className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-xs font-semibold";
                 document.getElementById('sheet-sync-status').innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span>Google Sheet 連線異常</span>';
-                showToast("無法讀取 Google Sheet，請檢查共用權限或分頁名稱", "info");
+                showToast("無法讀取 Google Sheet，請檢查共用權限", "info");
             } finally {
                 if (refreshIcon) refreshIcon.classList.remove('fa-spin');
                 renderApp();
@@ -464,63 +464,27 @@
             const rows = parseCSVRows(csvText);
             if (rows.length <= 1) return;
 
-            // 💡 清洗字串補助工具（自動去除去頭去尾的雙引號與空格）
             const clean = (val) => {
                 if (val === undefined || val === null) return "";
                 return String(val).trim().replace(/^"|"$/g, '').trim();
             };
 
-            // 尋找各標題的欄位索引
-            const headers = rows[0].map(h => clean(h).toLowerCase());
-            
-            let timeColIdx = headers.findIndex(h => h === 'time' || h === '時間' || h === '時段');
-            if (timeColIdx === -1) timeColIdx = 2; // 若沒對到標題，預設取第 3 欄 (C 欄)
-
-            let dayColIdx = headers.findIndex(h => h === 'day' || h === '天數');
-            if (dayColIdx === -1) dayColIdx = 0;
-
-            let catColIdx = headers.findIndex(h => h === 'category' || h === '分類' || h === '類別');
-            if (catColIdx === -1) catColIdx = 3;
-
-            let titleColIdx = headers.findIndex(h => h === 'title' || h === '景點' || h === '名稱' || h === '景點名稱');
-            if (titleColIdx === -1) titleColIdx = 4;
-
-            let costColIdx = headers.findIndex(h => h === 'cost' || h === '花費' || h === '金額');
-            if (costColIdx === -1) costColIdx = 5;
-
-            let currColIdx = headers.findIndex(h => h === 'currency' || h === '幣別');
-            if (currColIdx === -1) currColIdx = 6;
-
-            let latColIdx = headers.findIndex(h => h === 'latitude' || h === 'lat' || h === '緯度');
-            if (latColIdx === -1) latColIdx = 7;
-
-            let lngColIdx = headers.findIndex(h => h === 'longitude' || h === 'lng' || h === '經度');
-            if (lngColIdx === -1) lngColIdx = 8;
-
-            let mapColIdx = headers.findIndex(h => h === 'mapurl' || h === 'map' || h === '地圖連結');
-            if (mapColIdx === -1) mapColIdx = 9;
-
-            let notesColIdx = headers.findIndex(h => h === 'notes' || h === 'note' || h === '備註');
-            if (notesColIdx === -1) notesColIdx = 10;
-
             for (let i = 1; i < rows.length; i++) {
                 const cols = rows[i];
                 if (!cols || cols.length === 0) continue;
 
-                const dayNum = parseInt(clean(cols[dayColIdx])) || 1;
-                
-                // 💡 抓取 Time 欄位下的文字內容（不作任何切割或預設遮蔽）
-                const rawTimeText = clean(cols[timeColIdx]);
-                const timeStr = rawTimeText !== "" ? rawTimeText : "--:--";
-
-                const catStr = clean(cols[catColIdx]) || "Sightseeing";
-                const titleStr = clean(cols[titleColIdx]);
-                const costVal = parseFloat(clean(cols[costColIdx])) || 0;
-                const currStr = clean(cols[currColIdx]) || (dayNum <= 2 ? "RMB" : "HKD");
-                const latVal = parseFloat(clean(cols[latColIdx])) || 0;
-                const lngVal = parseFloat(clean(cols[lngColIdx])) || 0;
-                const mapUrlStr = clean(cols[mapColIdx]);
-                const notesStr = clean(cols[notesColIdx]);
+                // 💡 依照您 Google Sheet 的絕對欄位直覺對應：
+                // 0: Day, 1: Date, 2: Time, 3: Category, 4: Title, 5: Cost, 6: Currency, 7: Lat, 8: Lng, 9: MapUrl, 10: Notes
+                const dayNum = parseInt(clean(cols[0])) || 1;
+                const timeStr = clean(cols[2]) !== "" ? clean(cols[2]) : ""; // 直接抓取 C 欄時間文字
+                const catStr = clean(cols[3]) || "Sightseeing";
+                const titleStr = clean(cols[4]);
+                const costVal = parseFloat(clean(cols[5])) || 0;
+                const currStr = clean(cols[6]) || (dayNum <= 2 ? "RMB" : "HKD");
+                const latVal = parseFloat(clean(cols[7])) || 0;
+                const lngVal = parseFloat(clean(cols[8])) || 0;
+                const mapUrlStr = clean(cols[9]);
+                const notesStr = clean(cols[10]);
 
                 const targetDay = tripData.days.find(d => d.dayNum === dayNum);
                 if (targetDay && titleStr) {
@@ -761,6 +725,11 @@
             return day.spots.map((spot, index) => {
                 const meta = categoryMeta[spot.category] || categoryMeta.Sightseeing;
                 
+                // 💡 若抓到的時間欄位有值，直接顯示原始文字；若空白才隱藏或顯示 --
+                const timeBadgeHtml = (spot.time && spot.time !== "")
+                    ? `<span class="text-xs font-extrabold text-slate-900 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200"><i class="fa-regular fa-clock me-1 text-teal-600"></i>${spot.time}</span>`
+                    : '';
+
                 const costDisplay = (spot.cost && Number(spot.cost) > 0)
                     ? `<span class="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200"><i class="fa-solid fa-receipt text-emerald-600 me-1"></i>${spot.currency === 'RMB' ? '¥' : 'HK$'} ${spot.cost}</span>`
                     : '';
@@ -789,7 +758,7 @@
                             <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                                 <div class="flex-1">
                                     <div class="flex items-center space-x-2 flex-wrap gap-y-1">
-                                        <span class="text-xs font-extrabold text-slate-900 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200"><i class="fa-regular fa-clock me-1 text-teal-600"></i>${spot.time}</span>
+                                        ${timeBadgeHtml}
                                         <span class="text-xs font-semibold px-2 py-0.5 rounded-full border ${meta.badgeColor || meta.color}"><i class="fa-solid ${meta.icon} me-1"></i>${meta.name}</span>
                                         ${costDisplay}
                                     </div>
