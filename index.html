@@ -206,14 +206,45 @@
             TWD: 1.0
         };
 
-        const DAY_COLOR_PALETTE = {
-            1: "#059669",
-            2: "#2563eb",
-            3: "#d97706",
-            4: "#9333ea",
-            5: "#e11d48",
-            6: "#4f46e5"
-        };
+        // 🎨 擴充至 30 種不同高辨識度顏色的調色盤（支援超過 30 天自動循環）
+        const DAY_COLORS = [
+            "#059669", // 1: 翡翠綠
+            "#2563eb", // 2: 寶藍色
+            "#d97706", // 3: 琥珀橘
+            "#9333ea", // 4: 紫色
+            "#e11d48", // 5: 玫瑰紅
+            "#4f46e5", // 6: 靛藍色
+            "#0d9488", // 7: 青綠色
+            "#ca8a04", // 8: 黃金色
+            "#db2777", // 9: 粉紅色
+            "#7c3aed", // 10: 亮紫色
+            "#0284c7", // 11: 天藍色
+            "#16a34a", // 12: 草綠色
+            "#ea580c", // 13: 深橘色
+            "#6366f1", // 14: 柔和藍
+            "#be185d", // 15: 桃紅色
+            "#475569", // 16: 石墨灰
+            "#ca0404", // 17: 正紅色
+            "#047857", // 18: 深翠綠
+            "#701a75", // 19: 深紫紅
+            "#1e40af", // 20: 深寶藍
+            "#b45309", // 21: 棕黃色
+            "#3b82f6", // 22: 鮮藍色
+            "#10b981", // 23: 萊姆綠
+            "#f59e0b", // 24: 亮黃色
+            "#8b5cf6", // 25: 薰衣草紫
+            "#f43f5e", // 26: 珊瑚紅
+            "#06b6d4", // 27: 湖水藍
+            "#84cc16", // 28: 黃綠色
+            "#a855f7", // 29: 紫羅蘭
+            "#64748b"  // 30: 鐵灰色
+        ];
+
+        function getDayColor(dayNum) {
+            // 超過 30 天自動循環重複使用調色盤
+            const index = (dayNum - 1) % DAY_COLORS.length;
+            return DAY_COLORS[index];
+        }
 
         let tripData = {
             title: "行程規劃",
@@ -473,10 +504,8 @@
                 const cols = rows[i];
                 if (!cols || cols.length === 0) continue;
 
-                // 💡 依照您 Google Sheet 的絕對欄位直覺對應：
-                // 0: Day, 1: Date, 2: Time, 3: Category, 4: Title, 5: Cost, 6: Currency, 7: Lat, 8: Lng, 9: MapUrl, 10: Notes
                 const dayNum = parseInt(clean(cols[0])) || 1;
-                const timeStr = clean(cols[2]) !== "" ? clean(cols[2]) : ""; // 直接抓取 C 欄時間文字
+                const timeStr = clean(cols[2]) !== "" ? clean(cols[2]) : "";
                 const catStr = clean(cols[3]) || "Sightseeing";
                 const titleStr = clean(cols[4]);
                 const costVal = parseFloat(clean(cols[5])) || 0;
@@ -725,7 +754,6 @@
             return day.spots.map((spot, index) => {
                 const meta = categoryMeta[spot.category] || categoryMeta.Sightseeing;
                 
-                // 💡 若抓到的時間欄位有值，直接顯示原始文字；若空白才隱藏或顯示 --
                 const timeBadgeHtml = (spot.time && spot.time !== "")
                     ? `<span class="text-xs font-extrabold text-slate-900 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200"><i class="fa-regular fa-clock me-1 text-teal-600"></i>${spot.time}</span>`
                     : '';
@@ -792,7 +820,7 @@
             daysToInclude.forEach(day => {
                 if (!day.spots) return;
                 const dayLatLngs = [];
-                const dayColor = DAY_COLOR_PALETTE[day.dayNum] || "#059669";
+                const dayColor = getDayColor(day.dayNum); // 💡 使用 30 色循環函式
 
                 day.spots.forEach((spot, index) => {
                     const meta = categoryMeta[spot.category] || categoryMeta.Sightseeing;
