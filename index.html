@@ -206,44 +206,53 @@
             TWD: 1.0
         };
 
-        // 🎨 擴充至 30 種不同高辨識度顏色的調色盤（支援超過 30 天自動循環）
+        // 🎨 30 色高辨識度調色盤
         const DAY_COLORS = [
-            "#059669", // 1: 翡翠綠
-            "#2563eb", // 2: 寶藍色
-            "#d97706", // 3: 琥珀橘
-            "#9333ea", // 4: 紫色
-            "#e11d48", // 5: 玫瑰紅
-            "#4f46e5", // 6: 靛藍色
-            "#0d9488", // 7: 青綠色
-            "#ca8a04", // 8: 黃金色
-            "#db2777", // 9: 粉紅色
-            "#7c3aed", // 10: 亮紫色
-            "#0284c7", // 11: 天藍色
-            "#16a34a", // 12: 草綠色
-            "#ea580c", // 13: 深橘色
-            "#6366f1", // 14: 柔和藍
-            "#be185d", // 15: 桃紅色
-            "#475569", // 16: 石墨灰
-            "#ca0404", // 17: 正紅色
-            "#047857", // 18: 深翠綠
-            "#701a75", // 19: 深紫紅
-            "#1e40af", // 20: 深寶藍
-            "#b45309", // 21: 棕黃色
-            "#3b82f6", // 22: 鮮藍色
-            "#10b981", // 23: 萊姆綠
-            "#f59e0b", // 24: 亮黃色
-            "#8b5cf6", // 25: 薰衣草紫
-            "#f43f5e", // 26: 珊瑚紅
-            "#06b6d4", // 27: 湖水藍
-            "#84cc16", // 28: 黃綠色
-            "#a855f7", // 29: 紫羅蘭
-            "#64748b"  // 30: 鐵灰色
+            "#059669", "#2563eb", "#d97706", "#9333ea", "#e11d48", "#4f46e5",
+            "#0d9488", "#ca8a04", "#db2777", "#7c3aed", "#0284c7", "#16a34a",
+            "#ea580c", "#6366f1", "#be185d", "#475569", "#ca0404", "#047857",
+            "#701a75", "#1e40af", "#b45309", "#3b82f6", "#10b981", "#f59e0b",
+            "#8b5cf6", "#f43f5e", "#06b6d4", "#84cc16", "#a855f7", "#64748b"
         ];
 
         function getDayColor(dayNum) {
-            // 超過 30 天自動循環重複使用調色盤
             const index = (dayNum - 1) % DAY_COLORS.length;
             return DAY_COLORS[index];
+        }
+
+        // 👔 依據溫差、氣溫與降雨狀態產生穿著建議
+        function generateClothingAdvisory(tMin, tMax, wcode, rainProb) {
+            let advice = [];
+            const avgTemp = (tMin + tMax) / 2;
+            const diff = tMax - tMin;
+
+            // 1. 基礎溫感與衣服搭配
+            if (tMax < 12) {
+                advice.push("寒冷，建議羽絨外套、保暖內衣及毛帽手套");
+            } else if (tMax < 18) {
+                advice.push("偏冷，建議防風外套、厚針織衫或刷毛上衣");
+            } else if (tMax < 24) {
+                advice.push("涼爽舒適，適合薄長袖搭配薄外套或風衣");
+            } else if (tMax < 28) {
+                advice.push("溫和偏熱，建議短袖上衣，室內可備薄襯衫");
+            } else {
+                advice.push("炎熱，建議透氣棉麻短袖、防曬衣物及墨鏡");
+            }
+
+            // 2. 溫差補充說明
+            if (diff >= 8) {
+                advice.push("日夜溫差大，強烈建議洋蔥式穿搭以便增減衣物");
+            }
+
+            // 3. 降雨與天氣額外提示
+            const probNum = parseInt(rainProb) || 0;
+            if (probNum >= 40 || (wcode >= 51 && wcode <= 67)) {
+                advice.push("有降雨機會，請隨身攜帶折傘及穿著防水靴鞋");
+            } else if (wcode === 0 || wcode === 1) {
+                advice.push("陽光充足，戶外行程請注意曬後補充水分與防曬");
+            }
+
+            return advice.join('；') + '。';
         }
 
         let tripData = {
@@ -550,8 +559,16 @@
                 const diffTime = targetDate - todayObj;
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                if (diffDays < 0 || diffDays > 14) {
-                    day.weather = { temp: "--", status: "尚未預測", icon: "fa-clock", sunrise: "尚未預測", sunset: "尚未預測", rainProb: "尚未預測" };
+                if (diffDays < -1 || diffDays > 14) {
+                    day.weather = {
+                        temp: "--",
+                        status: "尚未預測",
+                        icon: "fa-clock",
+                        sunrise: "尚未預測",
+                        sunset: "尚未預測",
+                        rainProb: "尚未預測",
+                        clothingAdvice: "氣象預報發布時間未到，建議參考當地季節平均氣溫穿著。"
+                    };
                     continue;
                 }
 
@@ -569,11 +586,14 @@
                             const tMax = Math.round(data.daily.temperature_2m_max[index]);
                             const tMin = Math.round(data.daily.temperature_2m_min[index]);
                             const wcode = data.daily.weather_code[index];
+                            const rainProbVal = (data.daily.precipitation_probability_max[index] !== null) ? data.daily.precipitation_probability_max[index] + "%" : "0%";
                             
                             let status = "晴朗", icon = "fa-sun";
                             if (wcode >= 1 && wcode <= 3) { status = "多雲"; icon = "fa-cloud-sun"; }
                             else if (wcode >= 45 && wcode <= 48) { status = "有霧"; icon = "fa-smog"; }
                             else if (wcode >= 51 && wcode <= 67) { status = "陣雨"; icon = "fa-cloud-rain"; }
+
+                            const advisory = generateClothingAdvisory(tMin, tMax, wcode, rainProbVal);
 
                             day.weather = {
                                 temp: `${tMin}°C - ${tMax}°C`,
@@ -581,7 +601,8 @@
                                 icon: icon,
                                 sunrise: data.daily.sunrise[index] ? data.daily.sunrise[index].substring(11, 16) : "尚未預測",
                                 sunset: data.daily.sunset[index] ? data.daily.sunset[index].substring(11, 16) : "尚未預測",
-                                rainProb: (data.daily.precipitation_probability_max[index] !== null) ? data.daily.precipitation_probability_max[index] + "%" : "尚未預測"
+                                rainProb: rainProbVal,
+                                clothingAdvice: advisory
                             };
                         }
                     }
@@ -705,7 +726,15 @@
             const currency = day.dayNum <= 2 ? "RMB" : "HKD";
             if (day.spots) day.spots.forEach(s => dayTotalCost += (Number(s.cost) || 0));
 
-            const weather = day.weather || { temp: "--", status: "尚未預測", icon: "fa-clock", sunrise: "尚未預測", sunset: "尚未預測", rainProb: "尚未預測" };
+            const weather = day.weather || {
+                temp: "--",
+                status: "尚未預測",
+                icon: "fa-clock",
+                sunrise: "尚未預測",
+                sunset: "尚未預測",
+                rainProb: "尚未預測",
+                clothingAdvice: "氣象預報發布時間未到，建議參考當地季節平均氣溫穿著。"
+            };
 
             dayCard.innerHTML = `
                 <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl p-5 shadow-lg border border-slate-800 space-y-4">
@@ -735,6 +764,17 @@
                         <div class="bg-slate-800/80 rounded-xl p-2 px-3 border border-slate-700/70 flex items-center space-x-2.5">
                             <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-sm"><i class="fa-solid fa-wallet"></i></div>
                             <div><p class="text-[10px] text-slate-400 font-medium">當日花費總額</p><p class="font-extrabold text-emerald-300 text-xs">${currency === 'RMB' ? '¥' : 'HK$'} ${dayTotalCost.toLocaleString()} ${currency}</p></div>
+                        </div>
+                    </div>
+
+                    <!-- 👔 動態穿著建議 Banner -->
+                    <div class="bg-teal-950/60 border border-teal-500/30 rounded-xl p-3 flex items-start gap-2.5 text-xs text-teal-200">
+                        <div class="w-6 h-6 rounded-lg bg-teal-500/20 text-teal-300 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i class="fa-solid fa-shirt"></i>
+                        </div>
+                        <div class="flex-1">
+                            <span class="font-bold text-teal-300 me-1.5">穿著與出門建議：</span>
+                            <span class="text-slate-200">${weather.clothingAdvice}</span>
                         </div>
                     </div>
                 </div>
@@ -820,7 +860,7 @@
             daysToInclude.forEach(day => {
                 if (!day.spots) return;
                 const dayLatLngs = [];
-                const dayColor = getDayColor(day.dayNum); // 💡 使用 30 色循環函式
+                const dayColor = getDayColor(day.dayNum);
 
                 day.spots.forEach((spot, index) => {
                     const meta = categoryMeta[spot.category] || categoryMeta.Sightseeing;
