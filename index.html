@@ -104,7 +104,7 @@
                     <p class="text-sm md:text-base text-slate-300 mt-2 flex items-center gap-3 font-medium">
                         <span><i class="fa-regular fa-calendar text-teal-400 me-1.5"></i><span id="header-date-range">行程動態載入中</span></span>
                         <span class="text-slate-600">•</span>
-                        <span><i class="fa-solid fa-location-dot text-rose-400 me-1.5"></i>深圳 &amp; 香港</span>
+                        <span><i class="fa-solid fa-location-dot text-rose-400 me-1.5"></i><span id="header-locations">載入中...</span></span>
                     </p>
                 </div>
 
@@ -195,11 +195,10 @@
 
     <script>
         // ==========================================
-        // 📊 GOOGLE SHEET 連結設定 (包含 Days 與 Spots 兩個分頁)
+        // 📊 GOOGLE SHEET 連結設定
         // ==========================================
         const BASE_SHEET_ID = "1_ahVcayqH7ptZtJJa-YukQF7HDum12hMUU3R5y4dn5E";
         
-        // 透過 sheet 參數指定讀取 'Days' 與 'Spots' 工作表
         const DAYS_CSV_URL = `https://docs.google.com/spreadsheets/d/${BASE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Days`; 
         const SPOTS_CSV_URL = `https://docs.google.com/spreadsheets/d/${BASE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Spots`;
 
@@ -214,6 +213,7 @@
 
         let tripData = {
             title: "香港與深圳 慢活之旅",
+            locations: "深圳 & 香港",
             dateRange: "",
             days: []
         };
@@ -295,7 +295,7 @@
             if (refreshIcon) refreshIcon.classList.add('fa-spin');
 
             try {
-                // 1. 抓取 Days 分頁（主題與日期）
+                // 1. 抓取 Days 分頁（標題、地點、主題與日期）
                 const daysRes = await fetch(DAYS_CSV_URL + "&t=" + new Date().getTime());
                 if (!daysRes.ok) throw new Error("讀取 Days 失敗");
                 const daysCsv = await daysRes.text();
@@ -307,7 +307,12 @@
                 const spotsCsv = await spotsRes.text();
                 parseSpotsCSV(spotsCsv);
 
-                // 更新頁面動態資訊
+                // 更新頁面標題與動態資訊
+                document.getElementById('main-title').textContent = tripData.title;
+                document.getElementById('page-title').textContent = `${tripData.title} - 行程規劃`;
+                document.getElementById('footer-title-text').textContent = tripData.title;
+                document.getElementById('header-locations').textContent = tripData.locations;
+
                 if (tripData.days.length > 0) {
                     const firstDate = tripData.days[0].date || "";
                     const lastDate = tripData.days[tripData.days.length - 1].date || "";
@@ -386,15 +391,29 @@
 
             for (let i = 1; i < rows.length; i++) {
                 const cols = rows[i];
-                if (!cols || cols.length < 4) continue;
+                if (!cols) continue;
 
-                const dayNum = parseInt(cols[0]) || i;
-                const dateStr = cols[1] || "";
-                const dateStringVal = cols[2] || "";
-                const themeStr = cols[3] || "精彩行程";
-                const areaStr = cols[4] || "";
-                const latVal = parseFloat(cols[5]) || 22.35;
-                const lngVal = parseFloat(cols[6]) || 114.0;
+                // 檢查是否為頂部設定 (Config)
+                const configKey = cols[0] ? cols[0].trim() : "";
+                const configValue = cols[1] ? cols[1].trim() : "";
+
+                if (configKey === "main_title" && configValue) {
+                    tripData.title = configValue;
+                    continue;
+                }
+                if (configKey === "locations" && configValue) {
+                    tripData.locations = configValue;
+                    continue;
+                }
+
+                // 讀取各天主題 (Day, Date, DateString, Theme, Area)
+                const dayNum = parseInt(cols[2]) || parseInt(cols[0]);
+                if (isNaN(dayNum)) continue;
+
+                const dateStr = cols[3] || "";
+                const dateStringVal = cols[4] || "";
+                const themeStr = cols[5] || "精彩行程";
+                const areaStr = cols[6] || "";
 
                 tripData.days.push({
                     dayNum: dayNum,
@@ -402,8 +421,8 @@
                     dateString: dateStringVal,
                     theme: themeStr,
                     area: areaStr,
-                    lat: latVal,
-                    lng: lngVal,
+                    lat: 22.35,
+                    lng: 114.0,
                     spots: []
                 });
             }
