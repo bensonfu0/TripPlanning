@@ -195,12 +195,13 @@
 
     <script>
         // ==========================================
-        // 📊 GOOGLE SHEET 連結設定
+        // 📊 GOOGLE SHEET 連結設定 (獨立 Config, Days, Spots 三分頁)
         // ==========================================
         const BASE_SHEET_ID = "1_ahVcayqH7ptZtJJa-YukQF7HDum12hMUU3R5y4dn5E";
         
-        const DAYS_CSV_URL = `https://docs.google.com/spreadsheets/d/${BASE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Days`; 
-        const SPOTS_CSV_URL = `https://docs.google.com/spreadsheets/d/${BASE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Spots`;
+        const CONFIG_CSV_URL = `https://docs.google.com/spreadsheets/d/${BASE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Config`;
+        const DAYS_CSV_URL   = `https://docs.google.com/spreadsheets/d/${BASE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Days`; 
+        const SPOTS_CSV_URL  = `https://docs.google.com/spreadsheets/d/${BASE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Spots`;
 
         const DAY_COLOR_PALETTE = {
             1: "#059669",
@@ -295,16 +296,28 @@
             if (refreshIcon) refreshIcon.classList.add('fa-spin');
 
             try {
+                // 1. 抓取 Config 分頁（全域設定）
+                try {
+                    const configRes = await fetch(CONFIG_CSV_URL + "&t=" + new Date().getTime());
+                    if (configRes.ok) {
+                        const configCsv = await configRes.text();
+                        parseConfigCSV(configCsv);
+                    }
+                } catch (e) { console.warn("Config 分頁讀取略過", e); }
+
+                // 2. 抓取 Days 分頁（天數主題與日期）
                 const daysRes = await fetch(DAYS_CSV_URL + "&t=" + new Date().getTime());
                 if (!daysRes.ok) throw new Error("讀取 Days 失敗");
                 const daysCsv = await daysRes.text();
                 parseDaysCSV(daysCsv);
 
+                // 3. 抓取 Spots 分頁（詳細景點）
                 const spotsRes = await fetch(SPOTS_CSV_URL + "&t=" + new Date().getTime());
                 if (!spotsRes.ok) throw new Error("讀取 Spots 失敗");
                 const spotsCsv = await spotsRes.text();
                 parseSpotsCSV(spotsCsv);
 
+                // 更新頁面標題與動態資訊
                 document.getElementById('main-title').textContent = tripData.title;
                 document.getElementById('page-title').textContent = `${tripData.title} - 行程規劃`;
                 document.getElementById('footer-title-text').textContent = tripData.title;
@@ -381,6 +394,18 @@
             return rows;
         }
 
+        function parseConfigCSV(csvText) {
+            const rows = parseCSVRows(csvText);
+            for (let i = 1; i < rows.length; i++) {
+                const cols = rows[i];
+                if (!cols || cols.length < 2) continue;
+                const key = cols[0] ? cols[0].trim() : "";
+                const val = cols[1] ? cols[1].trim() : "";
+                if (key === "main_title" && val) tripData.title = val;
+                if (key === "locations" && val) tripData.locations = val;
+            }
+        }
+
         function parseDaysCSV(csvText) {
             const rows = parseCSVRows(csvText);
             tripData.days = [];
@@ -388,27 +413,15 @@
 
             for (let i = 1; i < rows.length; i++) {
                 const cols = rows[i];
-                if (!cols) continue;
+                if (!cols || cols.length < 4) continue;
 
-                const configKey = cols[0] ? cols[0].trim() : "";
-                const configValue = cols[1] ? cols[1].trim() : "";
-
-                if (configKey === "main_title" && configValue) {
-                    tripData.title = configValue;
-                    continue;
-                }
-                if (configKey === "locations" && configValue) {
-                    tripData.locations = configValue;
-                    continue;
-                }
-
-                const dayNum = parseInt(cols[2]) || parseInt(cols[0]);
-                if (isNaN(dayNum)) continue;
-
-                const dateStr = cols[3] || "";
-                const dateStringVal = cols[4] || "";
-                const themeStr = cols[5] || "精彩行程";
-                const areaStr = cols[6] || "";
+                const dayNum = parseInt(cols[0]) || i;
+                const dateStr = cols[1] || "";
+                const dateStringVal = cols[2] || "";
+                const themeStr = cols[3] || "精彩行程";
+                const areaStr = cols[4] || "";
+                const latVal = parseFloat(cols[5]) || 22.35;
+                const lngVal = parseFloat(cols[6]) || 114.0;
 
                 tripData.days.push({
                     dayNum: dayNum,
@@ -416,8 +429,8 @@
                     dateString: dateStringVal,
                     theme: themeStr,
                     area: areaStr,
-                    lat: 22.35,
-                    lng: 114.0,
+                    lat: latVal,
+                    lng: lngVal,
                     spots: []
                 });
             }
