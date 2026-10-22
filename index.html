@@ -88,11 +88,8 @@
         <div class="max-w-7xl mx-auto relative z-10">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <!-- Travel Badge & Sheet Status -->
+                    <!-- Sheet Status -->
                     <div class="flex flex-wrap items-center gap-2 mb-3">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/20 border border-teal-400/30 text-teal-300 text-xs font-semibold">
-                            <i class="fa-solid fa-plane-arrival"></i> <span id="header-badge-text">雙城移動慢活漫遊 • 全記錄</span>
-                        </div>
                         <div id="sheet-sync-status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold">
                             <i class="fa-solid fa-file-excel"></i> <span>Google Sheet 資料同步中...</span>
                         </div>
@@ -327,7 +324,7 @@
                 }
 
                 document.getElementById('sheet-sync-status').className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold";
-                document.getElementById('sheet-sync-status').innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> <span>已從 Google Sheet 同步主題與行程</span>';
+                document.getElementById('sheet-sync-status').innerHTML = '<i class="fa-solid fa-file-excel"></i> <span>已從 Google Sheet 同步主題與行程</span>';
 
                 showToast("已成功同步最新主題與行程！", "success");
             } catch (error) {
@@ -441,8 +438,8 @@
                 if (!cols || cols.length < 5) continue;
 
                 const dayNum = parseInt(cols[0]) || 1;
-                // 💡 支援任意格式的時間字串（例如 11:00-13:00、14:30 等）
-                const timeStr = cols[2] ? cols[2].trim() : "10:00";
+                // 💡 完全直接讀取 Google Sheet 內的原始字串（如 10:00-11:00）
+                const timeStr = cols[2] !== undefined && cols[2] !== null ? String(cols[2]).trim() : "10:00";
                 const catStr = cols[3] ? cols[3].trim() : "Sightseeing";
                 const titleStr = cols[4] ? cols[4].trim() : "";
                 const costVal = parseFloat(cols[5]) || 0;
