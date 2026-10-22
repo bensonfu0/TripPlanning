@@ -113,8 +113,8 @@
                 </div>
             </div>
 
-            <!-- Total Trip Budget Summary Bar -->
-            <div id="trip-budget-summary" class="mt-6 pt-5 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <!-- Total Trip Budget Summary Bar (動態依類別分類顯示) -->
+            <div id="trip-budget-summary" class="mt-6 pt-5 border-t border-white/10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 <!-- Dynamically injected -->
             </div>
         </div>
@@ -200,6 +200,13 @@
         const DAYS_CSV_URL   = `https://docs.google.com/spreadsheets/d/${BASE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Days`; 
         const SPOTS_CSV_URL  = `https://docs.google.com/spreadsheets/d/${BASE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Spots`;
 
+        // 💡 預設備用匯率（若 API 斷線時備用）
+        let EXCHANGE_RATES = {
+            RMB: 4.5,
+            HKD: 4.1,
+            TWD: 1.0
+        };
+
         const DAY_COLOR_PALETTE = {
             1: "#059669",
             2: "#2563eb",
@@ -238,10 +245,35 @@
             }
         };
 
-        document.addEventListener("DOMContentLoaded", () => {
+        const categoryMeta = {
+            Dining: { name: "餐飲 / 美食", icon: "fa-utensils", bg: "bg-amber-500/20", text: "text-amber-300", badgeColor: "bg-amber-100 text-amber-800 border-amber-200" },
+            Shopping: { name: "購物 / 選物", icon: "fa-bag-shopping", bg: "bg-purple-500/20", text: "text-purple-300", badgeColor: "bg-purple-100 text-purple-800 border-purple-200" },
+            Sightseeing: { name: "景點 / 慢步", icon: "fa-camera", bg: "bg-emerald-500/20", text: "text-emerald-300", badgeColor: "bg-emerald-100 text-emerald-800 border-emerald-200" },
+            Experience: { name: "特色體驗", icon: "fa-wand-magic-sparkles", bg: "bg-rose-500/20", text: "text-rose-300", badgeColor: "bg-rose-100 text-rose-800 border-rose-200" },
+            Flight: { name: "航班 / 交通", icon: "fa-plane", bg: "bg-blue-500/20", text: "text-blue-300", badgeColor: "bg-blue-100 text-blue-800 border-blue-200" },
+            Hotel: { name: "住宿 / 飯店", icon: "fa-hotel", bg: "bg-indigo-500/20", text: "text-indigo-300", badgeColor: "bg-indigo-100 text-indigo-800 border-indigo-200" }
+        };
+
+        document.addEventListener("DOMContentLoaded", async () => {
             initLeafletMap();
+            await fetchLatestExchangeRates();
             fetchAllGoogleSheetData();
         });
+
+        async function fetchLatestExchangeRates() {
+            try {
+                const res = await fetch("https://open.er-api.com/v6/latest/TWD");
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.rates) {
+                        if (data.rates.CNY) EXCHANGE_RATES.RMB = 1 / data.rates.CNY;
+                        if (data.rates.HKD) EXCHANGE_RATES.HKD = 1 / data.rates.HKD;
+                    }
+                }
+            } catch (err) {
+                console.warn("無法取得即時匯率，使用預設匯率算力：", err);
+            }
+        }
 
         function initLeafletMap() {
             map = L.map('map', {
@@ -433,21 +465,29 @@
             const rows = parseCSVRows(csvText);
             if (rows.length <= 1) return;
 
+            const headers = rows[0].map(h => h.trim().toLowerCase());
+            const getCol = (row, names) => {
+                for (let name of names) {
+                    const idx = headers.indexOf(name.toLowerCase());
+                    if (idx !== -1 && row[idx] !== undefined) return row[idx].trim();
+                }
+                return "";
+            };
+
             for (let i = 1; i < rows.length; i++) {
                 const cols = rows[i];
-                if (!cols || cols.length < 5) continue;
+                if (!cols || cols.length === 0) continue;
 
-                const dayNum = parseInt(cols[0]) || 1;
-                // 💡 完全直接讀取 Google Sheet 內的原始字串（如 10:00-11:00）
-                const timeStr = cols[2] !== undefined && cols[2] !== null ? String(cols[2]).trim() : "10:00";
-                const catStr = cols[3] ? cols[3].trim() : "Sightseeing";
-                const titleStr = cols[4] ? cols[4].trim() : "";
-                const costVal = parseFloat(cols[5]) || 0;
-                const currStr = cols[6] ? cols[6].trim() : (dayNum <= 2 ? "RMB" : "HKD");
-                const latVal = parseFloat(cols[7]) || 0;
-                const lngVal = parseFloat(cols[8]) || 0;
-                const mapUrlStr = cols[9] ? cols[9].trim() : "";
-                const notesStr = cols[10] ? cols[10].trim() : "";
+                const dayNum = parseInt(getCol(cols, ['day', '天數'])) || 1;
+                const timeStr = getCol(cols, ['time', '時間']) || "10:00";
+                const catStr = getCol(cols, ['category', '分類', '類別']) || "Sightseeing";
+                const titleStr = getCol(cols, ['title', '景點', '名稱', '景點名稱']) || "";
+                const costVal = parseFloat(getCol(cols, ['cost', '花費', '金額'])) || 0;
+                const currStr = getCol(cols, ['currency', '幣別']) || (dayNum <= 2 ? "RMB" : "HKD");
+                const latVal = parseFloat(getCol(cols, ['latitude', 'lat', '緯度'])) || 0;
+                const lngVal = parseFloat(getCol(cols, ['longitude', 'lng', '經度'])) || 0;
+                const mapUrlStr = getCol(cols, ['mapurl', 'map', '地圖連結']) || "";
+                const notesStr = getCol(cols, ['notes', 'note', '備註']) || "";
 
                 const targetDay = tripData.days.find(d => d.dayNum === dayNum);
                 if (targetDay && titleStr) {
@@ -466,15 +506,6 @@
                 }
             }
         }
-
-        const categoryMeta = {
-            Flight: { name: "航班 / 交通", color: "bg-blue-100 text-blue-800 border-blue-200", icon: "fa-plane" },
-            Hotel: { name: "住宿 / 飯店", color: "bg-indigo-100 text-indigo-800 border-indigo-200", icon: "fa-hotel" },
-            Sightseeing: { name: "景點 / 慢步", color: "bg-emerald-100 text-emerald-800 border-emerald-200", icon: "fa-camera" },
-            Dining: { name: "美食 / 咖啡", color: "bg-amber-100 text-amber-800 border-amber-200", icon: "fa-utensils" },
-            Shopping: { name: "購物 / 選物", color: "bg-purple-100 text-purple-800 border-purple-200", icon: "fa-bag-shopping" },
-            Experience: { name: "特色體驗", color: "bg-rose-100 text-rose-800 border-rose-200", icon: "fa-wand-magic-sparkles" }
-        };
 
         function renderApp() {
             renderHeaderBudgetSummary();
@@ -533,37 +564,72 @@
             renderItineraryWrapper();
         }
 
+        // 💡 依據「行程類別」進行分門別類加總
         function renderHeaderBudgetSummary() {
-            let totalRMB = 0, totalHKD = 0;
+            let totalRMB = 0, totalHKD = 0, totalTWD = 0;
+            const categoryTotals = {
+                Dining: 0,
+                Shopping: 0,
+                Sightseeing: 0,
+                Experience: 0,
+                Flight: 0,
+                Hotel: 0
+            };
+
             tripData.days.forEach(day => {
                 if (day.spots) {
                     day.spots.forEach(s => {
                         const amt = Number(s.cost) || 0;
-                        if (s.currency === "RMB") totalRMB += amt;
-                        else if (s.currency === "HKD") totalHKD += amt;
+                        const curr = (s.currency || "").toUpperCase();
+                        let spotTWD = 0;
+
+                        if (curr === "RMB" || curr === "CNY") {
+                            totalRMB += amt;
+                            spotTWD = amt * EXCHANGE_RATES.RMB;
+                        } else if (curr === "HKD") {
+                            totalHKD += amt;
+                            spotTWD = amt * EXCHANGE_RATES.HKD;
+                        } else if (curr === "TWD" || curr === "NTD") {
+                            spotTWD = amt;
+                        }
+
+                        totalTWD += spotTWD;
+
+                        const catKey = categoryMeta[s.category] ? s.category : "Sightseeing";
+                        categoryTotals[catKey] = (categoryTotals[catKey] || 0) + spotTWD;
                     });
                 }
             });
 
             const container = document.getElementById('trip-budget-summary');
-            container.innerHTML = `
-                <div class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-2.5 px-3.5">
-                    <div class="w-8 h-8 rounded-lg bg-teal-500/20 text-teal-300 flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-coins"></i></div>
-                    <div><p class="text-[11px] text-slate-400 uppercase font-semibold">深圳預計花費</p><p class="text-xs font-bold text-teal-300">¥ ${totalRMB.toLocaleString()} RMB</p></div>
-                </div>
-                <div class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-2.5 px-3.5">
-                    <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-money-bill-wave"></i></div>
-                    <div><p class="text-[11px] text-slate-400 uppercase font-semibold">香港預計花費</p><p class="text-xs font-bold text-amber-300">HK$ ${totalHKD.toLocaleString()} HKD</p></div>
-                </div>
-                <div class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-2.5 px-3.5">
-                    <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-300 flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-hotel"></i></div>
-                    <div><p class="text-[11px] text-slate-400 uppercase font-semibold">飯店住宿規畫</p><p class="text-xs font-bold text-slate-200">全程僅換飯店 1 次</p></div>
-                </div>
-                <div class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-2.5 px-3.5">
-                    <div class="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-300 flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-calendar-check"></i></div>
-                    <div><p class="text-[11px] text-slate-400 uppercase font-semibold">氣象預報狀態</p><p class="text-xs font-bold text-teal-300">日期動態對應</p></div>
+            let html = `
+                <div class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-2.5 px-3.5 shadow-sm">
+                    <div class="w-8 h-8 rounded-lg bg-teal-500/20 text-teal-300 flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-wallet"></i></div>
+                    <div>
+                        <p class="text-[11px] text-slate-400 uppercase font-semibold">整趟行程預估總額</p>
+                        <p class="text-xs font-bold text-teal-300">NT$ ${Math.round(totalTWD).toLocaleString()} 元 <span class="text-[10px] text-slate-400 font-normal">(¥${totalRMB.toLocaleString()} + HK$${totalHKD.toLocaleString()})</span></p>
+                    </div>
                 </div>
             `;
+
+            // 依據有花費的類別動態產生卡片
+            Object.keys(categoryTotals).forEach(catKey => {
+                const twdAmt = categoryTotals[catKey];
+                if (twdAmt > 0) {
+                    const meta = categoryMeta[catKey] || categoryMeta.Sightseeing;
+                    html += `
+                        <div class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-2.5 px-3.5 shadow-sm">
+                            <div class="w-8 h-8 rounded-lg ${meta.bg} ${meta.text} flex items-center justify-center font-bold text-sm"><i class="fa-solid ${meta.icon}"></i></div>
+                            <div>
+                                <p class="text-[11px] text-slate-400 uppercase font-semibold">${meta.name}</p>
+                                <p class="text-xs font-bold ${meta.text}">NT$ ${Math.round(twdAmt).toLocaleString()} 元</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            container.innerHTML = html;
         }
 
         function renderDayTabs() {
@@ -644,7 +710,7 @@
                         </div>
                         <div class="bg-slate-800/80 rounded-xl p-2 px-3 border border-slate-700/70 flex items-center space-x-2.5">
                             <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-sm"><i class="fa-solid fa-wallet"></i></div>
-                            <div><p class="text-[10px] text-slate-400 font-medium">預計花費總額</p><p class="font-extrabold text-emerald-300 text-xs">${currency === 'RMB' ? '¥' : 'HK$'} ${dayTotalCost.toLocaleString()} ${currency}</p></div>
+                            <div><p class="text-[10px] text-slate-400 font-medium">當日花費總額</p><p class="font-extrabold text-emerald-300 text-xs">${currency === 'RMB' ? '¥' : 'HK$'} ${dayTotalCost.toLocaleString()} ${currency}</p></div>
                         </div>
                     </div>
                 </div>
@@ -693,7 +759,7 @@
                                 <div class="flex-1">
                                     <div class="flex items-center space-x-2 flex-wrap gap-y-1">
                                         <span class="text-xs font-extrabold text-slate-900 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200"><i class="fa-regular fa-clock me-1 text-teal-600"></i>${spot.time}</span>
-                                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full border ${meta.color}"><i class="fa-solid ${meta.icon} me-1"></i>${meta.name}</span>
+                                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full border ${meta.badgeColor || meta.color}"><i class="fa-solid ${meta.icon} me-1"></i>${meta.name}</span>
                                         ${costDisplay}
                                     </div>
 
