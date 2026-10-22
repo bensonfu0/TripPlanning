@@ -132,7 +132,7 @@
                 </div>
             </div>
 
-            <!-- Total Trip Budget Summary Bar (Dynamic Categories) -->
+            <!-- Total Trip Budget Summary Bar -->
             <div id="trip-budget-summary" class="pt-2 border-t border-white/10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 <!-- Dynamically injected -->
             </div>
@@ -296,34 +296,23 @@
             "#8b5cf6", "#f43f5e", "#06b6d4", "#84cc16", "#a855f7", "#64748b"
         ];
 
-        // 🎨 供動態類別使用的配色與圖示循環庫（完全不預設限制名稱）
-        const DYNAMIC_THEMES = [
-            { bg: "bg-amber-500/20", text: "text-amber-300", badge: "bg-amber-100 text-amber-800 border-amber-200", icon: "fa-utensils" },
-            { bg: "bg-purple-500/20", text: "text-purple-300", badge: "bg-purple-100 text-purple-800 border-purple-200", icon: "fa-bag-shopping" },
-            { bg: "bg-emerald-500/20", text: "text-emerald-300", badge: "bg-emerald-100 text-emerald-800 border-emerald-200", icon: "fa-camera" },
-            { bg: "bg-rose-500/20", text: "text-rose-300", badge: "bg-rose-100 text-rose-800 border-rose-200", icon: "fa-wand-magic-sparkles" },
-            { bg: "bg-blue-500/20", text: "text-blue-300", badge: "bg-blue-100 text-blue-800 border-blue-200", icon: "fa-plane" },
-            { bg: "bg-indigo-500/20", text: "text-indigo-300", badge: "bg-indigo-100 text-indigo-800 border-indigo-200", icon: "fa-hotel" },
-            { bg: "bg-sky-500/20", text: "text-sky-300", badge: "bg-sky-100 text-sky-800 border-sky-200", icon: "fa-compass" },
-            { bg: "bg-orange-500/20", text: "text-orange-300", badge: "bg-orange-100 text-orange-800 border-orange-200", icon: "fa-ticket" }
-        ];
+        // 🏷️ 支援 Google Sheet 直接填寫中文分類對應的圖示與色彩
+        const categoryMeta = {
+            "餐飲 / 美食": { name: "餐飲 / 美食", icon: "fa-utensils", bg: "bg-amber-500/20", text: "text-amber-300", badgeColor: "bg-amber-100 text-amber-800 border-amber-200" },
+            "購物 / 選物": { name: "購物 / 選物", icon: "fa-bag-shopping", bg: "bg-purple-500/20", text: "text-purple-300", badgeColor: "bg-purple-100 text-purple-800 border-purple-200" },
+            "景點 / 慢步": { name: "景點 / 慢步", icon: "fa-camera", bg: "bg-emerald-500/20", text: "text-emerald-300", badgeColor: "bg-emerald-100 text-emerald-800 border-emerald-200" },
+            "特色體驗": { name: "特色體驗", icon: "fa-wand-magic-sparkles", bg: "bg-rose-500/20", text: "text-rose-300", badgeColor: "bg-rose-100 text-rose-800 border-rose-200" },
+            "航班 / 交通": { name: "航班 / 交通", icon: "fa-plane", bg: "bg-blue-500/20", text: "text-blue-300", badgeColor: "bg-blue-100 text-blue-800 border-blue-200" },
+            "住宿 / 飯店": { name: "住宿 / 飯店", icon: "fa-hotel", bg: "bg-indigo-500/20", text: "text-indigo-300", badgeColor: "bg-indigo-100 text-indigo-800 border-indigo-200" }
+        };
 
-        function getCategoryMeta(categoryName) {
-            const name = (categoryName || "一般行程").trim();
-            // 透過字串雜湊確保同一個自定義類別每次都分到相同的顏色與圖示
-            let hash = 0;
-            for (let i = 0; i < name.length; i++) {
-                hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        function getCategoryMeta(catName) {
+            const cleaned = (catName || "").trim();
+            // 若 Google Sheet 填寫的中文分類剛好在設定內，直接回傳；否則給預設樣式
+            if (categoryMeta[cleaned]) {
+                return categoryMeta[cleaned];
             }
-            const index = Math.abs(hash) % DYNAMIC_THEMES.length;
-            const theme = DYNAMIC_THEMES[index];
-            return {
-                name: name,
-                icon: theme.icon,
-                bg: theme.bg,
-                text: theme.text,
-                badgeColor: theme.badge
-            };
+            return { name: cleaned || "一般行程", icon: "fa-compass", bg: "bg-teal-500/20", text: "text-teal-300", badgeColor: "bg-teal-100 text-teal-800 border-teal-200" };
         }
 
         function getDayColor(dayNum) {
@@ -693,10 +682,10 @@
 
                 const dayNum = parseInt(clean(cols[0])) || 1;
                 const timeStr = clean(cols[2]) !== "" ? clean(cols[2]) : "";
-                const catStr = clean(cols[3]) !== "" ? clean(cols[3]) : "一般"; // 💡 完全直接抓取使用者自定義填寫的分類
+                const catStr = clean(cols[3]) || "景點 / 慢步";
                 const titleStr = clean(cols[4]);
                 const costVal = parseFloat(clean(cols[5])) || 0;
-                const currStr = clean(cols[6]) || "TWD";
+                const currStr = clean(cols[6]) || (dayNum <= 2 ? "RMB" : "HKD");
                 const latVal = parseFloat(clean(cols[7])) || 0;
                 const lngVal = parseFloat(clean(cols[8])) || 0;
                 const mapUrlStr = clean(cols[9]);
@@ -795,7 +784,14 @@
 
         function renderHeaderBudgetSummary() {
             let totalTWD = 0;
-            const categoryTotals = {};
+            const categoryTotals = {
+                "餐飲 / 美食": 0,
+                "購物 / 選物": 0,
+                "景點 / 慢步": 0,
+                "特色體驗": 0,
+                "航班 / 交通": 0,
+                "住宿 / 飯店": 0
+            };
 
             tripData.days.forEach(day => {
                 if (day.spots) {
@@ -812,17 +808,12 @@
                             spotTWD = amt * EXCHANGE_RATES.KRW;
                         } else if (curr === "TWD" || curr === "NTD") {
                             spotTWD = amt;
-                        } else {
-                            spotTWD = amt; // 其他自訂幣別預設 1:1
                         }
 
                         totalTWD += spotTWD;
 
-                        const catKey = s.category || "一般";
-                        if (!categoryTotals[catKey]) {
-                            categoryTotals[catKey] = 0;
-                        }
-                        categoryTotals[catKey] += spotTWD;
+                        const catKey = categoryMeta[s.category] ? s.category : "景點 / 慢步";
+                        categoryTotals[catKey] = (categoryTotals[catKey] || 0) + spotTWD;
                     });
                 }
             });
@@ -841,22 +832,23 @@
                 </div>
             `;
 
-            // 💡 動態產生使用者填寫的所有類別摘要卡片
             Object.keys(categoryTotals).forEach(catKey => {
                 const twdAmt = categoryTotals[catKey];
-                const meta = getCategoryMeta(catKey);
-                html += `
-                    <div onclick="openCostDetailModal('${catKey}')" class="flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-2.5 px-3.5 shadow-sm cursor-pointer transition transform hover:-translate-y-0.5">
-                        <div class="w-8 h-8 rounded-lg ${meta.bg} ${meta.text} flex items-center justify-center font-bold text-sm"><i class="fa-solid ${meta.icon}"></i></div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center justify-between">
-                                <p class="text-[11px] text-slate-400 uppercase font-semibold truncate">${meta.name}</p>
-                                <i class="fa-solid fa-angle-right text-[10px] text-slate-500"></i>
+                if (twdAmt > 0) {
+                    const meta = categoryMeta[catKey] || categoryMeta["景點 / 慢步"];
+                    html += `
+                        <div onclick="openCostDetailModal('${catKey}')" class="flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-2.5 px-3.5 shadow-sm cursor-pointer transition transform hover:-translate-y-0.5">
+                            <div class="w-8 h-8 rounded-lg ${meta.bg} ${meta.text} flex items-center justify-center font-bold text-sm"><i class="fa-solid ${meta.icon}"></i></div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-[11px] text-slate-400 uppercase font-semibold truncate">${meta.name}</p>
+                                    <i class="fa-solid fa-angle-right text-[10px] text-slate-500"></i>
+                                </div>
+                                <p class="text-xs font-bold ${meta.text} truncate">NT$ ${Math.round(twdAmt).toLocaleString()} 元</p>
                             </div>
-                            <p class="text-xs font-bold ${meta.text} truncate">NT$ ${Math.round(twdAmt).toLocaleString()} 元</p>
                         </div>
-                    </div>
-                `;
+                    `;
+                }
             });
 
             container.innerHTML = html;
@@ -891,7 +883,7 @@
                     }
                 });
             } else {
-                const meta = getCategoryMeta(categoryKey);
+                const meta = categoryMeta[categoryKey] || categoryMeta["景點 / 慢步"];
                 iconBg.className = `w-9 h-9 rounded-xl ${meta.bg} ${meta.text} flex items-center justify-center text-lg`;
                 iconEl.className = `fa-solid ${meta.icon}`;
                 titleEl.textContent = `${meta.name} 費用明細`;
@@ -927,7 +919,7 @@
 
                     totalTWD += spotTWD;
 
-                    const catMeta = getCategoryMeta(s.category);
+                    const catMeta = categoryMeta[s.category] || categoryMeta["景點 / 慢步"];
 
                     return `
                         <div class="flex items-center justify-between bg-slate-50 border border-slate-200/90 rounded-xl p-3 hover:bg-slate-100 transition">
@@ -939,7 +931,7 @@
                                 </div>
                             </div>
                             <div class="text-right">
-                                <span class="font-extrabold text-xs md:text-sm text-slate-900 block">${s.currency} ${amt.toLocaleString()}</span>
+                                <span class="font-extrabold text-xs md:text-sm text-slate-900 block">${s.currency === 'RMB' ? '¥' : 'HK$'} ${amt.toLocaleString()}</span>
                                 <span class="text-[10px] text-slate-400 font-semibold">≈ NT$ ${Math.round(spotTWD).toLocaleString()}</span>
                             </div>
                         </div>
@@ -1065,16 +1057,8 @@
             const dayCard = document.createElement('div');
             dayCard.className = "bg-white rounded-2xl border border-slate-200 p-5 md:p-6 shadow-sm space-y-6 overflow-hidden";
             let dayTotalCost = 0;
-            if (day.spots) {
-                day.spots.forEach(s => {
-                    const amt = Number(s.cost) || 0;
-                    const curr = (s.currency || "").toUpperCase();
-                    if (curr === "RMB" || curr === "CNY") dayTotalCost += amt * EXCHANGE_RATES.RMB;
-                    else if (curr === "HKD") dayTotalCost += amt * EXCHANGE_RATES.HKD;
-                    else if (curr === "KRW") dayTotalCost += amt * EXCHANGE_RATES.KRW;
-                    else dayTotalCost += amt;
-                });
-            }
+            const currency = day.dayNum <= 2 ? "RMB" : "HKD";
+            if (day.spots) day.spots.forEach(s => dayTotalCost += (Number(s.cost) || 0));
 
             const weather = day.weather || {
                 temp: "--",
@@ -1113,7 +1097,7 @@
                         </div>
                         <div class="bg-slate-800/80 rounded-xl p-2 px-3 border border-slate-700/70 flex items-center space-x-2.5">
                             <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-sm"><i class="fa-solid fa-wallet"></i></div>
-                            <div><p class="text-[10px] text-slate-400 font-medium">當日花費總額</p><p class="font-extrabold text-emerald-300 text-xs">NT$ ${Math.round(dayTotalCost).toLocaleString()}</p></div>
+                            <div><p class="text-[10px] text-slate-400 font-medium">當日花費總額</p><p class="font-extrabold text-emerald-300 text-xs">${currency === 'RMB' ? '¥' : 'HK$'} ${dayTotalCost.toLocaleString()} ${currency}</p></div>
                         </div>
                     </div>
 
@@ -1142,14 +1126,14 @@
             }
 
             return day.spots.map((spot, index) => {
-                const meta = getCategoryMeta(spot.category);
+                const meta = categoryMeta[spot.category] || categoryMeta["景點 / 慢步"];
                 
                 const timeBadgeHtml = (spot.time && spot.time !== "")
                     ? `<span class="text-xs font-extrabold text-slate-900 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200"><i class="fa-regular fa-clock me-1 text-teal-600"></i>${spot.time}</span>`
                     : '';
 
                 const costDisplay = (spot.cost && Number(spot.cost) > 0)
-                    ? `<span class="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200"><i class="fa-solid fa-receipt text-emerald-600 me-1"></i>${spot.currency} ${spot.cost}</span>`
+                    ? `<span class="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200"><i class="fa-solid fa-receipt text-emerald-600 me-1"></i>${spot.currency === 'RMB' ? '¥' : 'HK$'} ${spot.cost}</span>`
                     : '';
 
                 const mapButtonHtml = (spot.mapUrl && spot.mapUrl.trim() !== "")
@@ -1177,7 +1161,7 @@
                                 <div class="flex-1">
                                     <div class="flex items-center space-x-2 flex-wrap gap-y-1">
                                         ${timeBadgeHtml}
-                                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full border ${meta.badgeColor}"><i class="fa-solid ${meta.icon} me-1"></i>${meta.name}</span>
+                                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full border ${meta.badgeColor || meta.color}"><i class="fa-solid ${meta.icon} me-1"></i>${meta.name}</span>
                                         ${costDisplay}
                                     </div>
 
@@ -1213,7 +1197,7 @@
                 const dayColor = getDayColor(day.dayNum);
 
                 day.spots.forEach((spot, index) => {
-                    const meta = getCategoryMeta(spot.category);
+                    const meta = categoryMeta[spot.category] || categoryMeta["景點 / 慢步"];
                     const latLng = [spot.lat || day.lat, spot.lng || day.lng];
                     dayLatLngs.push(latLng);
 
