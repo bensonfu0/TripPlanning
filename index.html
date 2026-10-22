@@ -77,10 +77,6 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             border: 2.5px solid white;
         }
-        /* 💡 讓 Google Sheet 備註內的換行符號正確呈現 */
-        .spot-notes-text {
-            white-space: pre-line;
-        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
@@ -352,7 +348,6 @@
             }
         }
 
-        // 💡 健全的 CSV 狀態機解析器（完美支援儲存格內部的換行與引號）
         function parseCSVRows(text) {
             let rows = [];
             let row = [];
@@ -366,7 +361,7 @@
                 if (inQuotes) {
                     if (c === '"' && nextC === '"') {
                         field += '"';
-                        i++; // Skip escaped quote
+                        i++;
                     } else if (c === '"') {
                         inQuotes = false;
                     } else {
@@ -625,13 +620,27 @@
 
             return day.spots.map((spot, index) => {
                 const meta = categoryMeta[spot.category] || categoryMeta.Sightseeing;
+                
                 const costDisplay = (spot.cost && Number(spot.cost) > 0)
                     ? `<span class="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200"><i class="fa-solid fa-receipt text-emerald-600 me-1"></i>${spot.currency === 'RMB' ? '¥' : 'HK$'} ${spot.cost}</span>`
-                    : `<span class="text-xs text-slate-400 bg-slate-50 px-2 py-0.5 rounded-lg border border-slate-100">免費 / 已內含</span>`;
+                    : '';
 
                 const mapButtonHtml = (spot.mapUrl && spot.mapUrl.trim() !== "")
                     ? `<a href="${spot.mapUrl}" target="_blank" rel="noopener noreferrer" class="text-teal-700 hover:text-teal-900 font-bold flex items-center gap-1.5 bg-teal-500/10 hover:bg-teal-500/20 px-3 py-1 rounded-xl border border-teal-300/60 transition"><i class="fa-solid fa-diamond-turn-right text-teal-600"></i> 前往地圖</a>`
                     : '';
+
+                // 💡 將備註內容依換行符號分割，每一行都渲染獨立的帶有圖示區塊
+                let notesHtml = '';
+                if (spot.notes && spot.notes.trim() !== "") {
+                    const noteLines = spot.notes.split(/\r?\n/);
+                    const linesContent = noteLines.map(line => `
+                        <div class="flex items-start space-x-1.5">
+                            <i class="fa-solid fa-circle-info text-teal-600 mt-0.5 flex-shrink-0"></i>
+                            <span class="leading-relaxed">${line}</span>
+                        </div>
+                    `).join('');
+                    notesHtml = `<div class="text-xs text-slate-600 bg-slate-50 rounded-xl p-2.5 mt-2.5 border border-slate-200/80 space-y-1.5">${linesContent}</div>`;
+                }
 
                 return `
                     <div id="spot-card-${spot.id}" class="relative flex items-start space-x-3 group transition-all duration-200">
@@ -648,7 +657,7 @@
 
                                     <h4 class="font-extrabold text-slate-900 text-base md:text-lg mt-2 group-hover:text-teal-700 transition cursor-pointer" onclick="focusMapSpot('${spot.id}', ${day.dayNum})">${spot.title}</h4>
 
-                                    ${spot.notes ? `<p class="text-xs text-slate-600 bg-slate-50 rounded-xl p-2.5 mt-2.5 border border-slate-200/80 leading-relaxed spot-notes-text"><i class="fa-solid fa-circle-info text-teal-600 me-1.5"></i>${spot.notes}</p>` : ''}
+                                    ${notesHtml}
 
                                     <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs flex-wrap gap-2">
                                         <div class="flex items-center space-x-2">
