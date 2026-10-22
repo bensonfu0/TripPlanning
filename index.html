@@ -91,7 +91,7 @@
                     <!-- Travel Badge & Sheet Status -->
                     <div class="flex flex-wrap items-center gap-2 mb-3">
                         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/20 border border-teal-400/30 text-teal-300 text-xs font-semibold">
-                            <i class="fa-solid fa-plane-arrival"></i> <span id="header-badge-text">雙城移動慢活漫遊 • 6天5夜全記錄</span>
+                            <i class="fa-solid fa-plane-arrival"></i> <span id="header-badge-text">雙城移動慢活漫遊 • 全記錄</span>
                         </div>
                         <div id="sheet-sync-status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold">
                             <i class="fa-solid fa-file-excel"></i> <span>Google Sheet 資料同步中...</span>
@@ -99,18 +99,18 @@
                     </div>
                     
                     <h1 id="main-title" class="text-2xl md:text-4xl font-extrabold tracking-tight text-white flex items-center gap-3">
-                        香港與深圳 6天5夜 慢活之旅
+                        香港與深圳 慢活之旅
                     </h1>
                     <p class="text-sm md:text-base text-slate-300 mt-2 flex items-center gap-3 font-medium">
-                        <span><i class="fa-regular fa-calendar text-teal-400 me-1.5"></i><span id="header-date-range">1月18日 - 1月23日</span></span>
+                        <span><i class="fa-regular fa-calendar text-teal-400 me-1.5"></i><span id="header-date-range">行程動態載入中</span></span>
                         <span class="text-slate-600">•</span>
-                        <span><i class="fa-solid fa-location-dot text-rose-400 me-1.5"></i>深圳 (福田/南山) &amp; 香港 (中環/上環)</span>
+                        <span><i class="fa-solid fa-location-dot text-rose-400 me-1.5"></i>深圳 &amp; 香港</span>
                     </p>
                 </div>
 
                 <!-- Refresh Sheet Button -->
                 <div class="flex items-center gap-2">
-                    <button onclick="fetchGoogleSheetData()" class="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-1.5">
+                    <button onclick="fetchAllGoogleSheetData()" class="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-1.5">
                         <i class="fa-solid fa-arrows-rotate" id="refresh-icon"></i> 從 Google Sheet 重新同步
                     </button>
                 </div>
@@ -186,7 +186,7 @@
 
     <!-- Footer -->
     <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 py-6 px-4 text-center text-xs space-y-1 mt-12">
-        <p class="font-medium text-slate-350"><span id="footer-title-text">香港與深圳 6天5夜 慢活之旅</span> • 專屬地圖導航版</p>
+        <p class="font-medium text-slate-350"><span id="footer-title-text">香港與深圳 慢活之旅</span> • 專屬地圖導航版</p>
         <p class="text-slate-500">&copy; 2026 行程規劃器. All rights reserved.</p>
     </footer>
 
@@ -195,17 +195,13 @@
 
     <script>
         // ==========================================
-        // 📊 GOOGLE SHEET 連結設定
+        // 📊 GOOGLE SHEET 連結設定 (包含 Days 與 Spots 兩個分頁)
         // ==========================================
-        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1_ahVcayqH7ptZtJJa-YukQF7HDum12hMUU3R5y4dn5E/export?format=csv";
-
-        const TRIP_CONFIG = {
-            destination: "香港與深圳",
-            daysCount: 6,
-            nightsCount: 5,
-            themeName: "慢活之旅",
-            dateRangeStr: "1月18日 - 1月23日"
-        };
+        const BASE_SHEET_ID = "1_ahVcayqH7ptZtJJa-YukQF7HDum12hMUU3R5y4dn5E";
+        
+        // 透過 sheet 參數指定讀取 'Days' 與 'Spots' 工作表
+        const DAYS_CSV_URL = `https://docs.google.com/spreadsheets/d/${BASE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Days`; 
+        const SPOTS_CSV_URL = `https://docs.google.com/spreadsheets/d/${BASE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Spots`;
 
         const DAY_COLOR_PALETTE = {
             1: "#059669",
@@ -216,31 +212,12 @@
             6: "#4f46e5"
         };
 
-        const fullTitleString = `${TRIP_CONFIG.destination} ${TRIP_CONFIG.daysCount}天${TRIP_CONFIG.nightsCount}夜 ${TRIP_CONFIG.themeName}`;
-
-        const baseItineraryStructure = {
-            title: fullTitleString,
-            dateRange: TRIP_CONFIG.dateRangeStr,
-            days: [
-                { dayNum: 1, date: "1/18, 週一", dateString: "2027-01-18", theme: "雙城移動 x 頂級水療", area: "深圳 (福田)", lat: 22.5431, lng: 114.0579, spots: [] },
-                { dayNum: 2, date: "1/19, 週二", dateString: "2027-01-19", theme: "古城慢活 x 科技體驗", area: "深圳 (南山)", lat: 22.5330, lng: 113.9304, spots: [] },
-                { dayNum: 3, date: "1/20, 週三", dateString: "2027-01-20", theme: "古董老街 x 人文咖啡", area: "香港 (上環/中環)", lat: 22.2855, lng: 114.1577, spots: [] },
-                { dayNum: 4, date: "1/21, 週四", dateString: "2027-01-21", theme: "歷史藝文 x 質感選物", area: "香港 (中環/灣仔/鰂魚涌)", lat: 22.2783, lng: 114.1747, spots: [] },
-                { dayNum: 5, date: "1/22, 週五", dateString: "2027-01-22", theme: "海濱慢步 x 在地美食", area: "香港 (堅尼地城/西營盤)", lat: 22.2828, lng: 114.1283, spots: [] },
-                { dayNum: 6, date: "1/23, 週六", dateString: "2027-01-23", theme: "正宗早茶 x 輕鬆返台", area: "香港 (中環/機場)", lat: 22.3080, lng: 113.9185, spots: [] }
-            ]
+        let tripData = {
+            title: "香港與深圳 慢活之旅",
+            dateRange: "",
+            days: []
         };
 
-        const categoryMeta = {
-            Flight: { name: "航班 / 交通", color: "bg-blue-100 text-blue-800 border-blue-200", icon: "fa-plane" },
-            Hotel: { name: "住宿 / 飯店", color: "bg-indigo-100 text-indigo-800 border-indigo-200", icon: "fa-hotel" },
-            Sightseeing: { name: "景點 / 慢步", color: "bg-emerald-100 text-emerald-800 border-emerald-200", icon: "fa-camera" },
-            Dining: { name: "美食 / 咖啡", color: "bg-amber-100 text-amber-800 border-amber-200", icon: "fa-utensils" },
-            Shopping: { name: "購物 / 選物", color: "bg-purple-100 text-purple-800 border-purple-200", icon: "fa-bag-shopping" },
-            Experience: { name: "特色體驗", color: "bg-rose-100 text-rose-800 border-rose-200", icon: "fa-wand-magic-sparkles" }
-        };
-
-        let tripData = null;
         let selectedDayFilter = "ALL";
         let map = null;
         let currentMapProvider = 'amap';
@@ -264,14 +241,8 @@
         };
 
         document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById('page-title').textContent = `${fullTitleString} - 行程規劃`;
-            document.getElementById('main-title').textContent = fullTitleString;
-            document.getElementById('header-badge-text').textContent = `雙城移動慢活漫遊 • ${TRIP_CONFIG.daysCount}天${TRIP_CONFIG.nightsCount}夜全記錄`;
-            document.getElementById('header-date-range').textContent = TRIP_CONFIG.dateRangeStr;
-            document.getElementById('footer-title-text').textContent = fullTitleString;
-            
             initLeafletMap();
-            fetchGoogleSheetData();
+            fetchAllGoogleSheetData();
         });
 
         function initLeafletMap() {
@@ -319,28 +290,40 @@
             showToast(`已切換為 ${MAP_PROVIDERS[providerKey].title}`, "info");
         }
 
-        async function fetchGoogleSheetData() {
+        async function fetchAllGoogleSheetData() {
             const refreshIcon = document.getElementById('refresh-icon');
             if (refreshIcon) refreshIcon.classList.add('fa-spin');
 
-            tripData = JSON.parse(JSON.stringify(baseItineraryStructure));
-
             try {
-                const response = await fetch(GOOGLE_SHEET_CSV_URL + "&t=" + new Date().getTime());
-                if (!response.ok) throw new Error("網絡回應錯誤");
-                
-                const csvText = await response.text();
-                parseAndApplyCSV(csvText);
+                // 1. 抓取 Days 分頁（主題與日期）
+                const daysRes = await fetch(DAYS_CSV_URL + "&t=" + new Date().getTime());
+                if (!daysRes.ok) throw new Error("讀取 Days 失敗");
+                const daysCsv = await daysRes.text();
+                parseDaysCSV(daysCsv);
+
+                // 2. 抓取 Spots 分頁（詳細景點）
+                const spotsRes = await fetch(SPOTS_CSV_URL + "&t=" + new Date().getTime());
+                if (!spotsRes.ok) throw new Error("讀取 Spots 失敗");
+                const spotsCsv = await spotsRes.text();
+                parseSpotsCSV(spotsCsv);
+
+                // 更新頁面動態資訊
+                if (tripData.days.length > 0) {
+                    const firstDate = tripData.days[0].date || "";
+                    const lastDate = tripData.days[tripData.days.length - 1].date || "";
+                    tripData.dateRange = `${firstDate.split(',')[0]} - ${lastDate.split(',')[0]}`;
+                    document.getElementById('header-date-range').textContent = tripData.dateRange;
+                }
 
                 document.getElementById('sheet-sync-status').className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold";
-                document.getElementById('sheet-sync-status').innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> <span>已從 Google Sheet 同步行程</span>';
+                document.getElementById('sheet-sync-status').innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> <span>已從 Google Sheet 同步主題與行程</span>';
 
-                showToast("已成功載入 Google Sheet 最新行程！", "success");
+                showToast("已成功同步最新主題與行程！", "success");
             } catch (error) {
                 console.warn("無法從 Google Sheet 抓取資料：", error);
                 document.getElementById('sheet-sync-status').className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-xs font-semibold";
                 document.getElementById('sheet-sync-status').innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span>Google Sheet 連線異常</span>';
-                showToast("無法讀取 Google Sheet，請檢查共用權限", "info");
+                showToast("無法讀取 Google Sheet，請檢查共用權限或分頁名稱", "info");
             } finally {
                 if (refreshIcon) refreshIcon.classList.remove('fa-spin');
                 renderApp();
@@ -396,7 +379,37 @@
             return rows;
         }
 
-        function parseAndApplyCSV(csvText) {
+        function parseDaysCSV(csvText) {
+            const rows = parseCSVRows(csvText);
+            tripData.days = [];
+            if (rows.length <= 1) return;
+
+            for (let i = 1; i < rows.length; i++) {
+                const cols = rows[i];
+                if (!cols || cols.length < 4) continue;
+
+                const dayNum = parseInt(cols[0]) || i;
+                const dateStr = cols[1] || "";
+                const dateStringVal = cols[2] || "";
+                const themeStr = cols[3] || "精彩行程";
+                const areaStr = cols[4] || "";
+                const latVal = parseFloat(cols[5]) || 22.35;
+                const lngVal = parseFloat(cols[6]) || 114.0;
+
+                tripData.days.push({
+                    dayNum: dayNum,
+                    date: dateStr,
+                    dateString: dateStringVal,
+                    theme: themeStr,
+                    area: areaStr,
+                    lat: latVal,
+                    lng: lngVal,
+                    spots: []
+                });
+            }
+        }
+
+        function parseSpotsCSV(csvText) {
             const rows = parseCSVRows(csvText);
             if (rows.length <= 1) return;
 
@@ -432,6 +445,15 @@
                 }
             }
         }
+
+        const categoryMeta = {
+            Flight: { name: "航班 / 交通", color: "bg-blue-100 text-blue-800 border-blue-200", icon: "fa-plane" },
+            Hotel: { name: "住宿 / 飯店", color: "bg-indigo-100 text-indigo-800 border-indigo-200", icon: "fa-hotel" },
+            Sightseeing: { name: "景點 / 慢步", color: "bg-emerald-100 text-emerald-800 border-emerald-200", icon: "fa-camera" },
+            Dining: { name: "美食 / 咖啡", color: "bg-amber-100 text-amber-800 border-amber-200", icon: "fa-utensils" },
+            Shopping: { name: "購物 / 選物", color: "bg-purple-100 text-purple-800 border-purple-200", icon: "fa-bag-shopping" },
+            Experience: { name: "特色體驗", color: "bg-rose-100 text-rose-800 border-rose-200", icon: "fa-wand-magic-sparkles" }
+        };
 
         function renderApp() {
             renderHeaderBudgetSummary();
@@ -533,7 +555,7 @@
             allBtn.className = `px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 flex items-center space-x-1.5 border ${
                 isAll ? 'bg-slate-900 text-teal-300 border-slate-800 shadow-md scale-[1.02]' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
             }`;
-            allBtn.innerHTML = `<i class="fa-solid fa-layer-group text-teal-500"></i> <span>全部行程 (DAY 1-${TRIP_CONFIG.daysCount})</span>`;
+            allBtn.innerHTML = `<i class="fa-solid fa-layer-group text-teal-500"></i> <span>全部行程 (DAY 1-${tripData.days.length})</span>`;
             container.appendChild(allBtn);
 
             tripData.days.forEach((day) => {
@@ -548,7 +570,7 @@
             });
 
             const subtitle = document.getElementById('active-day-subtitle');
-            subtitle.textContent = isAll ? `全覽模式 (顯示 ${TRIP_CONFIG.dateRangeStr} 所有細節)` : (tripData.days.find(d => d.dayNum === selectedDayFilter)?.date || '');
+            subtitle.textContent = isAll ? `全覽模式` : (tripData.days.find(d => d.dayNum === selectedDayFilter)?.date || '');
         }
 
         function switchDayFilter(filter) {
@@ -580,7 +602,7 @@
                         <div class="flex items-center space-x-3.5">
                             <div class="w-12 h-12 rounded-2xl bg-teal-500/20 text-teal-300 border border-teal-400/30 flex items-center justify-center text-xl font-black">D${day.dayNum}</div>
                             <div>
-                                <h3 class="text-lg md:text-xl font-bold flex items-center gap-2">${day.theme} <span class="text-xs bg-slate-800 text-slate-300 font-semibold px-2.5 py-0.5 rounded-full border border-slate-700">${day.area}</span></h3>
+                                <h3 class="text-lg md:text-xl font-bold flex items-center gap-2">${day.theme} ${day.area ? `<span class="text-xs bg-slate-800 text-slate-300 font-semibold px-2.5 py-0.5 rounded-full border border-slate-700">${day.area}</span>` : ''}</h3>
                                 <p class="text-xs text-slate-400 mt-0.5"><i class="fa-regular fa-calendar text-teal-400 me-1"></i>${day.date}</p>
                             </div>
                         </div>
@@ -629,7 +651,6 @@
                     ? `<a href="${spot.mapUrl}" target="_blank" rel="noopener noreferrer" class="text-teal-700 hover:text-teal-900 font-bold flex items-center gap-1.5 bg-teal-500/10 hover:bg-teal-500/20 px-3 py-1 rounded-xl border border-teal-300/60 transition"><i class="fa-solid fa-diamond-turn-right text-teal-600"></i> 前往地圖</a>`
                     : '';
 
-                // 💡 將備註內容依換行符號分割，每一行都渲染獨立的帶有圖示區塊
                 let notesHtml = '';
                 if (spot.notes && spot.notes.trim() !== "") {
                     const noteLines = spot.notes.split(/\r?\n/);
