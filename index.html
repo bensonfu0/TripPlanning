@@ -77,6 +77,10 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             border: 2.5px solid white;
         }
+        /* 💡 讓 Google Sheet 備註內的換行符號在網頁正確呈現 */
+        .spot-notes-text {
+            white-space: pre-line;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
@@ -337,12 +341,11 @@
         let tripData = null;
         let selectedDayFilter = "ALL";
         let map = null;
-        let currentMapProvider = 'amap'; // 'amap' 或 'google'
+        let currentMapProvider = 'amap';
         let currentTileLayer = null;
         let mapMarkers = [];
         let routePolylines = [];
 
-        // 地圖圖資網址配置
         const MAP_PROVIDERS = {
             amap: {
                 title: "高德地圖 (Amap)",
@@ -396,7 +399,6 @@
 
             document.getElementById('current-map-title').textContent = config.title;
 
-            // 切換按鈕 UI 高亮狀態
             const btnAmap = document.getElementById('btn-map-amap');
             const btnGoogle = document.getElementById('btn-map-google');
 
@@ -718,7 +720,7 @@
 
                                     <h4 class="font-extrabold text-slate-900 text-base md:text-lg mt-2 group-hover:text-teal-700 transition cursor-pointer" onclick="focusMapSpot('${spot.id}', ${day.dayNum})">${spot.title}</h4>
 
-                                    ${spot.notes ? `<p class="text-xs text-slate-600 bg-slate-50 rounded-xl p-2.5 mt-2.5 border border-slate-200/80 leading-relaxed"><i class="fa-solid fa-circle-info text-teal-600 me-1.5"></i>${spot.notes}</p>` : ''}
+                                    ${spot.notes ? `<p class="text-xs text-slate-600 bg-slate-50 rounded-xl p-2.5 mt-2.5 border border-slate-200/80 leading-relaxed spot-notes-text"><i class="fa-solid fa-circle-info text-teal-600 me-1.5"></i>${spot.notes}</p>` : ''}
 
                                     <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs flex-wrap gap-2">
                                         <div class="flex items-center space-x-2">
