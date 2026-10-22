@@ -352,16 +352,62 @@
             }
         }
 
+        // 💡 健全的 CSV 狀態機解析器（完美支援儲存格內部的換行與引號）
+        function parseCSVRows(text) {
+            let rows = [];
+            let row = [];
+            let inQuotes = false;
+            let field = '';
+            
+            for (let i = 0; i < text.length; i++) {
+                let c = text[i];
+                let nextC = text[i + 1];
+                
+                if (inQuotes) {
+                    if (c === '"' && nextC === '"') {
+                        field += '"';
+                        i++; // Skip escaped quote
+                    } else if (c === '"') {
+                        inQuotes = false;
+                    } else {
+                        field += c;
+                    }
+                } else {
+                    if (c === '"') {
+                        inQuotes = true;
+                    } else if (c === ',') {
+                        row.push(field);
+                        field = '';
+                    } else if (c === '\r' && nextC === '\n') {
+                        row.push(field);
+                        rows.push(row);
+                        row = [];
+                        field = '';
+                        i++;
+                    } else if (c === '\n' || c === '\r') {
+                        row.push(field);
+                        rows.push(row);
+                        row = [];
+                        field = '';
+                    } else {
+                        field += c;
+                    }
+                }
+            }
+            if (field !== '' || row.length > 0) {
+                row.push(field);
+                rows.push(row);
+            }
+            return rows;
+        }
+
         function parseAndApplyCSV(csvText) {
-            const lines = csvText.split(/\r\n|\n/);
-            if (lines.length <= 1) return;
+            const rows = parseCSVRows(csvText);
+            if (rows.length <= 1) return;
 
-            for (let i = 1; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (!line) continue;
-
-                const cols = parseCSVRow(line);
-                if (cols.length < 5) continue;
+            for (let i = 1; i < rows.length; i++) {
+                const cols = rows[i];
+                if (!cols || cols.length < 5) continue;
 
                 const dayNum = parseInt(cols[0]) || 1;
                 const timeStr = cols[2] || "10:00";
@@ -390,24 +436,6 @@
                     });
                 }
             }
-        }
-
-        function parseCSVRow(text) {
-            let p = '', c = '', r = [];
-            let q = false;
-            for (let i = 0; i < text.length; i++) {
-                c = text[i];
-                if (c === '"') {
-                    q = !q;
-                } else if (c === ',' && !q) {
-                    r.push(p.trim().replace(/^"|"$/g, ''));
-                    p = '';
-                } else {
-                    p += c;
-                }
-            }
-            r.push(p.trim().replace(/^"|"$/g, ''));
-            return r;
         }
 
         function renderApp() {
