@@ -195,7 +195,7 @@
 
     <script>
         // ==========================================
-        // 📊 GOOGLE SHEET 連結設定 (獨立 Config, Days, Spots 三分頁)
+        // 📊 GOOGLE SHEET 連結設定
         // ==========================================
         const BASE_SHEET_ID = "1_ahVcayqH7ptZtJJa-YukQF7HDum12hMUU3R5y4dn5E";
         
@@ -296,7 +296,6 @@
             if (refreshIcon) refreshIcon.classList.add('fa-spin');
 
             try {
-                // 1. 抓取 Config 分頁（全域設定）
                 try {
                     const configRes = await fetch(CONFIG_CSV_URL + "&t=" + new Date().getTime());
                     if (configRes.ok) {
@@ -305,19 +304,16 @@
                     }
                 } catch (e) { console.warn("Config 分頁讀取略過", e); }
 
-                // 2. 抓取 Days 分頁（天數主題與日期）
                 const daysRes = await fetch(DAYS_CSV_URL + "&t=" + new Date().getTime());
                 if (!daysRes.ok) throw new Error("讀取 Days 失敗");
                 const daysCsv = await daysRes.text();
                 parseDaysCSV(daysCsv);
 
-                // 3. 抓取 Spots 分頁（詳細景點）
                 const spotsRes = await fetch(SPOTS_CSV_URL + "&t=" + new Date().getTime());
                 if (!spotsRes.ok) throw new Error("讀取 Spots 失敗");
                 const spotsCsv = await spotsRes.text();
                 parseSpotsCSV(spotsCsv);
 
-                // 更新頁面標題與動態資訊
                 document.getElementById('main-title').textContent = tripData.title;
                 document.getElementById('page-title').textContent = `${tripData.title} - 行程規劃`;
                 document.getElementById('footer-title-text').textContent = tripData.title;
@@ -445,15 +441,16 @@
                 if (!cols || cols.length < 5) continue;
 
                 const dayNum = parseInt(cols[0]) || 1;
-                const timeStr = cols[2] || "10:00";
-                const catStr = cols[3] || "Sightseeing";
-                const titleStr = cols[4] || "";
+                // 💡 支援任意格式的時間字串（例如 11:00-13:00、14:30 等）
+                const timeStr = cols[2] ? cols[2].trim() : "10:00";
+                const catStr = cols[3] ? cols[3].trim() : "Sightseeing";
+                const titleStr = cols[4] ? cols[4].trim() : "";
                 const costVal = parseFloat(cols[5]) || 0;
-                const currStr = cols[6] || (dayNum <= 2 ? "RMB" : "HKD");
+                const currStr = cols[6] ? cols[6].trim() : (dayNum <= 2 ? "RMB" : "HKD");
                 const latVal = parseFloat(cols[7]) || 0;
                 const lngVal = parseFloat(cols[8]) || 0;
-                const mapUrlStr = cols[9] || "";
-                const notesStr = cols[10] || "";
+                const mapUrlStr = cols[9] ? cols[9].trim() : "";
+                const notesStr = cols[10] ? cols[10].trim() : "";
 
                 const targetDay = tripData.days.find(d => d.dayNum === dayNum);
                 if (targetDay && titleStr) {
