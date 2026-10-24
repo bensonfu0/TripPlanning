@@ -310,16 +310,15 @@
             TWD: 1.0
         };
 
-        // 🎨 完美匹配 iOS/iPhone 設計風格的 3 種核心主題（特別對「銀白光感」頂部區塊進行底色/卡片色調對調）
+        // 🎨 主題詳細規範
         const THEMES = {
             "銀白光感": {
                 name: "銀白光感",
                 bodyBg: "bg-slate-100 text-slate-900",
-                headerGradient: "from-white via-slate-50 to-white", // 頂部背景改為純白/淺銀色
+                headerGradient: "from-white via-slate-50 to-white",
                 headerText: "text-slate-900",
                 borderCol: "border-slate-200",
                 primaryBtnBg: "bg-slate-900 hover:bg-slate-800 text-white",
-                // 區塊交換：功能區塊改用精緻的銀灰色 (bg-slate-200/80)
                 bannerBg: "bg-slate-200/80 hover:bg-slate-200 border-slate-300 text-slate-900 shadow-sm",
                 bannerIconBox: "bg-slate-300 text-slate-900 border-slate-300",
                 bannerTitle: "text-slate-900 font-bold",
@@ -327,12 +326,11 @@
                 navBg: "bg-white/90 border-slate-200 shadow-slate-200/60",
                 activeTabBg: "bg-slate-900 text-white border-slate-900",
                 inactiveTabBg: "bg-slate-200/80 hover:bg-slate-200 text-slate-800 border-slate-300 shadow-sm",
-                activeTabDot: "text-blue-400",
+                activeTabText: "text-white font-extrabold",
+                inactiveTabText: "text-black opacity-80",
                 iconColor: "text-blue-600",
                 navIconColor: "text-slate-600",
-                // 預估總額/分類按鈕改為銀灰卡片底色
                 budgetItemBg: "bg-slate-200/80 hover:bg-slate-300/80 border-slate-300 text-slate-900",
-                // 每日行程主卡片
                 dayMainCardBg: "bg-white border-slate-200 shadow-sm",
                 dayCardHeaderBg: "bg-slate-200/70 text-slate-900 border-slate-300 shadow-sm",
                 dayCardNumberBox: "bg-slate-900 text-white border-slate-900",
@@ -342,23 +340,23 @@
                 dayCardCostText: "text-blue-600 font-bold",
                 dayCardClothesBanner: "bg-slate-200/90 border-slate-300 text-slate-800",
                 dayCardClothesTitle: "text-blue-900",
-                // 時間軸行程卡片
                 spotCardBg: "bg-white hover:bg-slate-50 border-slate-200 text-slate-900 shadow-sm",
                 spotTitleText: "text-slate-900 group-hover:text-blue-600",
                 spotTimeBadge: "bg-slate-100 text-slate-900 border-slate-200",
                 spotNotesBg: "bg-slate-100 border-slate-200 text-slate-700",
                 spotLocBtn: "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-200",
                 spotLocIcon: "text-blue-600",
-                // 地圖區塊
                 mapSectionBg: "bg-white border-slate-200 shadow-lg",
                 mapHeaderBg: "bg-slate-100 border-slate-200 text-slate-900",
                 mapColorTag: "bg-slate-200 text-blue-600 border-slate-300",
                 mapProviderBox: "bg-slate-200 border-slate-300",
                 mapBtnReset: "bg-slate-200 hover:bg-slate-300 text-slate-800 border-slate-300",
-                // 彈窗設定
-                modalCard: "bg-white border-slate-200 text-slate-900",
-                modalHeader: "bg-slate-100 text-slate-900 border-slate-200",
-                modalFooter: "bg-slate-100 border-slate-200 text-slate-700"
+                modalCard: "bg-white border-slate-300 text-slate-900",
+                modalHeader: "bg-slate-100 text-slate-900 border-slate-300",
+                modalFooter: "bg-slate-100 border-slate-300 text-slate-700",
+                // 銀白色：懸浮視窗內的編號 1 2 3 4 / D1 D2 用黑底、黑框、白字
+                modalBadge: "bg-black text-white border-black font-extrabold",
+                modalItemBorder: "border-slate-300 bg-slate-50/80"
             },
             "太空灰": {
                 name: "太空灰",
@@ -374,13 +372,14 @@
                 navBg: "bg-zinc-900/95 border-zinc-800 shadow-zinc-950/50",
                 activeTabBg: "bg-zinc-100 text-zinc-900 border-zinc-200",
                 inactiveTabBg: "bg-zinc-800/80 hover:bg-zinc-800 text-zinc-300 border-zinc-700/80",
-                activeTabDot: "text-blue-500",
+                activeTabText: "text-black font-extrabold",
+                inactiveTabText: "text-white opacity-90",
                 iconColor: "text-blue-400",
                 navIconColor: "text-zinc-400",
                 budgetItemBg: "bg-white/10 hover:bg-white/20 border-white/20 text-white",
                 dayMainCardBg: "bg-zinc-900/80 border-zinc-800",
                 dayCardHeaderBg: "bg-gradient-to-br from-zinc-900 via-zinc-900/90 to-zinc-900 text-zinc-100 border-zinc-800",
-                dayCardNumberBox: "bg-zinc-800 text-blue-400 border-zinc-700",
+                dayCardNumberBox: "bg-zinc-800 text-white border-zinc-700", // 太空灰每日行程大標 D1/D2 字改純白
                 dayCardSubBadge: "bg-zinc-800 text-zinc-300 border-zinc-700",
                 dayCardWeatherBox: "bg-zinc-950/60 border-zinc-800 text-zinc-200",
                 dayCardCostBox: "bg-zinc-950/60 hover:bg-zinc-950 border-zinc-800 text-zinc-100",
@@ -398,9 +397,12 @@
                 mapColorTag: "bg-zinc-800 text-blue-400 border-zinc-700",
                 mapProviderBox: "bg-zinc-900 border-zinc-800",
                 mapBtnReset: "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700",
-                modalCard: "bg-zinc-900 border-zinc-800 text-zinc-100",
+                modalCard: "bg-zinc-900 border-zinc-700 text-zinc-100",
                 modalHeader: "bg-zinc-950 text-zinc-100 border-zinc-800",
-                modalFooter: "bg-zinc-950 border-zinc-800 text-zinc-300"
+                modalFooter: "bg-zinc-950 border-zinc-800 text-zinc-300",
+                // 太空灰：懸浮視窗內的編號 1 2 3 4 / D1 D2 用白底、白框、黑字
+                modalBadge: "bg-white text-black border-white font-extrabold",
+                modalItemBorder: "border-zinc-700 bg-zinc-950/70" // 懸浮視窗細項框框感更明顯
             },
             "海洋綠": {
                 name: "海洋綠",
@@ -416,7 +418,8 @@
                 navBg: "bg-white/95 border-slate-200 shadow-slate-200/50",
                 activeTabBg: "bg-slate-900 text-teal-300 border-slate-800",
                 inactiveTabBg: "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200",
-                activeTabDot: "text-teal-400",
+                activeTabText: "text-teal-300 font-extrabold",
+                inactiveTabText: "text-slate-700",
                 iconColor: "text-teal-400",
                 navIconColor: "text-teal-600",
                 budgetItemBg: "bg-white/10 hover:bg-white/20 border-white/20 text-white",
@@ -442,7 +445,9 @@
                 mapBtnReset: "bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700",
                 modalCard: "bg-white border-slate-200 text-slate-900",
                 modalHeader: "bg-slate-900 text-white border-slate-800",
-                modalFooter: "bg-slate-50 border-slate-200 text-slate-700"
+                modalFooter: "bg-slate-50 border-slate-200 text-slate-700",
+                modalBadge: "bg-teal-500/20 text-teal-800 border-teal-300 font-extrabold",
+                modalItemBorder: "border-slate-200 bg-slate-50"
             },
             emerald: "海洋綠",
             spacegray: "太空灰",
@@ -561,7 +566,7 @@
             title: "行程規劃",
             locations: "各景點",
             dateRange: "",
-            colorTheme: "海洋綠",
+            colorTheme: "銀白光感",
             days: []
         };
 
@@ -643,7 +648,7 @@
                 }
                 return THEMES[key];
             }
-            return THEMES["海洋綠"];
+            return THEMES["銀白光感"];
         }
 
         function applyTileLayer(providerKey) {
@@ -1144,6 +1149,7 @@
         // ==========================================
         function openCostDetailModal(categoryKey) {
             applyModalTheme();
+            const theme = getActiveTheme();
             const modal = document.getElementById('cost-detail-modal');
             const iconBg = document.getElementById('modal-cost-icon-bg');
             const iconEl = document.getElementById('modal-cost-icon');
@@ -1211,9 +1217,9 @@
                     let currSymbol = `${curr} $`;
 
                     return `
-                        <div class="flex items-center justify-between bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-3 transition">
+                        <div class="flex items-center justify-between ${theme.modalItemBorder} border rounded-xl p-3 transition shadow-sm">
                             <div class="flex items-center gap-3">
-                                <span class="text-xs font-black bg-slate-900 text-teal-300 px-2.5 py-1 rounded-lg">D${s.dayNum}</span>
+                                <span class="text-xs ${theme.modalBadge} px-2.5 py-1 rounded-lg border">D${s.dayNum}</span>
                                 <div>
                                     <h4 class="font-extrabold text-xs md:text-sm">${s.title}</h4>
                                     <p class="text-[11px] opacity-75 mt-0.5"><i class="fa-regular fa-clock me-1"></i>${s.time || '全天'} • <span class="font-medium ${catMeta.text}">${catMeta.name}</span></p>
@@ -1241,6 +1247,7 @@
         // ==========================================
         function openDayCostModal(dayNum) {
             applyModalTheme();
+            const theme = getActiveTheme();
             const day = tripData.days.find(d => d.dayNum === dayNum);
             if (!day) return;
 
@@ -1282,9 +1289,9 @@
                     let currSymbol = `${curr} $`;
 
                     return `
-                        <div class="flex items-center justify-between bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-3 transition">
+                        <div class="flex items-center justify-between ${theme.modalItemBorder} border rounded-xl p-3 transition shadow-sm">
                             <div class="flex items-center gap-3">
-                                <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-black text-xs flex items-center justify-center border border-emerald-300/60">${index + 1}</span>
+                                <span class="w-7 h-7 rounded-lg ${theme.modalBadge} border flex items-center justify-center text-xs">${index + 1}</span>
                                 <div>
                                     <h4 class="font-extrabold text-xs md:text-sm">${s.title}</h4>
                                     <p class="text-[11px] opacity-75 mt-0.5"><i class="fa-regular fa-clock me-1"></i>${s.time || '全天'} • <span class="font-semibold ${catMeta.text}">${catMeta.name}</span></p>
@@ -1312,6 +1319,7 @@
         // ==========================================
         function openWeatherOverviewModal() {
             applyModalTheme();
+            const theme = getActiveTheme();
             const modal = document.getElementById('weather-overview-modal');
             const listEl = document.getElementById('modal-weather-list');
 
@@ -1330,10 +1338,10 @@
                     };
 
                     return `
-                        <div class="bg-black/5 dark:bg-white/5 rounded-2xl p-4 border border-black/10 dark:border-white/10 space-y-3">
+                        <div class="${theme.modalItemBorder} border rounded-2xl p-4 space-y-3 shadow-sm">
                             <div class="flex items-center justify-between border-b border-black/10 dark:border-white/10 pb-2.5">
                                 <div class="flex items-center gap-2.5">
-                                    <span class="w-8 h-8 rounded-xl bg-teal-500/20 text-teal-600 dark:text-teal-400 font-black text-xs flex items-center justify-center border border-teal-400/30">D${d.dayNum}</span>
+                                    <span class="w-8 h-8 rounded-xl ${theme.modalBadge} border flex items-center justify-center text-xs">D${d.dayNum}</span>
                                     <div>
                                         <h4 class="font-bold text-xs md:text-sm">${d.theme} ${d.area ? `<span class="text-[10px] bg-black/10 dark:bg-white/10 font-semibold px-2 py-0.5 rounded-full border border-black/10">${d.area}</span>` : ''}</h4>
                                         <p class="text-[11px] opacity-75"><i class="fa-regular fa-calendar me-1 text-teal-500"></i>${d.date}</p>
@@ -1356,7 +1364,8 @@
                                 </div>
                             </div>
 
-                            <div class="bg-teal-500/10 border border-teal-500/20 rounded-xl p-2.5 text-xs flex items-start gap-2">
+                            <!-- 穿著點評框框與底色完全比照降雨機率/日出落 -->
+                            <div class="bg-black/5 dark:bg-white/5 p-2.5 rounded-xl border border-black/10 dark:border-white/10 text-xs flex items-start gap-2">
                                 <i class="fa-solid fa-shirt text-teal-600 dark:text-teal-400 mt-0.5"></i>
                                 <span><strong>穿著點評：</strong>${w.clothingAdvice}</span>
                             </div>
@@ -1384,7 +1393,7 @@
             allBtn.className = `px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 flex items-center space-x-1.5 border ${
                 isAll ? `${theme.activeTabBg} shadow-md scale-[1.02]` : theme.inactiveTabBg
             }`;
-            allBtn.innerHTML = `<i class="fa-solid fa-layer-group ${theme.iconColor}"></i> <span>全部行程 (DAY 1-${tripData.days.length})</span>`;
+            allBtn.innerHTML = `<i class="fa-solid fa-layer-group ${theme.iconColor}"></i> <span class="${isAll ? theme.activeTabText : theme.inactiveTabText}">全部行程 (DAY 1-${tripData.days.length})</span>`;
             container.appendChild(allBtn);
 
             tripData.days.forEach((day) => {
@@ -1394,7 +1403,7 @@
                 btn.className = `px-3.5 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 flex items-center space-x-2 border ${
                     isActive ? `${theme.activeTabBg} shadow-md scale-[1.02]` : theme.inactiveTabBg
                 }`;
-                btn.innerHTML = `<span class="${isActive ? `${theme.activeTabDot} font-extrabold` : 'opacity-60'}">D${day.dayNum}</span><span>•</span><span>${day.theme}</span>`;
+                btn.innerHTML = `<span class="${isActive ? theme.activeTabText : theme.inactiveTabText}">D${day.dayNum}</span><span>•</span><span class="${isActive ? theme.activeTabText : theme.inactiveTabText}">${day.theme}</span>`;
                 container.appendChild(btn);
             });
 
@@ -1472,7 +1481,7 @@
                             <div><p class="text-[10px] opacity-75 font-medium">降雨機率</p><p class="font-bold">${weather.rainProb === '尚未預測' ? '尚未預測' : `💧 ${weather.rainProb}`}</p></div>
                         </div>
 
-                        <!-- 💡 點擊可觸發當日花費彈窗 (與主題連動) -->
+                        <!-- 💡 點擊可觸發當日花費彈窗 -->
                         <div onclick="openDayCostModal(${day.dayNum})" class="${theme.dayCardCostBox} cursor-pointer transition transform hover:-translate-y-0.5 rounded-xl p-2 px-3 border flex items-center justify-between space-x-2 text-xs">
                             <div class="flex items-center space-x-2.5 min-w-0">
                                 <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center text-sm flex-shrink-0"><i class="fa-solid fa-wallet"></i></div>
@@ -1485,7 +1494,7 @@
                         </div>
                     </div>
 
-                    <!-- 👔 動態單日穿著建議 Banner (與主題連動) -->
+                    <!-- 👔 動態單日穿著建議 Banner -->
                     <div class="${theme.dayCardClothesBanner} border rounded-xl p-3 flex items-start gap-2.5 text-xs">
                         <div class="w-6 h-6 rounded-lg bg-black/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                             <i class="fa-solid fa-shirt"></i>
