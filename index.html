@@ -71,15 +71,15 @@
 <body id="app-body" class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
 
     <!-- Top Hero Banner Header -->
-    <header id="main-header" class="relative overflow-hidden pb-8 pt-6 px-4 md:px-8 border-b shadow-xl transition-all duration-500">
-        <div id="header-pattern" class="absolute inset-0 opacity-15 bg-[radial-gradient(#14b8a6_1px,transparent_1px)] [background-size:16px_16px]"></div>
+    <header id="main-header" class="relative overflow-hidden pb-8 pt-6 px-4 md:px-8 border-b shadow-md transition-all duration-500">
+        <div id="header-pattern" class="absolute inset-0 opacity-10 bg-[radial-gradient(#64748b_1px,transparent_1px)] [background-size:16px_16px]"></div>
         
         <div class="max-w-7xl mx-auto relative z-10 space-y-6">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                     <!-- Sheet Status -->
                     <div class="flex flex-wrap items-center gap-2 mb-3">
-                        <div id="sheet-sync-status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold">
+                        <div id="sheet-sync-status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-700 dark:text-emerald-300 text-xs font-semibold">
                             <i class="fa-solid fa-file-excel"></i> <span>Google Sheet 資料同步中...</span>
                         </div>
                     </div>
@@ -90,20 +90,20 @@
                     <p id="header-subtitle" class="text-sm md:text-base mt-2 flex items-center gap-3 font-medium opacity-90">
                         <span><i id="header-calendar-icon" class="fa-regular fa-calendar me-1.5"></i><span id="header-date-range">行程動態載入中</span></span>
                         <span class="opacity-40">•</span>
-                        <span><i class="fa-solid fa-location-dot text-rose-400 me-1.5"></i><span id="header-locations">載入中...</span></span>
+                        <span><i class="fa-solid fa-location-dot text-rose-500 me-1.5"></i><span id="header-locations">載入中...</span></span>
                     </p>
                 </div>
 
                 <!-- Refresh Sheet Button -->
                 <div class="flex items-center gap-2">
-                    <button id="refresh-btn" onclick="fetchAllGoogleSheetData()" class="px-4 py-2 font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-1.5">
+                    <button id="refresh-btn" onclick="fetchAllGoogleSheetData()" class="px-4 py-2 font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
                         <i class="fa-solid fa-arrows-rotate" id="refresh-icon"></i> 從 Google Sheet 重新同步
                     </button>
                 </div>
             </div>
 
             <!-- 👔 頂部行程總覽：整趟行程綜合穿著建議 Banner -->
-            <div id="overall-weather-banner" onclick="openWeatherOverviewModal()" class="rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3.5 shadow-xl text-xs md:text-sm cursor-pointer transition transform hover:-translate-y-0.5 border">
+            <div id="overall-weather-banner" onclick="openWeatherOverviewModal()" class="rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3.5 shadow-sm text-xs md:text-sm cursor-pointer transition transform hover:-translate-y-0.5 border">
                 <div id="overall-weather-icon-box" class="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold flex-shrink-0 border">
                     <i class="fa-solid fa-shirt"></i>
                 </div>
@@ -227,7 +227,7 @@
         <div id="day-cost-modal-card" class="w-full max-w-2xl rounded-2xl shadow-2xl border overflow-hidden flex flex-col max-h-[85vh]">
             <div id="day-cost-modal-header" class="p-4 md:p-5 flex items-center justify-between border-b">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 flex items-center justify-center text-lg">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-400/30 flex items-center justify-center text-lg">
                         <i class="fa-solid fa-receipt"></i>
                     </div>
                     <div>
@@ -259,7 +259,7 @@
         <div id="weather-modal-card" class="w-full max-w-3xl rounded-2xl shadow-2xl border overflow-hidden flex flex-col max-h-[85vh]">
             <div id="weather-modal-header" class="p-4 md:p-5 flex items-center justify-between border-b">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-teal-500/20 text-teal-400 border border-teal-400/30 flex items-center justify-center text-lg">
+                    <div class="w-9 h-9 rounded-xl bg-teal-500/20 text-teal-600 dark:text-teal-400 border border-teal-400/30 flex items-center justify-center text-lg">
                         <i class="fa-solid fa-cloud-sun"></i>
                     </div>
                     <div>
@@ -310,8 +310,56 @@
             TWD: 1.0
         };
 
-        // 🎨 完美匹配 iOS/iPhone 設計風格的 3 種核心主題（含完整標頭、地圖、卡片與彈窗連動）
+        // 🎨 完美匹配 iOS/iPhone 設計風格的 3 種核心主題（特別對「銀白光感」頂部區塊進行底色/卡片色調對調）
         const THEMES = {
+            "銀白光感": {
+                name: "銀白光感",
+                bodyBg: "bg-slate-100 text-slate-900",
+                headerGradient: "from-white via-slate-50 to-white", // 頂部背景改為純白/淺銀色
+                headerText: "text-slate-900",
+                borderCol: "border-slate-200",
+                primaryBtnBg: "bg-slate-900 hover:bg-slate-800 text-white",
+                // 區塊交換：功能區塊改用精緻的銀灰色 (bg-slate-200/80)
+                bannerBg: "bg-slate-200/80 hover:bg-slate-200 border-slate-300 text-slate-900 shadow-sm",
+                bannerIconBox: "bg-slate-300 text-slate-900 border-slate-300",
+                bannerTitle: "text-slate-900 font-bold",
+                badgeBg: "bg-slate-300/80 border-slate-300 text-slate-800",
+                navBg: "bg-white/90 border-slate-200 shadow-slate-200/60",
+                activeTabBg: "bg-slate-900 text-white border-slate-900",
+                inactiveTabBg: "bg-slate-200/80 hover:bg-slate-200 text-slate-800 border-slate-300 shadow-sm",
+                activeTabDot: "text-blue-400",
+                iconColor: "text-blue-600",
+                navIconColor: "text-slate-600",
+                // 預估總額/分類按鈕改為銀灰卡片底色
+                budgetItemBg: "bg-slate-200/80 hover:bg-slate-300/80 border-slate-300 text-slate-900",
+                // 每日行程主卡片
+                dayMainCardBg: "bg-white border-slate-200 shadow-sm",
+                dayCardHeaderBg: "bg-slate-200/70 text-slate-900 border-slate-300 shadow-sm",
+                dayCardNumberBox: "bg-slate-900 text-white border-slate-900",
+                dayCardSubBadge: "bg-slate-300 text-slate-800 border-slate-300",
+                dayCardWeatherBox: "bg-slate-100 border-slate-300 text-slate-800",
+                dayCardCostBox: "bg-slate-100 hover:bg-slate-200/80 border-slate-300 text-slate-900",
+                dayCardCostText: "text-blue-600 font-bold",
+                dayCardClothesBanner: "bg-slate-200/90 border-slate-300 text-slate-800",
+                dayCardClothesTitle: "text-blue-900",
+                // 時間軸行程卡片
+                spotCardBg: "bg-white hover:bg-slate-50 border-slate-200 text-slate-900 shadow-sm",
+                spotTitleText: "text-slate-900 group-hover:text-blue-600",
+                spotTimeBadge: "bg-slate-100 text-slate-900 border-slate-200",
+                spotNotesBg: "bg-slate-100 border-slate-200 text-slate-700",
+                spotLocBtn: "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-200",
+                spotLocIcon: "text-blue-600",
+                // 地圖區塊
+                mapSectionBg: "bg-white border-slate-200 shadow-lg",
+                mapHeaderBg: "bg-slate-100 border-slate-200 text-slate-900",
+                mapColorTag: "bg-slate-200 text-blue-600 border-slate-300",
+                mapProviderBox: "bg-slate-200 border-slate-300",
+                mapBtnReset: "bg-slate-200 hover:bg-slate-300 text-slate-800 border-slate-300",
+                // 彈窗設定
+                modalCard: "bg-white border-slate-200 text-slate-900",
+                modalHeader: "bg-slate-100 text-slate-900 border-slate-200",
+                modalFooter: "bg-slate-100 border-slate-200 text-slate-700"
+            },
             "太空灰": {
                 name: "太空灰",
                 bodyBg: "bg-[#09090b] text-zinc-100",
@@ -329,7 +377,7 @@
                 activeTabDot: "text-blue-500",
                 iconColor: "text-blue-400",
                 navIconColor: "text-zinc-400",
-                // 每日行程主卡片
+                budgetItemBg: "bg-white/10 hover:bg-white/20 border-white/20 text-white",
                 dayMainCardBg: "bg-zinc-900/80 border-zinc-800",
                 dayCardHeaderBg: "bg-gradient-to-br from-zinc-900 via-zinc-900/90 to-zinc-900 text-zinc-100 border-zinc-800",
                 dayCardNumberBox: "bg-zinc-800 text-blue-400 border-zinc-700",
@@ -339,68 +387,20 @@
                 dayCardCostText: "text-blue-400 font-bold",
                 dayCardClothesBanner: "bg-zinc-950/80 border-zinc-800 text-zinc-300",
                 dayCardClothesTitle: "text-zinc-100",
-                // 時間軸行程卡片
                 spotCardBg: "bg-zinc-900/90 hover:bg-zinc-900 border-zinc-800 text-zinc-100",
                 spotTitleText: "text-zinc-100 group-hover:text-blue-400",
                 spotTimeBadge: "bg-zinc-800 text-zinc-100 border-zinc-700",
                 spotNotesBg: "bg-zinc-950/70 border-zinc-800 text-zinc-300",
                 spotLocBtn: "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700",
                 spotLocIcon: "text-blue-400",
-                // 地圖區塊
                 mapSectionBg: "bg-zinc-900 border-zinc-800",
                 mapHeaderBg: "bg-zinc-950 border-zinc-800 text-zinc-100",
                 mapColorTag: "bg-zinc-800 text-blue-400 border-zinc-700",
                 mapProviderBox: "bg-zinc-900 border-zinc-800",
                 mapBtnReset: "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700",
-                // 彈窗設定 (太空灰深色)
                 modalCard: "bg-zinc-900 border-zinc-800 text-zinc-100",
                 modalHeader: "bg-zinc-950 text-zinc-100 border-zinc-800",
                 modalFooter: "bg-zinc-950 border-zinc-800 text-zinc-300"
-            },
-            "銀白光感": {
-                name: "銀白光感",
-                bodyBg: "bg-slate-100 text-slate-900",
-                headerGradient: "from-slate-200 via-slate-100 to-slate-200", // 修正：銀白主題改為淺色亮系漸層
-                headerText: "text-slate-900",
-                borderCol: "border-slate-300",
-                primaryBtnBg: "bg-slate-900 hover:bg-slate-800 text-white",
-                bannerBg: "bg-white border-slate-200 text-slate-900 shadow-sm",
-                bannerIconBox: "bg-slate-100 text-blue-600 border-slate-200",
-                bannerTitle: "text-slate-900 font-bold",
-                badgeBg: "bg-slate-100 border-slate-200 text-slate-700",
-                navBg: "bg-white/90 border-slate-200 shadow-slate-200/60",
-                activeTabBg: "bg-slate-900 text-white border-slate-900",
-                inactiveTabBg: "bg-white hover:bg-slate-50 text-slate-700 border-slate-200 shadow-sm",
-                activeTabDot: "text-blue-400",
-                iconColor: "text-blue-600",
-                navIconColor: "text-slate-500",
-                // 每日行程主卡片
-                dayMainCardBg: "bg-white border-white shadow-sm",
-                dayCardHeaderBg: "bg-white text-slate-900 border-slate-200 shadow-sm",
-                dayCardNumberBox: "bg-slate-900 text-white border-slate-900",
-                dayCardSubBadge: "bg-slate-100 text-slate-700 border-slate-200",
-                dayCardWeatherBox: "bg-slate-50 border-slate-200 text-slate-800",
-                dayCardCostBox: "bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-900",
-                dayCardCostText: "text-blue-600 font-bold",
-                dayCardClothesBanner: "bg-blue-50/50 border-blue-100 text-slate-800",
-                dayCardClothesTitle: "text-blue-900",
-                // 時間軸行程卡片
-                spotCardBg: "bg-white hover:bg-slate-50 border-slate-200 text-slate-900 shadow-sm",
-                spotTitleText: "text-slate-900 group-hover:text-blue-600",
-                spotTimeBadge: "bg-slate-100 text-slate-900 border-slate-200",
-                spotNotesBg: "bg-slate-50 border-slate-200 text-slate-700",
-                spotLocBtn: "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-200",
-                spotLocIcon: "text-blue-600",
-                // 地圖區塊
-                mapSectionBg: "bg-white border-white shadow-lg",
-                mapHeaderBg: "bg-white border-slate-200 text-slate-900",
-                mapColorTag: "bg-slate-100 text-blue-600 border-slate-200",
-                mapProviderBox: "bg-slate-100 border-slate-200",
-                mapBtnReset: "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-200",
-                // 彈窗設定 (銀白淺色)
-                modalCard: "bg-white border-slate-200 text-slate-900",
-                modalHeader: "bg-slate-50 text-slate-900 border-slate-200",
-                modalFooter: "bg-slate-50 border-slate-200 text-slate-700"
             },
             "海洋綠": {
                 name: "海洋綠",
@@ -419,7 +419,7 @@
                 activeTabDot: "text-teal-400",
                 iconColor: "text-teal-400",
                 navIconColor: "text-teal-600",
-                // 每日行程主卡片
+                budgetItemBg: "bg-white/10 hover:bg-white/20 border-white/20 text-white",
                 dayMainCardBg: "bg-white border-slate-200 shadow-sm",
                 dayCardHeaderBg: "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white border-slate-800",
                 dayCardNumberBox: "bg-teal-500/20 text-teal-300 border-teal-400/30",
@@ -429,31 +429,26 @@
                 dayCardCostText: "text-emerald-300",
                 dayCardClothesBanner: "bg-teal-950/60 border-teal-500/30 text-teal-200",
                 dayCardClothesTitle: "text-teal-300",
-                // 時間軸行程卡片
                 spotCardBg: "bg-white hover:bg-slate-50/90 border-slate-200/90 text-slate-900 shadow-sm",
                 spotTitleText: "text-slate-900 group-hover:text-teal-700",
                 spotTimeBadge: "bg-slate-100 text-slate-900 border-slate-200",
                 spotNotesBg: "bg-slate-50 border-slate-200/80 text-slate-600",
                 spotLocBtn: "bg-teal-50 hover:bg-teal-100/80 text-slate-900 border-teal-200/60",
                 spotLocIcon: "text-teal-600",
-                // 地圖區塊
                 mapSectionBg: "bg-white border-slate-200 shadow-xl",
                 mapHeaderBg: "bg-slate-900 border-slate-800 text-white",
                 mapColorTag: "bg-amber-500/20 text-amber-300 border-amber-400/30",
                 mapProviderBox: "bg-slate-800 border-slate-700",
                 mapBtnReset: "bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700",
-                // 彈窗設定 (海洋綠經典深色標頭)
                 modalCard: "bg-white border-slate-200 text-slate-900",
                 modalHeader: "bg-slate-900 text-white border-slate-800",
                 modalFooter: "bg-slate-50 border-slate-200 text-slate-700"
             },
-            // 別名相容
             emerald: "海洋綠",
             spacegray: "太空灰",
             silver: "銀白光感"
         };
 
-        // 🎨 30 色高辨識度調色盤
         const DAY_COLORS = [
             "#059669", "#2563eb", "#d97706", "#9333ea", "#e11d48", "#4f46e5",
             "#0d9488", "#ca8a04", "#db2777", "#7c3aed", "#0284c7", "#16a34a",
@@ -462,14 +457,13 @@
             "#8b5cf6", "#f43f5e", "#06b6d4", "#84cc16", "#a855f7", "#64748b"
         ];
 
-        // 🏷️ 分類元數據
         const categoryMeta = {
-            "餐飲": { name: "餐飲", icon: "fa-utensils", bg: "bg-amber-500/20", text: "text-amber-300", badgeColor: "bg-amber-100 text-amber-800 border-amber-200" },
-            "購物": { name: "購物", icon: "fa-bag-shopping", bg: "bg-purple-500/20", text: "text-purple-300", badgeColor: "bg-purple-100 text-purple-800 border-purple-200" },
-            "景點": { name: "景點", icon: "fa-camera", bg: "bg-emerald-500/20", text: "text-emerald-300", badgeColor: "bg-emerald-100 text-emerald-800 border-emerald-200" },
-            "特色體驗": { name: "特色體驗", icon: "fa-wand-magic-sparkles", bg: "bg-rose-500/20", text: "text-rose-300", badgeColor: "bg-rose-100 text-rose-800 border-rose-200" },
-            "交通": { name: "交通", icon: "fa-plane", bg: "bg-blue-500/20", text: "text-blue-300", badgeColor: "bg-blue-100 text-blue-800 border-blue-200" },
-            "住宿": { name: "住宿", icon: "fa-hotel", bg: "bg-indigo-500/20", text: "text-indigo-300", badgeColor: "bg-indigo-100 text-indigo-800 border-indigo-200" }
+            "餐飲": { name: "餐飲", icon: "fa-utensils", bg: "bg-amber-500/20", text: "text-amber-600 dark:text-amber-300", badgeColor: "bg-amber-100 text-amber-800 border-amber-200" },
+            "購物": { name: "購物", icon: "fa-bag-shopping", bg: "bg-purple-500/20", text: "text-purple-600 dark:text-purple-300", badgeColor: "bg-purple-100 text-purple-800 border-purple-200" },
+            "景點": { name: "景點", icon: "fa-camera", bg: "bg-emerald-500/20", text: "text-emerald-600 dark:text-emerald-300", badgeColor: "bg-emerald-100 text-emerald-800 border-emerald-200" },
+            "特色體驗": { name: "特色體驗", icon: "fa-wand-magic-sparkles", bg: "bg-rose-500/20", text: "text-rose-600 dark:text-rose-300", badgeColor: "bg-rose-100 text-rose-800 border-rose-200" },
+            "交通": { name: "交通", icon: "fa-plane", bg: "bg-blue-500/20", text: "text-blue-600 dark:text-blue-300", badgeColor: "bg-blue-100 text-blue-800 border-blue-200" },
+            "住宿": { name: "住宿", icon: "fa-hotel", bg: "bg-indigo-500/20", text: "text-indigo-600 dark:text-indigo-300", badgeColor: "bg-indigo-100 text-indigo-800 border-indigo-200" }
         };
 
         function getCategoryMeta(catName) {
@@ -477,7 +471,7 @@
             if (categoryMeta[cleaned]) {
                 return categoryMeta[cleaned];
             }
-            return { name: cleaned || "一般行程", icon: "fa-compass", bg: "bg-teal-500/20", text: "text-teal-300", badgeColor: "bg-teal-100 text-teal-800 border-teal-200" };
+            return { name: cleaned || "一般行程", icon: "fa-compass", bg: "bg-teal-500/20", text: "text-teal-600 dark:text-teal-300", badgeColor: "bg-teal-100 text-teal-800 border-teal-200" };
         }
 
         function getDayColor(dayNum) {
@@ -567,7 +561,7 @@
             title: "行程規劃",
             locations: "各景點",
             dateRange: "",
-            colorTheme: "海洋綠", // 預設配色
+            colorTheme: "海洋綠",
             days: []
         };
 
@@ -744,13 +738,13 @@
 
                 autoDetectAndSetMapProvider(tripData.locations, tripData.title);
 
-                document.getElementById('sheet-sync-status').className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold";
+                document.getElementById('sheet-sync-status').className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-700 dark:text-emerald-300 text-xs font-semibold";
                 document.getElementById('sheet-sync-status').innerHTML = '<i class="fa-solid fa-file-excel"></i> <span>已從 Google Sheet 同步主題與配色</span>';
 
                 showToast("已成功同步最新主題與配色！", "success");
             } catch (error) {
                 console.warn("無法從 Google Sheet 抓取資料：", error);
-                document.getElementById('sheet-sync-status').className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-xs font-semibold";
+                document.getElementById('sheet-sync-status').className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-700 dark:text-amber-300 text-xs font-semibold";
                 document.getElementById('sheet-sync-status').innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span>Google Sheet 連線異常</span>';
                 showToast("無法讀取 Google Sheet，請檢查共用權限", "info");
             } finally {
@@ -768,15 +762,15 @@
 
             // Header Background & Text
             const header = document.getElementById('main-header');
-            header.className = `relative bg-gradient-to-r ${theme.headerGradient} ${theme.headerText} overflow-hidden pb-8 pt-6 px-4 md:px-8 border-b ${theme.borderCol} shadow-xl transition-all duration-500`;
+            header.className = `relative bg-gradient-to-r ${theme.headerGradient} ${theme.headerText} overflow-hidden pb-8 pt-6 px-4 md:px-8 border-b ${theme.borderCol} shadow-md transition-all duration-500`;
 
             // Refresh Button
             const refreshBtn = document.getElementById('refresh-btn');
-            refreshBtn.className = `px-4 py-2 ${theme.primaryBtnBg} font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-1.5`;
+            refreshBtn.className = `px-4 py-2 ${theme.primaryBtnBg} font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5`;
 
             // Overall Weather Banner
             const weatherBanner = document.getElementById('overall-weather-banner');
-            weatherBanner.className = `${theme.bannerBg} rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3.5 shadow-xl text-xs md:text-sm cursor-pointer transition transform hover:-translate-y-0.5 border`;
+            weatherBanner.className = `${theme.bannerBg} rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3.5 shadow-sm text-xs md:text-sm cursor-pointer transition transform hover:-translate-y-0.5 border`;
 
             const iconBox = document.getElementById('overall-weather-icon-box');
             iconBox.className = `w-10 h-10 rounded-xl ${theme.bannerIconBox} flex items-center justify-center text-lg font-bold flex-shrink-0 border`;
@@ -1111,7 +1105,7 @@
 
             const container = document.getElementById('trip-budget-summary');
             let html = `
-                <div onclick="openCostDetailModal('ALL')" class="flex items-center gap-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl p-2.5 px-3.5 shadow-sm cursor-pointer transition transform hover:-translate-y-0.5">
+                <div onclick="openCostDetailModal('ALL')" class="flex items-center gap-3 ${theme.budgetItemBg} rounded-xl p-2.5 px-3.5 shadow-sm cursor-pointer transition transform hover:-translate-y-0.5 border">
                     <div class="w-8 h-8 rounded-lg ${theme.bannerIconBox} flex items-center justify-center font-bold text-sm border"><i class="fa-solid fa-wallet"></i></div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between">
@@ -1128,7 +1122,7 @@
                 if (twdAmt > 0) {
                     const meta = categoryMeta[catKey] || categoryMeta["景點"];
                     html += `
-                        <div onclick="openCostDetailModal('${catKey}')" class="flex items-center gap-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl p-2.5 px-3.5 shadow-sm cursor-pointer transition transform hover:-translate-y-0.5">
+                        <div onclick="openCostDetailModal('${catKey}')" class="flex items-center gap-3 ${theme.budgetItemBg} rounded-xl p-2.5 px-3.5 shadow-sm cursor-pointer transition transform hover:-translate-y-0.5 border">
                             <div class="w-8 h-8 rounded-lg ${meta.bg} ${meta.text} flex items-center justify-center font-bold text-sm"><i class="fa-solid ${meta.icon}"></i></div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between">
@@ -1161,7 +1155,7 @@
             let totalTWD = 0;
 
             if (categoryKey === 'ALL') {
-                iconBg.className = "w-9 h-9 rounded-xl bg-teal-500/20 text-teal-300 border border-teal-400/30 flex items-center justify-center text-lg";
+                iconBg.className = "w-9 h-9 rounded-xl bg-teal-500/20 text-teal-600 dark:text-teal-300 border border-teal-400/30 flex items-center justify-center text-lg";
                 iconEl.className = "fa-solid fa-wallet";
                 titleEl.textContent = "全行程費用明細";
 
@@ -1290,7 +1284,7 @@
                     return `
                         <div class="flex items-center justify-between bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-3 transition">
                             <div class="flex items-center gap-3">
-                                <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-500 font-black text-xs flex items-center justify-center border border-emerald-300/60">${index + 1}</span>
+                                <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-black text-xs flex items-center justify-center border border-emerald-300/60">${index + 1}</span>
                                 <div>
                                     <h4 class="font-extrabold text-xs md:text-sm">${s.title}</h4>
                                     <p class="text-[11px] opacity-75 mt-0.5"><i class="fa-regular fa-clock me-1"></i>${s.time || '全天'} • <span class="font-semibold ${catMeta.text}">${catMeta.name}</span></p>
@@ -1339,10 +1333,10 @@
                         <div class="bg-black/5 dark:bg-white/5 rounded-2xl p-4 border border-black/10 dark:border-white/10 space-y-3">
                             <div class="flex items-center justify-between border-b border-black/10 dark:border-white/10 pb-2.5">
                                 <div class="flex items-center gap-2.5">
-                                    <span class="w-8 h-8 rounded-xl bg-teal-500/20 text-teal-400 font-black text-xs flex items-center justify-center border border-teal-400/30">D${d.dayNum}</span>
+                                    <span class="w-8 h-8 rounded-xl bg-teal-500/20 text-teal-600 dark:text-teal-400 font-black text-xs flex items-center justify-center border border-teal-400/30">D${d.dayNum}</span>
                                     <div>
                                         <h4 class="font-bold text-xs md:text-sm">${d.theme} ${d.area ? `<span class="text-[10px] bg-black/10 dark:bg-white/10 font-semibold px-2 py-0.5 rounded-full border border-black/10">${d.area}</span>` : ''}</h4>
-                                        <p class="text-[11px] opacity-75"><i class="fa-regular fa-calendar me-1 text-teal-400"></i>${d.date}</p>
+                                        <p class="text-[11px] opacity-75"><i class="fa-regular fa-calendar me-1 text-teal-500"></i>${d.date}</p>
                                     </div>
                                 </div>
                                 <div class="text-right">
@@ -1353,17 +1347,17 @@
 
                             <div class="grid grid-cols-2 gap-2 text-[11px]">
                                 <div class="bg-black/5 dark:bg-white/5 p-2 rounded-xl border border-black/10 dark:border-white/10 flex items-center gap-2">
-                                    <i class="fa-solid fa-cloud-showers-heavy text-sky-400"></i>
-                                    <span>降雨機率：<strong class="text-sky-400">${w.rainProb}</strong></span>
+                                    <i class="fa-solid fa-cloud-showers-heavy text-sky-500"></i>
+                                    <span>降雨機率：<strong class="text-sky-600 dark:text-sky-400">${w.rainProb}</strong></span>
                                 </div>
                                 <div class="bg-black/5 dark:bg-white/5 p-2 rounded-xl border border-black/10 dark:border-white/10 flex items-center gap-2">
-                                    <i class="fa-solid fa-sun text-rose-400"></i>
+                                    <i class="fa-solid fa-sun text-rose-500"></i>
                                     <span>日出/落：<strong class="opacity-85">${w.sunrise === '尚未預測' ? '未提供' : `${w.sunrise} / ${w.sunset}`}</strong></span>
                                 </div>
                             </div>
 
                             <div class="bg-teal-500/10 border border-teal-500/20 rounded-xl p-2.5 text-xs flex items-start gap-2">
-                                <i class="fa-solid fa-shirt text-teal-400 mt-0.5"></i>
+                                <i class="fa-solid fa-shirt text-teal-600 dark:text-teal-400 mt-0.5"></i>
                                 <span><strong>穿著點評：</strong>${w.clothingAdvice}</span>
                             </div>
                         </div>
@@ -1453,7 +1447,7 @@
             };
 
             dayCard.innerHTML = `
-                <div class="${theme.dayCardHeaderBg} rounded-2xl p-5 shadow-lg border space-y-4 transition-colors">
+                <div class="${theme.dayCardHeaderBg} rounded-2xl p-5 shadow-sm border space-y-4 transition-colors">
                     <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-black/10">
                         <div class="flex items-center space-x-3.5">
                             <div class="w-12 h-12 rounded-2xl ${theme.dayCardNumberBox} flex items-center justify-center text-xl font-black shadow-sm border">D${day.dayNum}</div>
