@@ -201,7 +201,7 @@
         </div>
     </main>
 
-    <!-- 🔲 MODAL 1: 花費費用明細懸浮視窗 -->
+    <!-- 🔲 MODAL 1: 全行程 / 分類花費費用明細懸浮視窗 -->
     <div id="cost-detail-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm transition-opacity">
         <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-200">
             <div class="p-4 md:p-5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
@@ -233,7 +233,39 @@
         </div>
     </div>
 
-    <!-- 🔲 MODAL 2: 整趟行程每日預估氣候懸浮視窗 -->
+    <!-- 🔲 MODAL 2: 當日花費明細懸浮視窗 -->
+    <div id="day-cost-detail-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm transition-opacity">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-200">
+            <div class="p-4 md:p-5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+                    <div>
+                        <h3 id="day-cost-modal-title" class="font-bold text-base md:text-lg">Day 1 花費明細</h3>
+                        <p id="day-cost-modal-subtitle" class="text-xs text-slate-400">當日所有包含費用的行程項目</p>
+                    </div>
+                </div>
+                <button onclick="closeDayCostModal()" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div id="day-cost-modal-list" class="p-4 md:p-6 overflow-y-auto space-y-3 flex-1">
+                <!-- Dynamic Daily Cost Items -->
+            </div>
+
+            <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+                <span class="text-xs text-slate-500 font-medium">即時匯率自動換算結果</span>
+                <div class="text-right">
+                    <span class="text-xs text-slate-500 me-1">當日總計:</span>
+                    <span id="day-cost-modal-total" class="text-base font-extrabold text-emerald-700">NT$ 0 元</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔲 MODAL 3: 整趟行程每日預估氣候懸浮視窗 -->
     <div id="weather-overview-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm transition-opacity">
         <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-200">
             <div class="p-4 md:p-5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
@@ -442,6 +474,7 @@
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     closeCostModal();
+                    closeDayCostModal();
                     closeWeatherModal();
                 }
             });
@@ -864,7 +897,7 @@
         }
 
         // ==========================================
-        // 🔲 MODAL 邏輯：花費明細彈窗
+        // 🔲 MODAL 1 邏輯：全行程 / 分類花費明細彈窗
         // ==========================================
         function openCostDetailModal(categoryKey) {
             const modal = document.getElementById('cost-detail-modal');
@@ -931,7 +964,6 @@
                     totalTWD += spotTWD;
 
                     const catMeta = categoryMeta[s.category] || categoryMeta["景點"];
-                    // 統一使用 英文代碼 + $ 符號 (例如 USD $, JPY $, TWD $)
                     let currSymbol = `${curr} $`;
 
                     return `
@@ -961,7 +993,77 @@
         }
 
         // ==========================================
-        // 🔲 MODAL 邏輯：整趟氣候與穿搭彈窗
+        // 🔲 MODAL 2 邏輯：單日（當日）花費明細彈窗
+        // ==========================================
+        function openDayCostModal(dayNum) {
+            const day = tripData.days.find(d => d.dayNum === dayNum);
+            if (!day) return;
+
+            const modal = document.getElementById('day-cost-detail-modal');
+            const titleEl = document.getElementById('day-cost-modal-title');
+            const subtitleEl = document.getElementById('day-cost-modal-subtitle');
+            const listEl = document.getElementById('day-cost-modal-list');
+            const totalEl = document.getElementById('day-cost-modal-total');
+
+            titleEl.textContent = `Day ${day.dayNum} 花費明細 - ${day.theme}`;
+            subtitleEl.textContent = `${day.date} • 共 ${day.spots ? day.spots.filter(s => Number(s.cost) > 0).length : 0} 筆費用項目`;
+
+            let dayCostSpots = (day.spots || []).filter(s => Number(s.cost) > 0);
+            let dayTotalTWD = 0;
+
+            if (dayCostSpots.length === 0) {
+                listEl.innerHTML = `
+                    <div class="text-center py-10 text-slate-400 font-medium">
+                        <i class="fa-solid fa-wallet text-3xl mb-2 text-slate-300"></i>
+                        <p>當日行程目前尚無費用紀錄</p>
+                    </div>
+                `;
+            } else {
+                listEl.innerHTML = dayCostSpots.map((s, index) => {
+                    const amt = Number(s.cost) || 0;
+                    const curr = (s.currency || "USD").toUpperCase();
+                    let spotTWD = 0;
+
+                    if (curr === "RMB" || curr === "CNY") spotTWD = amt * EXCHANGE_RATES.RMB;
+                    else if (curr === "HKD") spotTWD = amt * EXCHANGE_RATES.HKD;
+                    else if (curr === "KRW") spotTWD = amt * EXCHANGE_RATES.KRW;
+                    else if (curr === "JPY") spotTWD = amt * EXCHANGE_RATES.JPY;
+                    else if (curr === "USD") spotTWD = amt * EXCHANGE_RATES.USD;
+                    else spotTWD = amt;
+
+                    dayTotalTWD += spotTWD;
+
+                    const catMeta = categoryMeta[s.category] || categoryMeta["景點"];
+                    let currSymbol = `${curr} $`;
+
+                    return `
+                        <div class="flex items-center justify-between bg-slate-50 border border-slate-200/90 rounded-xl p-3 hover:bg-slate-100 transition">
+                            <div class="flex items-center gap-3">
+                                <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-800 font-black text-xs flex items-center justify-center border border-emerald-300/60">${index + 1}</span>
+                                <div>
+                                    <h4 class="font-extrabold text-xs md:text-sm text-slate-800">${s.title}</h4>
+                                    <p class="text-[11px] text-slate-500 mt-0.5"><i class="fa-regular fa-clock me-1"></i>${s.time || '全天'} • <span class="font-semibold ${catMeta.text}">${catMeta.name}</span></p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="font-extrabold text-xs md:text-sm text-slate-900 block">${currSymbol} ${amt.toLocaleString()}</span>
+                                <span class="text-[10px] text-slate-400 font-semibold">≈ NT$ ${Math.round(spotTWD).toLocaleString()}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            totalEl.textContent = `NT$ ${Math.round(dayTotalTWD).toLocaleString()} 元`;
+            modal.classList.remove('hidden');
+        }
+
+        function closeDayCostModal() {
+            document.getElementById('day-cost-detail-modal').classList.add('hidden');
+        }
+
+        // ==========================================
+        // 🔲 MODAL 3 邏輯：整趟氣候與穿搭彈窗
         // ==========================================
         function openWeatherOverviewModal() {
             const modal = document.getElementById('weather-overview-modal');
@@ -1120,9 +1222,17 @@
                             <div class="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-300 flex items-center justify-center text-sm"><i class="fa-solid fa-cloud-showers-heavy"></i></div>
                             <div><p class="text-[10px] text-slate-400 font-medium">降雨機率</p><p class="font-bold text-sky-200">${weather.rainProb === '尚未預測' ? '尚未預測' : `💧 ${weather.rainProb}`}</p></div>
                         </div>
-                        <div class="bg-slate-800/80 rounded-xl p-2 px-3 border border-slate-700/70 flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-sm"><i class="fa-solid fa-wallet"></i></div>
-                            <div><p class="text-[10px] text-slate-400 font-medium">當日花費總額 (折合)</p><p class="font-extrabold text-emerald-300 text-xs">NT$ ${Math.round(dayTotalTWD).toLocaleString()}</p></div>
+
+                        <!-- 💡 點擊可觸發當日花費彈窗 -->
+                        <div onclick="openDayCostModal(${day.dayNum})" class="bg-slate-800/80 hover:bg-slate-700/90 cursor-pointer transition transform hover:-translate-y-0.5 rounded-xl p-2 px-3 border border-slate-700/70 flex items-center justify-between space-x-2 text-xs">
+                            <div class="flex items-center space-x-2.5 min-w-0">
+                                <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-sm flex-shrink-0"><i class="fa-solid fa-wallet"></i></div>
+                                <div class="min-w-0">
+                                    <p class="text-[10px] text-slate-400 font-medium">當日花費總額 (折合)</p>
+                                    <p class="font-extrabold text-emerald-300 text-xs truncate">NT$ ${Math.round(dayTotalTWD).toLocaleString()}</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-circle-chevron-right text-emerald-400/70 text-xs flex-shrink-0"></i>
                         </div>
                     </div>
 
@@ -1158,7 +1268,6 @@
                     : '';
 
                 const curr = (spot.currency || "USD").toUpperCase();
-                // 統一以英文代碼 + $ 符號顯示（例如：USD $, JPY $, TWD $, HKD $）
                 let currSymbol = `${curr} $`;
                 
                 const costDisplay = (spot.cost && Number(spot.cost) > 0)
