@@ -132,12 +132,12 @@
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
         
         <!-- 1. Sticky Navigation Bar for Days Selection -->
-        <div id="sticky-nav-bar" class="sticky top-3 z-30 bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-2xl p-3 shadow-lg shadow-slate-200/50">
+        <div id="sticky-nav-bar" class="sticky top-3 z-30 bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-2xl p-3 shadow-lg shadow-slate-200/50 transition-colors">
             <div class="flex items-center justify-between px-2 mb-2">
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                     <i id="day-nav-icon" class="fa-solid fa-calendar-days"></i> 天數快速導覽
                 </span>
-                <span id="active-day-subtitle" class="text-xs bg-slate-100 text-slate-700 px-3 py-0.5 rounded-full font-bold border border-slate-200">--</span>
+                <span id="active-day-subtitle" class="text-xs px-3 py-0.5 rounded-full font-bold border">--</span>
             </div>
 
             <!-- Horizontal Day Tab Pills including "ALL" Mode -->
@@ -155,8 +155,8 @@
             </div>
 
             <!-- Right Column: Sticky Map (5 cols on Desktop) -->
-            <section id="map-section" class="lg:col-span-5 lg:sticky lg:top-20 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden flex flex-col">
-                <div class="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800 gap-2 flex-wrap">
+            <section id="map-section" class="lg:col-span-5 lg:sticky lg:top-20 rounded-2xl border shadow-xl overflow-hidden flex flex-col transition-colors">
+                <div id="map-header" class="p-4 flex items-center justify-between border-b gap-2 flex-wrap transition-colors">
                     <div class="flex items-center gap-3">
                         <div id="map-icon-box" class="w-9 h-9 rounded-xl flex items-center justify-center border">
                             <i class="fa-solid fa-map-location-dot"></i>
@@ -164,20 +164,20 @@
                         <div>
                             <h3 class="font-bold text-sm md:text-base flex items-center gap-2">
                                 <span id="current-map-title">Google 地圖 (標準)</span>
-                                <span class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full font-medium">按天色彩區分</span>
+                                <span id="map-color-tag" class="text-[10px] px-2 py-0.5 rounded-full font-medium border">按天色彩區分</span>
                             </h3>
-                            <p class="text-xs text-slate-400">同一天使用相同顏色，不同天以不同色彩呈現</p>
+                            <p id="map-sub-text" class="text-xs opacity-70">同一天使用相同顏色，不同天以不同色彩呈現</p>
                         </div>
                     </div>
                     
                     <!-- Map Layer Switcher & Reset -->
                     <div class="flex items-center gap-1.5">
-                        <div class="inline-flex bg-slate-800 p-1 rounded-xl border border-slate-700 text-xs">
-                            <button id="btn-map-google" onclick="switchMapProvider('google')" class="px-2 py-1 rounded-lg font-bold transition text-slate-400 hover:text-white">Google</button>
-                            <button id="btn-map-amap" onclick="switchMapProvider('amap')" class="px-2 py-1 rounded-lg font-bold transition text-slate-400 hover:text-white">高德</button>
-                            <button id="btn-map-naver" onclick="switchMapProvider('naver')" class="px-2 py-1 rounded-lg font-bold transition text-slate-400 hover:text-white">Naver</button>
+                        <div id="map-provider-box" class="inline-flex p-1 rounded-xl border text-xs">
+                            <button id="btn-map-google" onclick="switchMapProvider('google')" class="px-2 py-1 rounded-lg font-bold transition">Google</button>
+                            <button id="btn-map-amap" onclick="switchMapProvider('amap')" class="px-2 py-1 rounded-lg font-bold transition">高德</button>
+                            <button id="btn-map-naver" onclick="switchMapProvider('naver')" class="px-2 py-1 rounded-lg font-bold transition">Naver</button>
                         </div>
-                        <button onclick="fitMapBounds()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1" title="重置全景">
+                        <button id="btn-map-reset" onclick="fitMapBounds()" class="px-2.5 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1 border" title="重置全景">
                             <i class="fa-solid fa-expand"></i>
                         </button>
                     </div>
@@ -192,7 +192,7 @@
 
     <!-- 🔲 MODAL 1: 全行程 / 分類花費費用明細懸浮視窗 -->
     <div id="cost-detail-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm transition-opacity">
-        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-200">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh]">
             <div class="p-4 md:p-5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
                 <div class="flex items-center gap-3">
                     <div id="modal-cost-icon-bg" class="w-9 h-9 rounded-xl bg-teal-500/20 text-teal-300 border border-teal-400/30 flex items-center justify-center text-lg">
@@ -224,7 +224,7 @@
 
     <!-- 🔲 MODAL 2: 當日花費明細懸浮視窗 -->
     <div id="day-cost-detail-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm transition-opacity">
-        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-200">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh]">
             <div class="p-4 md:p-5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center justify-center text-lg">
@@ -256,7 +256,7 @@
 
     <!-- 🔲 MODAL 3: 整趟行程每日預估氣候懸浮視窗 -->
     <div id="weather-overview-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm transition-opacity">
-        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-200">
+        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh]">
             <div class="p-4 md:p-5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-xl bg-teal-500/20 text-teal-300 border border-teal-400/30 flex items-center justify-center text-lg">
@@ -310,8 +310,90 @@
             TWD: 1.0
         };
 
-        // 🎨 精簡的 3 種高質感主題庫（海洋綠、iPhone 太空灰、iPhone 銀白光感）
+        // 🎨 完美匹配 iOS/iPhone 設計風格的 3 種核心主題（含全方位地圖與卡片連動）
         const THEMES = {
+            "太空灰": {
+                name: "太空灰",
+                bodyBg: "bg-[#09090b] text-zinc-100",
+                headerGradient: "from-zinc-950 via-zinc-900 to-zinc-950",
+                headerText: "text-zinc-100",
+                borderCol: "border-zinc-800/80",
+                primaryBtnBg: "bg-zinc-100 hover:bg-zinc-200 text-zinc-900",
+                bannerBg: "bg-zinc-900/90 hover:bg-zinc-900 border-zinc-800 text-zinc-200",
+                bannerIconBox: "bg-zinc-800 text-blue-400 border-zinc-700/80",
+                bannerTitle: "text-zinc-100",
+                badgeBg: "bg-zinc-800 border-zinc-700 text-zinc-300",
+                navBg: "bg-zinc-900/95 border-zinc-800 shadow-zinc-950/50",
+                activeTabBg: "bg-zinc-100 text-zinc-900 border-zinc-200",
+                inactiveTabBg: "bg-zinc-800/80 hover:bg-zinc-800 text-zinc-300 border-zinc-700/80",
+                activeTabDot: "text-blue-500",
+                iconColor: "text-blue-400",
+                navIconColor: "text-zinc-400",
+                // 每日行程主卡片
+                dayMainCardBg: "bg-zinc-900/80 border-zinc-800",
+                dayCardHeaderBg: "bg-gradient-to-br from-zinc-900 via-zinc-900/90 to-zinc-900 text-zinc-100 border-zinc-800",
+                dayCardNumberBox: "bg-zinc-800 text-blue-400 border-zinc-700",
+                dayCardSubBadge: "bg-zinc-800 text-zinc-300 border-zinc-700",
+                dayCardWeatherBox: "bg-zinc-950/60 border-zinc-800 text-zinc-200",
+                dayCardCostBox: "bg-zinc-950/60 hover:bg-zinc-950 border-zinc-800 text-zinc-100",
+                dayCardCostText: "text-blue-400 font-bold",
+                dayCardClothesBanner: "bg-zinc-950/80 border-zinc-800 text-zinc-300",
+                dayCardClothesTitle: "text-zinc-100",
+                // 時間軸行程卡片
+                spotCardBg: "bg-zinc-900/90 hover:bg-zinc-900 border-zinc-800 text-zinc-100",
+                spotTitleText: "text-zinc-100 group-hover:text-blue-400",
+                spotTimeBadge: "bg-zinc-800 text-zinc-100 border-zinc-700",
+                spotNotesBg: "bg-zinc-950/70 border-zinc-800 text-zinc-300",
+                spotLocBtn: "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700",
+                spotLocIcon: "text-blue-400",
+                // 地圖區塊完全連動
+                mapSectionBg: "bg-zinc-900 border-zinc-800",
+                mapHeaderBg: "bg-zinc-950 border-zinc-800 text-zinc-100",
+                mapColorTag: "bg-zinc-800 text-blue-400 border-zinc-700",
+                mapProviderBox: "bg-zinc-900 border-zinc-800",
+                mapBtnReset: "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700"
+            },
+            "銀白光感": {
+                name: "銀白光感",
+                bodyBg: "bg-slate-100 text-slate-900",
+                headerGradient: "from-slate-900 via-slate-800 to-slate-900",
+                headerText: "text-white",
+                borderCol: "border-slate-700",
+                primaryBtnBg: "bg-blue-600 hover:bg-blue-500 text-white",
+                bannerBg: "bg-white border-white text-slate-800 shadow-sm",
+                bannerIconBox: "bg-blue-50 text-blue-600 border-blue-100",
+                bannerTitle: "text-slate-900 font-bold",
+                badgeBg: "bg-slate-100 border-slate-200 text-slate-700",
+                navBg: "bg-white/90 border-white shadow-slate-200/60",
+                activeTabBg: "bg-slate-900 text-white border-slate-900",
+                inactiveTabBg: "bg-white hover:bg-slate-50 text-slate-700 border-white shadow-sm",
+                activeTabDot: "text-blue-400",
+                iconColor: "text-blue-600",
+                navIconColor: "text-slate-500",
+                // 每日行程主卡片 (iPhone 極簡白底底框)
+                dayMainCardBg: "bg-white border-white shadow-sm",
+                dayCardHeaderBg: "bg-slate-50/80 text-slate-900 border-slate-200/80",
+                dayCardNumberBox: "bg-slate-900 text-white border-slate-900",
+                dayCardSubBadge: "bg-white text-slate-700 border-slate-200",
+                dayCardWeatherBox: "bg-white border-slate-200/80 text-slate-800",
+                dayCardCostBox: "bg-white hover:bg-slate-50 border-slate-200/80 text-slate-900",
+                dayCardCostText: "text-blue-600 font-bold",
+                dayCardClothesBanner: "bg-blue-50/60 border-blue-100/80 text-slate-800",
+                dayCardClothesTitle: "text-blue-900",
+                // 時間軸行程卡片
+                spotCardBg: "bg-white hover:bg-slate-50/80 border-slate-200/80 text-slate-900 shadow-sm",
+                spotTitleText: "text-slate-900 group-hover:text-blue-600",
+                spotTimeBadge: "bg-slate-100 text-slate-900 border-slate-200",
+                spotNotesBg: "bg-slate-50 border-slate-200/80 text-slate-700",
+                spotLocBtn: "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-200",
+                spotLocIcon: "text-blue-600",
+                // 地圖區塊完全連動
+                mapSectionBg: "bg-white border-white shadow-lg",
+                mapHeaderBg: "bg-slate-900 border-slate-800 text-white",
+                mapColorTag: "bg-slate-800 text-blue-300 border-slate-700",
+                mapProviderBox: "bg-slate-800 border-slate-700",
+                mapBtnReset: "bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700"
+            },
             "海洋綠": {
                 name: "海洋綠",
                 bodyBg: "bg-slate-50 text-slate-800",
@@ -323,11 +405,14 @@
                 bannerIconBox: "bg-teal-500/20 text-teal-300 border-teal-400/30",
                 bannerTitle: "text-teal-300",
                 badgeBg: "bg-teal-900/90 border-teal-400/30 text-teal-200",
+                navBg: "bg-white/95 border-slate-200 shadow-slate-200/50",
                 activeTabBg: "bg-slate-900 text-teal-300 border-slate-800",
+                inactiveTabBg: "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200",
                 activeTabDot: "text-teal-400",
                 iconColor: "text-teal-400",
                 navIconColor: "text-teal-600",
-                // 每日卡片連動
+                // 每日行程主卡片
+                dayMainCardBg: "bg-white border-slate-200 shadow-sm",
                 dayCardHeaderBg: "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white border-slate-800",
                 dayCardNumberBox: "bg-teal-500/20 text-teal-300 border-teal-400/30",
                 dayCardSubBadge: "bg-slate-800 text-slate-300 border-slate-700",
@@ -336,62 +421,19 @@
                 dayCardCostText: "text-emerald-300",
                 dayCardClothesBanner: "bg-teal-950/60 border-teal-500/30 text-teal-200",
                 dayCardClothesTitle: "text-teal-300",
+                // 時間軸行程卡片
+                spotCardBg: "bg-white hover:bg-slate-50/90 border-slate-200/90 text-slate-900 shadow-sm",
+                spotTitleText: "text-slate-900 group-hover:text-teal-700",
+                spotTimeBadge: "bg-slate-100 text-slate-900 border-slate-200",
+                spotNotesBg: "bg-slate-50 border-slate-200/80 text-slate-600",
                 spotLocBtn: "bg-teal-50 hover:bg-teal-100/80 text-slate-900 border-teal-200/60",
-                spotLocIcon: "text-teal-600"
-            },
-            "太空灰": {
-                name: "太空灰",
-                bodyBg: "bg-zinc-950 text-zinc-100",
-                headerGradient: "from-zinc-900 via-zinc-900 to-zinc-950",
-                headerText: "text-zinc-100",
-                borderCol: "border-zinc-800",
-                primaryBtnBg: "bg-zinc-100 hover:bg-zinc-200 text-zinc-900",
-                bannerBg: "bg-zinc-900/90 hover:bg-zinc-900 border-zinc-800 text-zinc-200",
-                bannerIconBox: "bg-zinc-800 text-blue-400 border-zinc-700",
-                bannerTitle: "text-zinc-100",
-                badgeBg: "bg-zinc-800 border-zinc-700 text-zinc-300",
-                activeTabBg: "bg-zinc-100 text-zinc-900 border-zinc-200",
-                activeTabDot: "text-blue-500",
-                iconColor: "text-blue-400",
-                navIconColor: "text-zinc-400",
-                // 每日卡片連動
-                dayCardHeaderBg: "bg-zinc-900 text-zinc-100 border-zinc-800",
-                dayCardNumberBox: "bg-zinc-800 text-blue-400 border-zinc-700",
-                dayCardSubBadge: "bg-zinc-800 text-zinc-300 border-zinc-700",
-                dayCardWeatherBox: "bg-zinc-900/80 border-zinc-800 text-zinc-200",
-                dayCardCostBox: "bg-zinc-900/80 hover:bg-zinc-800 border-zinc-800 text-zinc-100",
-                dayCardCostText: "text-blue-400 font-bold",
-                dayCardClothesBanner: "bg-zinc-900/90 border-zinc-800 text-zinc-300",
-                dayCardClothesTitle: "text-zinc-100",
-                spotLocBtn: "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700",
-                spotLocIcon: "text-blue-400"
-            },
-            "銀白光感": {
-                name: "銀白光感",
-                bodyBg: "bg-zinc-50 text-zinc-900",
-                headerGradient: "from-zinc-900 via-zinc-800 to-zinc-900",
-                headerText: "text-white",
-                borderCol: "border-zinc-700",
-                primaryBtnBg: "bg-blue-600 hover:bg-blue-500 text-white",
-                bannerBg: "bg-white border-zinc-200 text-zinc-800 shadow-sm",
-                bannerIconBox: "bg-zinc-100 text-blue-600 border-zinc-200",
-                bannerTitle: "text-zinc-900 font-bold",
-                badgeBg: "bg-zinc-100 border-zinc-200 text-zinc-700",
-                activeTabBg: "bg-zinc-900 text-white border-zinc-900",
-                activeTabDot: "text-blue-400",
-                iconColor: "text-blue-600",
-                navIconColor: "text-zinc-600",
-                // 每日卡片連動
-                dayCardHeaderBg: "bg-white text-zinc-900 border-zinc-200 shadow-sm",
-                dayCardNumberBox: "bg-zinc-900 text-white border-zinc-900",
-                dayCardSubBadge: "bg-zinc-100 text-zinc-700 border-zinc-200",
-                dayCardWeatherBox: "bg-zinc-50 border-zinc-200 text-zinc-800",
-                dayCardCostBox: "bg-zinc-50 hover:bg-zinc-100 border-zinc-200 text-zinc-900",
-                dayCardCostText: "text-blue-600 font-bold",
-                dayCardClothesBanner: "bg-blue-50/50 border-blue-100 text-zinc-800",
-                dayCardClothesTitle: "text-blue-900",
-                spotLocBtn: "bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border-zinc-200",
-                spotLocIcon: "text-blue-600"
+                spotLocIcon: "text-teal-600",
+                // 地圖區塊完全連動
+                mapSectionBg: "bg-white border-slate-200 shadow-xl",
+                mapHeaderBg: "bg-slate-900 border-slate-800 text-white",
+                mapColorTag: "bg-amber-500/20 text-amber-300 border-amber-400/30",
+                mapProviderBox: "bg-slate-800 border-slate-700",
+                mapBtnReset: "bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700"
             },
             // 別名相容
             emerald: "海洋綠",
@@ -736,9 +778,31 @@
             const subBadge = document.getElementById('overall-weather-subbadge');
             subBadge.className = `text-[11px] flex items-center gap-1 ${theme.badgeBg} px-2.5 py-1 rounded-lg border`;
 
-            // Map Section Icon
+            // Sticky Navigation Bar
+            const stickyNav = document.getElementById('sticky-nav-bar');
+            stickyNav.className = `sticky top-3 z-30 ${theme.navBg} backdrop-blur-md rounded-2xl p-3 shadow-lg transition-colors border`;
+
+            const activeDaySub = document.getElementById('active-day-subtitle');
+            activeDaySub.className = `text-xs px-3 py-0.5 rounded-full font-bold ${theme.badgeBg}`;
+
+            // Map Section Whole Area連動
+            const mapSection = document.getElementById('map-section');
+            mapSection.className = `lg:col-span-5 lg:sticky lg:top-20 ${theme.mapSectionBg} rounded-2xl border shadow-xl overflow-hidden flex flex-col transition-colors`;
+
+            const mapHeader = document.getElementById('map-header');
+            mapHeader.className = `p-4 ${theme.mapHeaderBg} flex items-center justify-between border-b gap-2 flex-wrap transition-colors`;
+
             const mapIconBox = document.getElementById('map-icon-box');
             mapIconBox.className = `w-9 h-9 rounded-xl ${theme.bannerIconBox} flex items-center justify-center border`;
+
+            const mapColorTag = document.getElementById('map-color-tag');
+            mapColorTag.className = `text-[10px] ${theme.mapColorTag} px-2 py-0.5 rounded-full font-medium border`;
+
+            const mapProviderBox = document.getElementById('map-provider-box');
+            mapProviderBox.className = `inline-flex ${theme.mapProviderBox} p-1 rounded-xl border text-xs`;
+
+            const btnMapReset = document.getElementById('btn-map-reset');
+            btnMapReset.className = `${theme.mapBtnReset} px-2.5 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1 border`;
 
             // Calendar & Nav Icons
             document.getElementById('header-calendar-icon').className = `fa-regular fa-calendar ${theme.iconColor} me-1.5`;
@@ -1281,7 +1345,7 @@
             const allBtn = document.createElement('button');
             allBtn.onclick = () => switchDayFilter("ALL");
             allBtn.className = `px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 flex items-center space-x-1.5 border ${
-                isAll ? `${theme.activeTabBg} shadow-md scale-[1.02]` : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+                isAll ? `${theme.activeTabBg} shadow-md scale-[1.02]` : theme.inactiveTabBg
             }`;
             allBtn.innerHTML = `<i class="fa-solid fa-layer-group ${theme.iconColor}"></i> <span>全部行程 (DAY 1-${tripData.days.length})</span>`;
             container.appendChild(allBtn);
@@ -1291,7 +1355,7 @@
                 const btn = document.createElement('button');
                 btn.onclick = () => switchDayFilter(day.dayNum);
                 btn.className = `px-3.5 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 flex items-center space-x-2 border ${
-                    isActive ? `${theme.activeTabBg} shadow-md scale-[1.02]` : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+                    isActive ? `${theme.activeTabBg} shadow-md scale-[1.02]` : theme.inactiveTabBg
                 }`;
                 btn.innerHTML = `<span class="${isActive ? `${theme.activeTabDot} font-extrabold` : 'opacity-60'}">D${day.dayNum}</span><span>•</span><span>${day.theme}</span>`;
                 container.appendChild(btn);
@@ -1318,7 +1382,7 @@
         function createDayCardElement(day) {
             const theme = getActiveTheme();
             const dayCard = document.createElement('div');
-            dayCard.className = "bg-white rounded-2xl border border-slate-200 p-5 md:p-6 shadow-sm space-y-6 overflow-hidden";
+            dayCard.className = `${theme.dayMainCardBg} rounded-2xl p-5 md:p-6 space-y-6 overflow-hidden transition-colors border shadow-sm`;
             
             let dayTotalTWD = 0;
             if (day.spots) {
@@ -1359,22 +1423,22 @@
 
                     <div class="grid grid-cols-2 gap-2.5 text-xs">
                         <div class="${theme.dayCardWeatherBox} rounded-xl p-2 px-3 border flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-600 flex items-center justify-center text-sm"><i class="fa-solid ${weather.icon}"></i></div>
+                            <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-500 flex items-center justify-center text-sm"><i class="fa-solid ${weather.icon}"></i></div>
                             <div><p class="text-[10px] opacity-75 font-medium">氣象預報</p><p class="font-bold">${weather.status} • ${weather.temp}</p></div>
                         </div>
                         <div class="${theme.dayCardWeatherBox} rounded-xl p-2 px-3 border flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-600 flex items-center justify-center text-sm"><i class="fa-solid fa-sun"></i></div>
+                            <div class="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-500 flex items-center justify-center text-sm"><i class="fa-solid fa-sun"></i></div>
                             <div><p class="text-[10px] opacity-75 font-medium">日出 / 日落</p><p class="font-bold">${weather.sunrise === '尚未預測' ? '尚未預測' : `🌅 ${weather.sunrise} / 🌇 ${weather.sunset}`}</p></div>
                         </div>
                         <div class="${theme.dayCardWeatherBox} rounded-xl p-2 px-3 border flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-600 flex items-center justify-center text-sm"><i class="fa-solid fa-cloud-showers-heavy"></i></div>
+                            <div class="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-500 flex items-center justify-center text-sm"><i class="fa-solid fa-cloud-showers-heavy"></i></div>
                             <div><p class="text-[10px] opacity-75 font-medium">降雨機率</p><p class="font-bold">${weather.rainProb === '尚未預測' ? '尚未預測' : `💧 ${weather.rainProb}`}</p></div>
                         </div>
 
                         <!-- 💡 點擊可觸發當日花費彈窗 (與主題連動) -->
                         <div onclick="openDayCostModal(${day.dayNum})" class="${theme.dayCardCostBox} cursor-pointer transition transform hover:-translate-y-0.5 rounded-xl p-2 px-3 border flex items-center justify-between space-x-2 text-xs">
                             <div class="flex items-center space-x-2.5 min-w-0">
-                                <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-600 flex items-center justify-center text-sm flex-shrink-0"><i class="fa-solid fa-wallet"></i></div>
+                                <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center text-sm flex-shrink-0"><i class="fa-solid fa-wallet"></i></div>
                                 <div class="min-w-0">
                                     <p class="text-[10px] opacity-75 font-medium">當日花費總額 (折合)</p>
                                     <p class="font-extrabold ${theme.dayCardCostText} text-xs truncate">NT$ ${Math.round(dayTotalTWD).toLocaleString()}</p>
@@ -1396,7 +1460,7 @@
                     </div>
                 </div>
 
-                <div class="relative pl-1 md:pl-2 space-y-5 before:absolute before:left-[17px] md:before:left-[21px] before:top-4 before:bottom-4 before:w-0.5 before:bg-slate-200">
+                <div class="relative pl-1 md:pl-2 space-y-5 before:absolute before:left-[17px] md:before:left-[21px] before:top-4 before:bottom-4 before:w-0.5 before:bg-slate-300/40">
                     ${renderTimelineSpotItems(day)}
                 </div>
             `;
@@ -1405,7 +1469,7 @@
 
         function renderTimelineSpotItems(day) {
             if (!day.spots || day.spots.length === 0) {
-                return `<div class="text-center py-8 px-4 bg-slate-50 rounded-2xl border border-dashed border-slate-200"><p class="text-sm text-slate-500 font-medium">此天尚無安排行程項目</p></div>`;
+                return `<div class="text-center py-8 px-4 bg-slate-500/10 rounded-2xl border border-dashed border-slate-400/30"><p class="text-sm opacity-70 font-medium">此天尚無安排行程項目</p></div>`;
             }
 
             const theme = getActiveTheme();
@@ -1414,14 +1478,14 @@
                 const meta = categoryMeta[spot.category] || categoryMeta["景點"];
                 
                 const timeBadgeHtml = (spot.time && spot.time !== "")
-                    ? `<span class="text-xs font-extrabold text-slate-900 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200"><i class="fa-regular fa-clock me-1 text-teal-600"></i>${spot.time}</span>`
+                    ? `<span class="text-xs font-extrabold ${theme.spotTimeBadge} px-2 py-0.5 rounded-lg border"><i class="fa-regular fa-clock me-1 text-teal-500"></i>${spot.time}</span>`
                     : '';
 
                 const curr = (spot.currency || "USD").toUpperCase();
                 let currSymbol = `${curr} $`;
                 
                 const costDisplay = (spot.cost && Number(spot.cost) > 0)
-                    ? `<span class="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200"><i class="fa-solid fa-receipt text-emerald-600 me-1"></i>${currSymbol} ${spot.cost}</span>`
+                    ? `<span class="text-xs font-bold ${theme.spotTimeBadge} px-2 py-0.5 rounded-lg border"><i class="fa-solid fa-receipt text-emerald-500 me-1"></i>${currSymbol} ${spot.cost}</span>`
                     : '';
 
                 const mapButtonHtml = (spot.mapUrl && spot.mapUrl.trim() !== "")
@@ -1433,18 +1497,18 @@
                     const noteLines = spot.notes.split(/\r?\n/);
                     const linesContent = noteLines.map(line => `
                         <div class="flex items-start space-x-1.5">
-                            <i class="fa-solid fa-circle-info text-teal-600 mt-0.5 flex-shrink-0"></i>
+                            <i class="fa-solid fa-circle-info text-teal-500 mt-0.5 flex-shrink-0"></i>
                             <span class="leading-relaxed">${line}</span>
                         </div>
                     `).join('');
-                    notesHtml = `<div class="text-xs text-slate-600 bg-slate-50 rounded-xl p-2.5 mt-2.5 border border-slate-200/80 space-y-1.5">${linesContent}</div>`;
+                    notesHtml = `<div class="text-xs ${theme.spotNotesBg} rounded-xl p-2.5 mt-2.5 border space-y-1.5">${linesContent}</div>`;
                 }
 
                 return `
                     <div id="spot-card-${spot.id}" class="relative flex items-start space-x-3 group transition-all duration-200">
                         <div class="relative z-10 flex-shrink-0 w-8 h-8 md:w-9 md:h-9 rounded-full bg-slate-900 text-white font-extrabold text-xs flex items-center justify-center shadow-md border-2 border-white group-hover:scale-110 transition">${index + 1}</div>
 
-                        <div class="flex-1 bg-white hover:bg-slate-50/90 rounded-2xl p-4 border border-slate-200/90 shadow-sm hover:shadow-md transition">
+                        <div class="flex-1 ${theme.spotCardBg} rounded-2xl p-4 border shadow-sm hover:shadow-md transition">
                             <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                                 <div class="flex-1">
                                     <div class="flex items-center space-x-2 flex-wrap gap-y-1">
@@ -1453,11 +1517,11 @@
                                         ${costDisplay}
                                     </div>
 
-                                    <h4 class="font-extrabold text-slate-900 text-base md:text-lg mt-2 group-hover:text-teal-700 transition cursor-pointer" onclick="focusMapSpot('${spot.id}', ${day.dayNum})">${spot.title}</h4>
+                                    <h4 class="font-extrabold text-base md:text-lg mt-2 ${theme.spotTitleText} transition cursor-pointer" onclick="focusMapSpot('${spot.id}', ${day.dayNum})">${spot.title}</h4>
 
                                     ${notesHtml}
 
-                                    <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs flex-wrap gap-2">
+                                    <div class="mt-3 pt-2.5 border-t border-black/10 flex items-center justify-between text-xs flex-wrap gap-2">
                                         <div class="flex items-center space-x-2">
                                             <button onclick="focusMapSpot('${spot.id}', ${day.dayNum})" class="${theme.spotLocBtn} font-bold flex items-center gap-1.5 px-2.5 py-1 rounded-xl border transition"><i class="fa-solid fa-location-crosshairs ${theme.spotLocIcon}"></i> 地圖定位</button>
                                             ${mapButtonHtml}
