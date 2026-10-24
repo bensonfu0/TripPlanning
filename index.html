@@ -170,12 +170,11 @@
                         </div>
                     </div>
                     
-                    <!-- Map Layer Switcher & Reset -->
+                    <!-- Map Layer Switcher & Reset (保留 Google 與 高德) -->
                     <div class="flex items-center gap-1.5">
                         <div id="map-provider-box" class="inline-flex p-1 rounded-xl border text-xs">
-                            <button id="btn-map-google" onclick="switchMapProvider('google')" class="px-2 py-1 rounded-lg font-bold transition">Google</button>
-                            <button id="btn-map-amap" onclick="switchMapProvider('amap')" class="px-2 py-1 rounded-lg font-bold transition">高德</button>
-                            <button id="btn-map-naver" onclick="switchMapProvider('naver')" class="px-2 py-1 rounded-lg font-bold transition">Naver</button>
+                            <button id="btn-map-google" onclick="switchMapProvider('google')" class="px-2.5 py-1 rounded-lg font-bold transition">Google</button>
+                            <button id="btn-map-amap" onclick="switchMapProvider('amap')" class="px-2.5 py-1 rounded-lg font-bold transition">高德</button>
                         </div>
                         <button id="btn-map-reset" onclick="fitMapBounds()" class="px-2.5 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1 border" title="重置全景">
                             <i class="fa-solid fa-expand"></i>
@@ -354,7 +353,6 @@
                 modalCard: "bg-white border-slate-300 text-slate-900",
                 modalHeader: "bg-slate-100 text-slate-900 border-slate-300",
                 modalFooter: "bg-slate-100 border-slate-300 text-slate-700",
-                // 銀白色：懸浮視窗內的編號 1 2 3 4 / D1 D2 用黑底、黑框、白字
                 modalBadge: "bg-black text-white border-black font-extrabold",
                 modalItemBorder: "border-slate-300 bg-slate-50/80"
             },
@@ -379,7 +377,7 @@
                 budgetItemBg: "bg-white/10 hover:bg-white/20 border-white/20 text-white",
                 dayMainCardBg: "bg-zinc-900/80 border-zinc-800",
                 dayCardHeaderBg: "bg-gradient-to-br from-zinc-900 via-zinc-900/90 to-zinc-900 text-zinc-100 border-zinc-800",
-                dayCardNumberBox: "bg-zinc-800 text-white border-zinc-700", // 太空灰每日行程大標 D1/D2 字改純白
+                dayCardNumberBox: "bg-zinc-800 text-white border-zinc-700",
                 dayCardSubBadge: "bg-zinc-800 text-zinc-300 border-zinc-700",
                 dayCardWeatherBox: "bg-zinc-950/60 border-zinc-800 text-zinc-200",
                 dayCardCostBox: "bg-zinc-950/60 hover:bg-zinc-950 border-zinc-800 text-zinc-100",
@@ -400,9 +398,8 @@
                 modalCard: "bg-zinc-900 border-zinc-700 text-zinc-100",
                 modalHeader: "bg-zinc-950 text-zinc-100 border-zinc-800",
                 modalFooter: "bg-zinc-950 border-zinc-800 text-zinc-300",
-                // 太空灰：懸浮視窗內的編號 1 2 3 4 / D1 D2 用白底、白框、黑字
                 modalBadge: "bg-white text-black border-white font-extrabold",
-                modalItemBorder: "border-zinc-700 bg-zinc-950/70" // 懸浮視窗細項框框感更明顯
+                modalItemBorder: "border-zinc-700 bg-zinc-950/70"
             },
             "海洋綠": {
                 name: "海洋綠",
@@ -577,6 +574,7 @@
         let mapMarkers = [];
         let routePolylines = [];
 
+        // 地圖圖層僅保留 Google 與 高德 (Amap)
         const MAP_PROVIDERS = {
             google: {
                 title: "Google 地圖 (標準)",
@@ -589,12 +587,6 @@
                 url: "https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}",
                 subdomains: ["1", "2", "3", "4"],
                 attribution: '&copy; 高德地圖 (Amap)'
-            },
-            naver: {
-                title: "Naver 地圖 (韓國)",
-                url: "https://map.pstatic.net/nrb/styles/basic/1585817812/{z}/{x}/{y}@2x.png?type=png&suppress_analytics=true",
-                subdomains: [],
-                attribution: '&copy; NAVER Corp.'
             }
         };
 
@@ -670,15 +662,13 @@
 
             const btnGoogle = document.getElementById('btn-map-google');
             const btnAmap = document.getElementById('btn-map-amap');
-            const btnNaver = document.getElementById('btn-map-naver');
 
             const theme = getActiveTheme();
-            const activeClass = `px-2 py-1 rounded-lg font-bold transition ${theme.primaryBtnBg} shadow`;
-            const inactiveClass = "px-2 py-1 rounded-lg font-bold transition opacity-60 hover:opacity-100";
+            const activeClass = `px-2.5 py-1 rounded-lg font-bold transition ${theme.primaryBtnBg} shadow`;
+            const inactiveClass = "px-2.5 py-1 rounded-lg font-bold transition opacity-60 hover:opacity-100";
 
-            btnGoogle.className = providerKey === 'google' ? activeClass : inactiveClass;
-            btnAmap.className = providerKey === 'amap' ? activeClass : inactiveClass;
-            btnNaver.className = providerKey === 'naver' ? activeClass : inactiveClass;
+            if (btnGoogle) btnGoogle.className = providerKey === 'google' ? activeClass : inactiveClass;
+            if (btnAmap) btnAmap.className = providerKey === 'amap' ? activeClass : inactiveClass;
         }
 
         function switchMapProvider(providerKey) {
@@ -687,18 +677,17 @@
             showToast(`已切換為 ${MAP_PROVIDERS[providerKey].title}`, "info");
         }
 
+        // 自動地點判斷：若包含中國大陸或韓國關鍵字，自動切換高德地圖；其餘預設 Google
         function autoDetectAndSetMapProvider(locationStr, titleStr) {
             const combinedText = `${locationStr} ${titleStr}`.toLowerCase();
-
-            const chinaKeywords = ["中國", "中国", "大陸", "大陆", "深圳", "廣州", "广州", "北京", "上海", "成都", "重慶", "重庆", "廈門", "厦门", "珠海", "杭州"];
-            const koreaKeywords = ["韓國", "韩国", "首爾", "首尔", "釜山", "濟州", "济州", "仁川", "明洞", "弘大", "korea", "seoul", "busan"];
+            const amapKeywords = [
+                "中國", "中国", "大陸", "大陆", "深圳", "廣州", "广州", "北京", "上海", "成都", "重慶", "重庆", "廈門", "厦门", "珠海", "杭州",
+                "韓國", "韩国", "首爾", "首尔", "釜山", "濟州", "济州", "仁川", "明洞", "弘大", "korea", "seoul", "busan"
+            ];
 
             let targetProvider = 'google';
-
-            if (chinaKeywords.some(kw => combinedText.includes(kw))) {
+            if (amapKeywords.some(kw => combinedText.includes(kw))) {
                 targetProvider = 'amap';
-            } else if (koreaKeywords.some(kw => combinedText.includes(kw))) {
-                targetProvider = 'naver';
             }
 
             applyTileLayer(targetProvider);
