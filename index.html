@@ -71,8 +71,8 @@
 <body id="app-body" class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
 
     <!-- Top Hero Banner Header -->
-    <header id="main-header" class="relative text-white overflow-hidden pb-8 pt-6 px-4 md:px-8 border-b shadow-2xl transition-all duration-500">
-        <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#14b8a6_1px,transparent_1px)] [background-size:16px_16px]"></div>
+    <header id="main-header" class="relative overflow-hidden pb-8 pt-6 px-4 md:px-8 border-b shadow-xl transition-all duration-500">
+        <div id="header-pattern" class="absolute inset-0 opacity-15 bg-[radial-gradient(#14b8a6_1px,transparent_1px)] [background-size:16px_16px]"></div>
         
         <div class="max-w-7xl mx-auto relative z-10 space-y-6">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -122,7 +122,7 @@
             </div>
 
             <!-- Total Trip Budget Summary Bar -->
-            <div id="trip-budget-summary" class="pt-2 border-t border-white/10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            <div id="trip-budget-summary" class="pt-2 border-t grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 <!-- Dynamically injected -->
             </div>
         </div>
@@ -132,9 +132,9 @@
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
         
         <!-- 1. Sticky Navigation Bar for Days Selection -->
-        <div id="sticky-nav-bar" class="sticky top-3 z-30 bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-2xl p-3 shadow-lg shadow-slate-200/50 transition-colors">
+        <div id="sticky-nav-bar" class="sticky top-3 z-30 backdrop-blur-md rounded-2xl p-3 shadow-lg transition-colors border">
             <div class="flex items-center justify-between px-2 mb-2">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <span class="text-xs font-bold uppercase tracking-wider opacity-70 flex items-center gap-1.5">
                     <i id="day-nav-icon" class="fa-solid fa-calendar-days"></i> 天數快速導覽
                 </span>
                 <span id="active-day-subtitle" class="text-xs px-3 py-0.5 rounded-full font-bold border">--</span>
@@ -192,18 +192,18 @@
 
     <!-- 🔲 MODAL 1: 全行程 / 分類花費費用明細懸浮視窗 -->
     <div id="cost-detail-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm transition-opacity">
-        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh]">
-            <div class="p-4 md:p-5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+        <div id="cost-modal-card" class="w-full max-w-2xl rounded-2xl shadow-2xl border overflow-hidden flex flex-col max-h-[85vh]">
+            <div id="cost-modal-header" class="p-4 md:p-5 flex items-center justify-between border-b">
                 <div class="flex items-center gap-3">
-                    <div id="modal-cost-icon-bg" class="w-9 h-9 rounded-xl bg-teal-500/20 text-teal-300 border border-teal-400/30 flex items-center justify-center text-lg">
+                    <div id="modal-cost-icon-bg" class="w-9 h-9 rounded-xl flex items-center justify-center text-lg">
                         <i id="modal-cost-icon" class="fa-solid fa-wallet"></i>
                     </div>
                     <div>
                         <h3 id="modal-cost-title" class="font-bold text-base md:text-lg">費用明細總覽</h3>
-                        <p id="modal-cost-subtitle" class="text-xs text-slate-400">此類別包含的所有景點與花費記錄</p>
+                        <p id="modal-cost-subtitle" class="text-xs opacity-75">此類別包含的所有景點與花費記錄</p>
                     </div>
                 </div>
-                <button onclick="closeCostModal()" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition">
+                <button onclick="closeCostModal()" class="w-8 h-8 rounded-xl bg-black/10 hover:bg-black/20 flex items-center justify-center transition">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
@@ -212,11 +212,11 @@
                 <!-- Dynamic Cost Items List -->
             </div>
 
-            <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
-                <span class="text-xs text-slate-500 font-medium">即時匯率自動換算結果</span>
+            <div id="cost-modal-footer" class="p-4 border-t flex items-center justify-between">
+                <span class="text-xs opacity-75 font-medium">即時匯率自動換算結果</span>
                 <div class="text-right">
-                    <span class="text-xs text-slate-500 me-1">類別總計:</span>
-                    <span id="modal-cost-total" class="text-base font-extrabold text-teal-700">NT$ 0 元</span>
+                    <span class="text-xs opacity-75 me-1">類別總計:</span>
+                    <span id="modal-cost-total" class="text-base font-extrabold">NT$ 0 元</span>
                 </div>
             </div>
         </div>
@@ -224,18 +224,18 @@
 
     <!-- 🔲 MODAL 2: 當日花費明細懸浮視窗 -->
     <div id="day-cost-detail-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm transition-opacity">
-        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh]">
-            <div class="p-4 md:p-5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+        <div id="day-cost-modal-card" class="w-full max-w-2xl rounded-2xl shadow-2xl border overflow-hidden flex flex-col max-h-[85vh]">
+            <div id="day-cost-modal-header" class="p-4 md:p-5 flex items-center justify-between border-b">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center justify-center text-lg">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 flex items-center justify-center text-lg">
                         <i class="fa-solid fa-receipt"></i>
                     </div>
                     <div>
                         <h3 id="day-cost-modal-title" class="font-bold text-base md:text-lg">Day 1 花費明細</h3>
-                        <p id="day-cost-modal-subtitle" class="text-xs text-slate-400">當日所有包含費用的行程項目</p>
+                        <p id="day-cost-modal-subtitle" class="text-xs opacity-75">當日所有包含費用的行程項目</p>
                     </div>
                 </div>
-                <button onclick="closeDayCostModal()" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition">
+                <button onclick="closeDayCostModal()" class="w-8 h-8 rounded-xl bg-black/10 hover:bg-black/20 flex items-center justify-center transition">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
@@ -244,11 +244,11 @@
                 <!-- Dynamic Daily Cost Items -->
             </div>
 
-            <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
-                <span class="text-xs text-slate-500 font-medium">即時匯率自動換算結果</span>
+            <div id="day-cost-modal-footer" class="p-4 border-t flex items-center justify-between">
+                <span class="text-xs opacity-75 font-medium">即時匯率自動換算結果</span>
                 <div class="text-right">
-                    <span class="text-xs text-slate-500 me-1">當日總計:</span>
-                    <span id="day-cost-modal-total" class="text-base font-extrabold text-emerald-700">NT$ 0 元</span>
+                    <span class="text-xs opacity-75 me-1">當日總計:</span>
+                    <span id="day-cost-modal-total" class="text-base font-extrabold">NT$ 0 元</span>
                 </div>
             </div>
         </div>
@@ -256,18 +256,18 @@
 
     <!-- 🔲 MODAL 3: 整趟行程每日預估氣候懸浮視窗 -->
     <div id="weather-overview-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm transition-opacity">
-        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh]">
-            <div class="p-4 md:p-5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+        <div id="weather-modal-card" class="w-full max-w-3xl rounded-2xl shadow-2xl border overflow-hidden flex flex-col max-h-[85vh]">
+            <div id="weather-modal-header" class="p-4 md:p-5 flex items-center justify-between border-b">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-teal-500/20 text-teal-300 border border-teal-400/30 flex items-center justify-center text-lg">
+                    <div class="w-9 h-9 rounded-xl bg-teal-500/20 text-teal-400 border border-teal-400/30 flex items-center justify-center text-lg">
                         <i class="fa-solid fa-cloud-sun"></i>
                     </div>
                     <div>
                         <h3 class="font-bold text-base md:text-lg">整趟行程每日氣候與穿搭</h3>
-                        <p class="text-xs text-slate-400">跨天預報數據與打包攻略</p>
+                        <p class="text-xs opacity-75">跨天預報數據與打包攻略</p>
                     </div>
                 </div>
-                <button onclick="closeWeatherModal()" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition">
+                <button onclick="closeWeatherModal()" class="w-8 h-8 rounded-xl bg-black/10 hover:bg-black/20 flex items-center justify-center transition">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
@@ -276,7 +276,7 @@
                 <!-- Dynamic Daily Weather Items List -->
             </div>
 
-            <div class="p-4 bg-slate-50 border-t border-slate-200 text-xs text-slate-500 text-center">
+            <div id="weather-modal-footer" class="p-4 border-t text-xs opacity-75 text-center">
                 💡 氣象資料由 Open-Meteo 提供，預報會在每日動態即時同步更新。
             </div>
         </div>
@@ -310,7 +310,7 @@
             TWD: 1.0
         };
 
-        // 🎨 完美匹配 iOS/iPhone 設計風格的 3 種核心主題（含全方位地圖與卡片連動）
+        // 🎨 完美匹配 iOS/iPhone 設計風格的 3 種核心主題（含完整標頭、地圖、卡片與彈窗連動）
         const THEMES = {
             "太空灰": {
                 name: "太空灰",
@@ -346,53 +346,61 @@
                 spotNotesBg: "bg-zinc-950/70 border-zinc-800 text-zinc-300",
                 spotLocBtn: "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700",
                 spotLocIcon: "text-blue-400",
-                // 地圖區塊完全連動
+                // 地圖區塊
                 mapSectionBg: "bg-zinc-900 border-zinc-800",
                 mapHeaderBg: "bg-zinc-950 border-zinc-800 text-zinc-100",
                 mapColorTag: "bg-zinc-800 text-blue-400 border-zinc-700",
                 mapProviderBox: "bg-zinc-900 border-zinc-800",
-                mapBtnReset: "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700"
+                mapBtnReset: "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700",
+                // 彈窗設定 (太空灰深色)
+                modalCard: "bg-zinc-900 border-zinc-800 text-zinc-100",
+                modalHeader: "bg-zinc-950 text-zinc-100 border-zinc-800",
+                modalFooter: "bg-zinc-950 border-zinc-800 text-zinc-300"
             },
             "銀白光感": {
                 name: "銀白光感",
                 bodyBg: "bg-slate-100 text-slate-900",
-                headerGradient: "from-slate-900 via-slate-800 to-slate-900",
-                headerText: "text-white",
-                borderCol: "border-slate-700",
-                primaryBtnBg: "bg-blue-600 hover:bg-blue-500 text-white",
-                bannerBg: "bg-white border-white text-slate-800 shadow-sm",
-                bannerIconBox: "bg-blue-50 text-blue-600 border-blue-100",
+                headerGradient: "from-slate-200 via-slate-100 to-slate-200", // 修正：銀白主題改為淺色亮系漸層
+                headerText: "text-slate-900",
+                borderCol: "border-slate-300",
+                primaryBtnBg: "bg-slate-900 hover:bg-slate-800 text-white",
+                bannerBg: "bg-white border-slate-200 text-slate-900 shadow-sm",
+                bannerIconBox: "bg-slate-100 text-blue-600 border-slate-200",
                 bannerTitle: "text-slate-900 font-bold",
                 badgeBg: "bg-slate-100 border-slate-200 text-slate-700",
-                navBg: "bg-white/90 border-white shadow-slate-200/60",
+                navBg: "bg-white/90 border-slate-200 shadow-slate-200/60",
                 activeTabBg: "bg-slate-900 text-white border-slate-900",
-                inactiveTabBg: "bg-white hover:bg-slate-50 text-slate-700 border-white shadow-sm",
+                inactiveTabBg: "bg-white hover:bg-slate-50 text-slate-700 border-slate-200 shadow-sm",
                 activeTabDot: "text-blue-400",
                 iconColor: "text-blue-600",
                 navIconColor: "text-slate-500",
-                // 每日行程主卡片 (iPhone 極簡白底底框)
+                // 每日行程主卡片
                 dayMainCardBg: "bg-white border-white shadow-sm",
-                dayCardHeaderBg: "bg-slate-50/80 text-slate-900 border-slate-200/80",
+                dayCardHeaderBg: "bg-white text-slate-900 border-slate-200 shadow-sm",
                 dayCardNumberBox: "bg-slate-900 text-white border-slate-900",
-                dayCardSubBadge: "bg-white text-slate-700 border-slate-200",
-                dayCardWeatherBox: "bg-white border-slate-200/80 text-slate-800",
-                dayCardCostBox: "bg-white hover:bg-slate-50 border-slate-200/80 text-slate-900",
+                dayCardSubBadge: "bg-slate-100 text-slate-700 border-slate-200",
+                dayCardWeatherBox: "bg-slate-50 border-slate-200 text-slate-800",
+                dayCardCostBox: "bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-900",
                 dayCardCostText: "text-blue-600 font-bold",
-                dayCardClothesBanner: "bg-blue-50/60 border-blue-100/80 text-slate-800",
+                dayCardClothesBanner: "bg-blue-50/50 border-blue-100 text-slate-800",
                 dayCardClothesTitle: "text-blue-900",
                 // 時間軸行程卡片
-                spotCardBg: "bg-white hover:bg-slate-50/80 border-slate-200/80 text-slate-900 shadow-sm",
+                spotCardBg: "bg-white hover:bg-slate-50 border-slate-200 text-slate-900 shadow-sm",
                 spotTitleText: "text-slate-900 group-hover:text-blue-600",
                 spotTimeBadge: "bg-slate-100 text-slate-900 border-slate-200",
-                spotNotesBg: "bg-slate-50 border-slate-200/80 text-slate-700",
+                spotNotesBg: "bg-slate-50 border-slate-200 text-slate-700",
                 spotLocBtn: "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-200",
                 spotLocIcon: "text-blue-600",
-                // 地圖區塊完全連動
+                // 地圖區塊
                 mapSectionBg: "bg-white border-white shadow-lg",
-                mapHeaderBg: "bg-slate-900 border-slate-800 text-white",
-                mapColorTag: "bg-slate-800 text-blue-300 border-slate-700",
-                mapProviderBox: "bg-slate-800 border-slate-700",
-                mapBtnReset: "bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700"
+                mapHeaderBg: "bg-white border-slate-200 text-slate-900",
+                mapColorTag: "bg-slate-100 text-blue-600 border-slate-200",
+                mapProviderBox: "bg-slate-100 border-slate-200",
+                mapBtnReset: "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-200",
+                // 彈窗設定 (銀白淺色)
+                modalCard: "bg-white border-slate-200 text-slate-900",
+                modalHeader: "bg-slate-50 text-slate-900 border-slate-200",
+                modalFooter: "bg-slate-50 border-slate-200 text-slate-700"
             },
             "海洋綠": {
                 name: "海洋綠",
@@ -428,12 +436,16 @@
                 spotNotesBg: "bg-slate-50 border-slate-200/80 text-slate-600",
                 spotLocBtn: "bg-teal-50 hover:bg-teal-100/80 text-slate-900 border-teal-200/60",
                 spotLocIcon: "text-teal-600",
-                // 地圖區塊完全連動
+                // 地圖區塊
                 mapSectionBg: "bg-white border-slate-200 shadow-xl",
                 mapHeaderBg: "bg-slate-900 border-slate-800 text-white",
                 mapColorTag: "bg-amber-500/20 text-amber-300 border-amber-400/30",
                 mapProviderBox: "bg-slate-800 border-slate-700",
-                mapBtnReset: "bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700"
+                mapBtnReset: "bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700",
+                // 彈窗設定 (海洋綠經典深色標頭)
+                modalCard: "bg-white border-slate-200 text-slate-900",
+                modalHeader: "bg-slate-900 text-white border-slate-800",
+                modalFooter: "bg-slate-50 border-slate-200 text-slate-700"
             },
             // 別名相容
             emerald: "海洋綠",
@@ -756,7 +768,7 @@
 
             // Header Background & Text
             const header = document.getElementById('main-header');
-            header.className = `relative bg-gradient-to-r ${theme.headerGradient} ${theme.headerText} overflow-hidden pb-8 pt-6 px-4 md:px-8 border-b ${theme.borderCol} shadow-2xl transition-all duration-500`;
+            header.className = `relative bg-gradient-to-r ${theme.headerGradient} ${theme.headerText} overflow-hidden pb-8 pt-6 px-4 md:px-8 border-b ${theme.borderCol} shadow-xl transition-all duration-500`;
 
             // Refresh Button
             const refreshBtn = document.getElementById('refresh-btn');
@@ -807,6 +819,34 @@
             // Calendar & Nav Icons
             document.getElementById('header-calendar-icon').className = `fa-regular fa-calendar ${theme.iconColor} me-1.5`;
             document.getElementById('day-nav-icon').className = `fa-solid fa-calendar-days ${theme.navIconColor}`;
+        }
+
+        function applyModalTheme() {
+            const theme = getActiveTheme();
+
+            // Modal 1: 費用明細總覽
+            const cCard = document.getElementById('cost-modal-card');
+            const cHeader = document.getElementById('cost-modal-header');
+            const cFooter = document.getElementById('cost-modal-footer');
+            if (cCard) cCard.className = `${theme.modalCard} w-full max-w-2xl rounded-2xl shadow-2xl border overflow-hidden flex flex-col max-h-[85vh]`;
+            if (cHeader) cHeader.className = `p-4 md:p-5 ${theme.modalHeader} flex items-center justify-between border-b`;
+            if (cFooter) cFooter.className = `p-4 ${theme.modalFooter} border-t flex items-center justify-between`;
+
+            // Modal 2: 當日花費明細
+            const dCard = document.getElementById('day-cost-modal-card');
+            const dHeader = document.getElementById('day-cost-modal-header');
+            const dFooter = document.getElementById('day-cost-modal-footer');
+            if (dCard) dCard.className = `${theme.modalCard} w-full max-w-2xl rounded-2xl shadow-2xl border overflow-hidden flex flex-col max-h-[85vh]`;
+            if (dHeader) dHeader.className = `p-4 md:p-5 ${theme.modalHeader} flex items-center justify-between border-b`;
+            if (dFooter) dFooter.className = `p-4 ${theme.modalFooter} border-t flex items-center justify-between`;
+
+            // Modal 3: 氣象預報總覽
+            const wCard = document.getElementById('weather-modal-card');
+            const wHeader = document.getElementById('weather-modal-header');
+            const wFooter = document.getElementById('weather-modal-footer');
+            if (wCard) wCard.className = `${theme.modalCard} w-full max-w-3xl rounded-2xl shadow-2xl border overflow-hidden flex flex-col max-h-[85vh]`;
+            if (wHeader) wHeader.className = `p-4 md:p-5 ${theme.modalHeader} flex items-center justify-between border-b`;
+            if (wFooter) wFooter.className = `p-4 ${theme.modalFooter} border-t text-xs text-center opacity-75`;
         }
 
         function parseCSVRows(text) {
@@ -1109,6 +1149,7 @@
         // 🔲 MODAL 1 邏輯：全行程 / 分類花費明細彈窗
         // ==========================================
         function openCostDetailModal(categoryKey) {
+            applyModalTheme();
             const modal = document.getElementById('cost-detail-modal');
             const iconBg = document.getElementById('modal-cost-icon-bg');
             const iconEl = document.getElementById('modal-cost-icon');
@@ -1152,8 +1193,8 @@
 
             if (matchedSpots.length === 0) {
                 listEl.innerHTML = `
-                    <div class="text-center py-10 text-slate-400 font-medium">
-                        <i class="fa-solid fa-receipt text-3xl mb-2 text-slate-300"></i>
+                    <div class="text-center py-10 opacity-60 font-medium">
+                        <i class="fa-solid fa-receipt text-3xl mb-2"></i>
                         <p>此類別目前尚無費用紀錄</p>
                     </div>
                 `;
@@ -1176,17 +1217,17 @@
                     let currSymbol = `${curr} $`;
 
                     return `
-                        <div class="flex items-center justify-between bg-slate-50 border border-slate-200/90 rounded-xl p-3 hover:bg-slate-100 transition">
+                        <div class="flex items-center justify-between bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-3 transition">
                             <div class="flex items-center gap-3">
                                 <span class="text-xs font-black bg-slate-900 text-teal-300 px-2.5 py-1 rounded-lg">D${s.dayNum}</span>
                                 <div>
-                                    <h4 class="font-extrabold text-xs md:text-sm text-slate-800">${s.title}</h4>
-                                    <p class="text-[11px] text-slate-500 mt-0.5"><i class="fa-regular fa-clock me-1"></i>${s.time || '全天'} • <span class="font-medium ${catMeta.text}">${catMeta.name}</span></p>
+                                    <h4 class="font-extrabold text-xs md:text-sm">${s.title}</h4>
+                                    <p class="text-[11px] opacity-75 mt-0.5"><i class="fa-regular fa-clock me-1"></i>${s.time || '全天'} • <span class="font-medium ${catMeta.text}">${catMeta.name}</span></p>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <span class="font-extrabold text-xs md:text-sm text-slate-900 block">${currSymbol} ${amt.toLocaleString()}</span>
-                                <span class="text-[10px] text-slate-400 font-semibold">≈ NT$ ${Math.round(spotTWD).toLocaleString()}</span>
+                                <span class="font-extrabold text-xs md:text-sm block">${currSymbol} ${amt.toLocaleString()}</span>
+                                <span class="text-[10px] opacity-75 font-semibold">≈ NT$ ${Math.round(spotTWD).toLocaleString()}</span>
                             </div>
                         </div>
                     `;
@@ -1205,6 +1246,7 @@
         // 🔲 MODAL 2 邏輯：單日（當日）花費明細彈窗
         // ==========================================
         function openDayCostModal(dayNum) {
+            applyModalTheme();
             const day = tripData.days.find(d => d.dayNum === dayNum);
             if (!day) return;
 
@@ -1222,8 +1264,8 @@
 
             if (dayCostSpots.length === 0) {
                 listEl.innerHTML = `
-                    <div class="text-center py-10 text-slate-400 font-medium">
-                        <i class="fa-solid fa-wallet text-3xl mb-2 text-slate-300"></i>
+                    <div class="text-center py-10 opacity-60 font-medium">
+                        <i class="fa-solid fa-wallet text-3xl mb-2"></i>
                         <p>當日行程目前尚無費用紀錄</p>
                     </div>
                 `;
@@ -1246,17 +1288,17 @@
                     let currSymbol = `${curr} $`;
 
                     return `
-                        <div class="flex items-center justify-between bg-slate-50 border border-slate-200/90 rounded-xl p-3 hover:bg-slate-100 transition">
+                        <div class="flex items-center justify-between bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-3 transition">
                             <div class="flex items-center gap-3">
-                                <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-800 font-black text-xs flex items-center justify-center border border-emerald-300/60">${index + 1}</span>
+                                <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-500 font-black text-xs flex items-center justify-center border border-emerald-300/60">${index + 1}</span>
                                 <div>
-                                    <h4 class="font-extrabold text-xs md:text-sm text-slate-800">${s.title}</h4>
-                                    <p class="text-[11px] text-slate-500 mt-0.5"><i class="fa-regular fa-clock me-1"></i>${s.time || '全天'} • <span class="font-semibold ${catMeta.text}">${catMeta.name}</span></p>
+                                    <h4 class="font-extrabold text-xs md:text-sm">${s.title}</h4>
+                                    <p class="text-[11px] opacity-75 mt-0.5"><i class="fa-regular fa-clock me-1"></i>${s.time || '全天'} • <span class="font-semibold ${catMeta.text}">${catMeta.name}</span></p>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <span class="font-extrabold text-xs md:text-sm text-slate-900 block">${currSymbol} ${amt.toLocaleString()}</span>
-                                <span class="text-[10px] text-slate-400 font-semibold">≈ NT$ ${Math.round(spotTWD).toLocaleString()}</span>
+                                <span class="font-extrabold text-xs md:text-sm block">${currSymbol} ${amt.toLocaleString()}</span>
+                                <span class="text-[10px] opacity-75 font-semibold">≈ NT$ ${Math.round(spotTWD).toLocaleString()}</span>
                             </div>
                         </div>
                     `;
@@ -1275,11 +1317,12 @@
         // 🔲 MODAL 3 邏輯：整趟氣候與穿搭彈窗
         // ==========================================
         function openWeatherOverviewModal() {
+            applyModalTheme();
             const modal = document.getElementById('weather-overview-modal');
             const listEl = document.getElementById('modal-weather-list');
 
             if (tripData.days.length === 0) {
-                listEl.innerHTML = `<div class="text-center py-10 text-slate-400">目前尚無行程日期資料</div>`;
+                listEl.innerHTML = `<div class="text-center py-10 opacity-60">目前尚無行程日期資料</div>`;
             } else {
                 listEl.innerHTML = tripData.days.map(d => {
                     const w = d.weather || {
@@ -1293,33 +1336,33 @@
                     };
 
                     return `
-                        <div class="bg-slate-900 text-white rounded-2xl p-4 border border-slate-800 space-y-3">
-                            <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                        <div class="bg-black/5 dark:bg-white/5 rounded-2xl p-4 border border-black/10 dark:border-white/10 space-y-3">
+                            <div class="flex items-center justify-between border-b border-black/10 dark:border-white/10 pb-2.5">
                                 <div class="flex items-center gap-2.5">
-                                    <span class="w-8 h-8 rounded-xl bg-teal-500/20 text-teal-300 font-black text-xs flex items-center justify-center border border-teal-400/30">D${d.dayNum}</span>
+                                    <span class="w-8 h-8 rounded-xl bg-teal-500/20 text-teal-400 font-black text-xs flex items-center justify-center border border-teal-400/30">D${d.dayNum}</span>
                                     <div>
-                                        <h4 class="font-bold text-xs md:text-sm text-white">${d.theme} ${d.area ? `<span class="text-[10px] bg-slate-800 text-slate-300 font-semibold px-2 py-0.5 rounded-full border border-slate-700">${d.area}</span>` : ''}</h4>
-                                        <p class="text-[11px] text-slate-400"><i class="fa-regular fa-calendar me-1 text-teal-400"></i>${d.date}</p>
+                                        <h4 class="font-bold text-xs md:text-sm">${d.theme} ${d.area ? `<span class="text-[10px] bg-black/10 dark:bg-white/10 font-semibold px-2 py-0.5 rounded-full border border-black/10">${d.area}</span>` : ''}</h4>
+                                        <p class="text-[11px] opacity-75"><i class="fa-regular fa-calendar me-1 text-teal-400"></i>${d.date}</p>
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <span class="text-xs font-bold text-amber-300 block"><i class="fa-solid ${w.icon} me-1"></i>${w.status}</span>
-                                    <span class="text-[11px] font-semibold text-slate-300">${w.temp}</span>
+                                    <span class="text-xs font-bold text-amber-500 block"><i class="fa-solid ${w.icon} me-1"></i>${w.status}</span>
+                                    <span class="text-[11px] font-semibold opacity-85">${w.temp}</span>
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-2 gap-2 text-[11px]">
-                                <div class="bg-slate-800/80 p-2 rounded-xl border border-slate-700/60 flex items-center gap-2">
+                                <div class="bg-black/5 dark:bg-white/5 p-2 rounded-xl border border-black/10 dark:border-white/10 flex items-center gap-2">
                                     <i class="fa-solid fa-cloud-showers-heavy text-sky-400"></i>
-                                    <span>降雨機率：<strong class="text-sky-300">${w.rainProb}</strong></span>
+                                    <span>降雨機率：<strong class="text-sky-400">${w.rainProb}</strong></span>
                                 </div>
-                                <div class="bg-slate-800/80 p-2 rounded-xl border border-slate-700/60 flex items-center gap-2">
+                                <div class="bg-black/5 dark:bg-white/5 p-2 rounded-xl border border-black/10 dark:border-white/10 flex items-center gap-2">
                                     <i class="fa-solid fa-sun text-rose-400"></i>
-                                    <span>日出/落：<strong class="text-slate-200">${w.sunrise === '尚未預測' ? '未提供' : `${w.sunrise} / ${w.sunset}`}</strong></span>
+                                    <span>日出/落：<strong class="opacity-85">${w.sunrise === '尚未預測' ? '未提供' : `${w.sunrise} / ${w.sunset}`}</strong></span>
                                 </div>
                             </div>
 
-                            <div class="bg-teal-950/60 border border-teal-500/30 rounded-xl p-2.5 text-xs text-teal-200 flex items-start gap-2">
+                            <div class="bg-teal-500/10 border border-teal-500/20 rounded-xl p-2.5 text-xs flex items-start gap-2">
                                 <i class="fa-solid fa-shirt text-teal-400 mt-0.5"></i>
                                 <span><strong>穿著點評：</strong>${w.clothingAdvice}</span>
                             </div>
@@ -1469,7 +1512,7 @@
 
         function renderTimelineSpotItems(day) {
             if (!day.spots || day.spots.length === 0) {
-                return `<div class="text-center py-8 px-4 bg-slate-500/10 rounded-2xl border border-dashed border-slate-400/30"><p class="text-sm opacity-70 font-medium">此天尚無安排行程項目</p></div>`;
+                return `<div class="text-center py-8 px-4 opacity-50 rounded-2xl border border-dashed border-slate-400/30"><p class="text-sm font-medium">此天尚無安排行程項目</p></div>`;
             }
 
             const theme = getActiveTheme();
