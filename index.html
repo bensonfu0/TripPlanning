@@ -285,6 +285,7 @@
             HKD: 4.1,
             KRW: 0.024,
             JPY: 0.21,
+            USD: 32.0,
             TWD: 1.0
         };
 
@@ -456,6 +457,7 @@
                         if (data.rates.HKD) EXCHANGE_RATES.HKD = 1 / data.rates.HKD;
                         if (data.rates.KRW) EXCHANGE_RATES.KRW = 1 / data.rates.KRW;
                         if (data.rates.JPY) EXCHANGE_RATES.JPY = 1 / data.rates.JPY;
+                        if (data.rates.USD) EXCHANGE_RATES.USD = 1 / data.rates.USD;
                     }
                 }
             } catch (err) {
@@ -686,7 +688,7 @@
                 const catStr = clean(cols[3]) || "景點";
                 const titleStr = clean(cols[4]);
                 const costVal = parseFloat(clean(cols[5])) || 0;
-                const currStr = clean(cols[6]) || "TWD";
+                const currStr = clean(cols[6]) || "USD";
                 const latVal = parseFloat(clean(cols[7])) || 0;
                 const lngVal = parseFloat(clean(cols[8])) || 0;
                 const mapUrlStr = clean(cols[9]);
@@ -809,6 +811,8 @@
                             spotTWD = amt * EXCHANGE_RATES.KRW;
                         } else if (curr === "JPY") {
                             spotTWD = amt * EXCHANGE_RATES.JPY;
+                        } else if (curr === "USD") {
+                            spotTWD = amt * EXCHANGE_RATES.USD;
                         } else if (curr === "TWD" || curr === "NTD") {
                             spotTWD = amt;
                         } else {
@@ -914,19 +918,21 @@
             } else {
                 listEl.innerHTML = matchedSpots.map(s => {
                     const amt = Number(s.cost) || 0;
-                    const curr = (s.currency || "").toUpperCase();
+                    const curr = (s.currency || "USD").toUpperCase();
                     let spotTWD = 0;
 
                     if (curr === "RMB" || curr === "CNY") spotTWD = amt * EXCHANGE_RATES.RMB;
                     else if (curr === "HKD") spotTWD = amt * EXCHANGE_RATES.HKD;
                     else if (curr === "KRW") spotTWD = amt * EXCHANGE_RATES.KRW;
                     else if (curr === "JPY") spotTWD = amt * EXCHANGE_RATES.JPY;
+                    else if (curr === "USD") spotTWD = amt * EXCHANGE_RATES.USD;
                     else spotTWD = amt;
 
                     totalTWD += spotTWD;
 
                     const catMeta = categoryMeta[s.category] || categoryMeta["景點"];
-                    let currSymbol = curr === 'RMB' ? '¥' : (curr === 'JPY' ? '¥' : (curr === 'HKD' ? 'HK$' : (curr === 'KRW' ? '₩' : 'NT$')));
+                    // 統一使用 英文代碼 + $ 符號 (例如 USD $, JPY $, TWD $)
+                    let currSymbol = `${curr} $`;
 
                     return `
                         <div class="flex items-center justify-between bg-slate-50 border border-slate-200/90 rounded-xl p-3 hover:bg-slate-100 transition">
@@ -1073,6 +1079,7 @@
                     else if (curr === "HKD") dayTotalTWD += amt * EXCHANGE_RATES.HKD;
                     else if (curr === "KRW") dayTotalTWD += amt * EXCHANGE_RATES.KRW;
                     else if (curr === "JPY") dayTotalTWD += amt * EXCHANGE_RATES.JPY;
+                    else if (curr === "USD") dayTotalTWD += amt * EXCHANGE_RATES.USD;
                     else if (curr === "TWD" || curr === "NTD") dayTotalTWD += amt;
                     else dayTotalTWD += amt;
                 });
@@ -1150,8 +1157,9 @@
                     ? `<span class="text-xs font-extrabold text-slate-900 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200"><i class="fa-regular fa-clock me-1 text-teal-600"></i>${spot.time}</span>`
                     : '';
 
-                const curr = (spot.currency || "").toUpperCase();
-                let currSymbol = curr === 'RMB' ? '¥' : (curr === 'JPY' ? '¥' : (curr === 'HKD' ? 'HK$' : (curr === 'KRW' ? '₩' : 'NT$')));
+                const curr = (spot.currency || "USD").toUpperCase();
+                // 統一以英文代碼 + $ 符號顯示（例如：USD $, JPY $, TWD $, HKD $）
+                let currSymbol = `${curr} $`;
                 
                 const costDisplay = (spot.cost && Number(spot.cost) > 0)
                     ? `<span class="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200"><i class="fa-solid fa-receipt text-emerald-600 me-1"></i>${currSymbol} ${spot.cost}</span>`
