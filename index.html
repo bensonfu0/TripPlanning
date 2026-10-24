@@ -31,7 +31,7 @@
     <style>
         body {
             font-family: 'Plus Jakarta Sans', 'Noto Sans TC', sans-serif;
-            background-color: #f8fafc;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         ::-webkit-scrollbar {
             width: 8px;
@@ -310,68 +310,11 @@
             TWD: 1.0
         };
 
-        // 🎨 完全連動每日卡片與明細的完整配色主題庫
+        // 🎨 精簡的 3 種高質感主題庫（海洋綠、iPhone 太空灰、iPhone 銀白光感）
         const THEMES = {
-            "米白暖調": {
-                name: "米白暖調",
-                isLightMode: true,
-                bodyBg: "bg-[#fcfbf9]",
-                headerGradient: "from-[#f4f1ea] via-[#eae5d9] to-[#f4f1ea]",
-                headerText: "text-stone-800",
-                borderCol: "border-stone-300",
-                primaryBtnBg: "bg-stone-800 hover:bg-stone-700 text-amber-50",
-                bannerBg: "bg-white/80 hover:bg-white border-stone-300 text-stone-800 shadow-sm",
-                bannerIconBox: "bg-amber-100/80 text-amber-900 border-amber-300/60",
-                bannerTitle: "text-stone-900",
-                badgeBg: "bg-stone-200/80 border-stone-300 text-stone-800",
-                activeTabBg: "bg-stone-800 text-amber-100 border-stone-900",
-                activeTabDot: "text-amber-300",
-                iconColor: "text-amber-700",
-                navIconColor: "text-amber-800",
-                // 每日卡片連動樣式
-                dayCardHeaderBg: "bg-gradient-to-br from-[#f5f1e8] via-[#ebe5d8] to-[#f5f1e8] text-stone-900 border-stone-300",
-                dayCardNumberBox: "bg-stone-800 text-amber-100 border-stone-700",
-                dayCardSubBadge: "bg-stone-200/80 text-stone-700 border-stone-300",
-                dayCardWeatherBox: "bg-white/80 border-stone-300 text-stone-800",
-                dayCardCostBox: "bg-amber-100/60 hover:bg-amber-100 border-amber-300/80 text-stone-900",
-                dayCardCostText: "text-amber-900",
-                dayCardClothesBanner: "bg-amber-50 border-amber-200 text-stone-800",
-                dayCardClothesTitle: "text-amber-900",
-                spotLocBtn: "bg-stone-200/80 hover:bg-stone-300 text-stone-800 border-stone-300",
-                spotLocIcon: "text-stone-700"
-            },
-            "奶油米黃": {
-                name: "奶油米黃",
-                isLightMode: true,
-                bodyBg: "bg-[#fdfbf2]",
-                headerGradient: "from-[#fef9e7] via-[#f7eed0] to-[#fef9e7]",
-                headerText: "text-amber-950",
-                borderCol: "border-amber-300/70",
-                primaryBtnBg: "bg-amber-800 hover:bg-amber-900 text-amber-50",
-                bannerBg: "bg-white/85 hover:bg-white border-amber-300/80 text-amber-950 shadow-sm",
-                bannerIconBox: "bg-amber-200/80 text-amber-950 border-amber-400/60",
-                bannerTitle: "text-amber-950",
-                badgeBg: "bg-amber-200/70 border-amber-300 text-amber-900",
-                activeTabBg: "bg-amber-900 text-amber-100 border-amber-950",
-                activeTabDot: "text-amber-300",
-                iconColor: "text-amber-800",
-                navIconColor: "text-amber-800",
-                // 每日卡片連動樣式
-                dayCardHeaderBg: "bg-gradient-to-br from-[#fef5d8] via-[#f9e9be] to-[#fef5d8] text-amber-950 border-amber-300",
-                dayCardNumberBox: "bg-amber-900 text-amber-100 border-amber-950",
-                dayCardSubBadge: "bg-amber-200/70 text-amber-900 border-amber-300",
-                dayCardWeatherBox: "bg-white/80 border-amber-300/70 text-amber-950",
-                dayCardCostBox: "bg-amber-200/50 hover:bg-amber-200/80 border-amber-300 text-amber-950",
-                dayCardCostText: "text-amber-950",
-                dayCardClothesBanner: "bg-amber-100/60 border-amber-300 text-amber-950",
-                dayCardClothesTitle: "text-amber-900",
-                spotLocBtn: "bg-amber-100 hover:bg-amber-200/80 text-amber-950 border-amber-300",
-                spotLocIcon: "text-amber-800"
-            },
             "海洋綠": {
                 name: "海洋綠",
-                isLightMode: false,
-                bodyBg: "bg-slate-50",
+                bodyBg: "bg-slate-50 text-slate-800",
                 headerGradient: "from-slate-950 via-teal-950 to-slate-900",
                 headerText: "text-white",
                 borderCol: "border-teal-900/50",
@@ -384,7 +327,7 @@
                 activeTabDot: "text-teal-400",
                 iconColor: "text-teal-400",
                 navIconColor: "text-teal-600",
-                // 每日卡片連動樣式
+                // 每日卡片連動
                 dayCardHeaderBg: "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white border-slate-800",
                 dayCardNumberBox: "bg-teal-500/20 text-teal-300 border-teal-400/30",
                 dayCardSubBadge: "bg-slate-800 text-slate-300 border-slate-700",
@@ -396,122 +339,64 @@
                 spotLocBtn: "bg-teal-50 hover:bg-teal-100/80 text-slate-900 border-teal-200/60",
                 spotLocIcon: "text-teal-600"
             },
-            "優雅靛藍": {
-                name: "優雅靛藍",
-                isLightMode: false,
-                bodyBg: "bg-slate-50",
-                headerGradient: "from-slate-950 via-indigo-950 to-slate-900",
-                headerText: "text-white",
-                borderCol: "border-indigo-900/50",
-                primaryBtnBg: "bg-indigo-600 hover:bg-indigo-500 text-white",
-                bannerBg: "bg-indigo-950/80 hover:bg-indigo-900/90 border-indigo-500/30 text-indigo-100",
-                bannerIconBox: "bg-indigo-500/20 text-indigo-300 border-indigo-400/30",
-                bannerTitle: "text-indigo-300",
-                badgeBg: "bg-indigo-900/90 border-indigo-400/30 text-indigo-200",
-                activeTabBg: "bg-slate-900 text-indigo-300 border-slate-800",
-                activeTabDot: "text-indigo-400",
-                iconColor: "text-indigo-400",
-                navIconColor: "text-indigo-600",
-                dayCardHeaderBg: "bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white border-indigo-900/50",
-                dayCardNumberBox: "bg-indigo-500/20 text-indigo-300 border-indigo-400/30",
-                dayCardSubBadge: "bg-slate-800 text-slate-300 border-slate-700",
-                dayCardWeatherBox: "bg-slate-800/80 border-slate-700/70 text-slate-200",
-                dayCardCostBox: "bg-slate-800/80 hover:bg-slate-700/90 border-slate-700/70 text-white",
-                dayCardCostText: "text-indigo-300",
-                dayCardClothesBanner: "bg-indigo-950/60 border-indigo-500/30 text-indigo-200",
-                dayCardClothesTitle: "text-indigo-300",
-                spotLocBtn: "bg-indigo-50 hover:bg-indigo-100/80 text-slate-900 border-indigo-200/60",
-                spotLocIcon: "text-indigo-600"
+            "太空灰": {
+                name: "太空灰",
+                bodyBg: "bg-zinc-950 text-zinc-100",
+                headerGradient: "from-zinc-900 via-zinc-900 to-zinc-950",
+                headerText: "text-zinc-100",
+                borderCol: "border-zinc-800",
+                primaryBtnBg: "bg-zinc-100 hover:bg-zinc-200 text-zinc-900",
+                bannerBg: "bg-zinc-900/90 hover:bg-zinc-900 border-zinc-800 text-zinc-200",
+                bannerIconBox: "bg-zinc-800 text-blue-400 border-zinc-700",
+                bannerTitle: "text-zinc-100",
+                badgeBg: "bg-zinc-800 border-zinc-700 text-zinc-300",
+                activeTabBg: "bg-zinc-100 text-zinc-900 border-zinc-200",
+                activeTabDot: "text-blue-500",
+                iconColor: "text-blue-400",
+                navIconColor: "text-zinc-400",
+                // 每日卡片連動
+                dayCardHeaderBg: "bg-zinc-900 text-zinc-100 border-zinc-800",
+                dayCardNumberBox: "bg-zinc-800 text-blue-400 border-zinc-700",
+                dayCardSubBadge: "bg-zinc-800 text-zinc-300 border-zinc-700",
+                dayCardWeatherBox: "bg-zinc-900/80 border-zinc-800 text-zinc-200",
+                dayCardCostBox: "bg-zinc-900/80 hover:bg-zinc-800 border-zinc-800 text-zinc-100",
+                dayCardCostText: "text-blue-400 font-bold",
+                dayCardClothesBanner: "bg-zinc-900/90 border-zinc-800 text-zinc-300",
+                dayCardClothesTitle: "text-zinc-100",
+                spotLocBtn: "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700",
+                spotLocIcon: "text-blue-400"
             },
-            "玫瑰粉紅": {
-                name: "玫瑰粉紅",
-                isLightMode: false,
-                bodyBg: "bg-slate-50",
-                headerGradient: "from-slate-950 via-rose-950 to-slate-900",
+            "銀白光感": {
+                name: "銀白光感",
+                bodyBg: "bg-zinc-50 text-zinc-900",
+                headerGradient: "from-zinc-900 via-zinc-800 to-zinc-900",
                 headerText: "text-white",
-                borderCol: "border-rose-900/50",
-                primaryBtnBg: "bg-rose-600 hover:bg-rose-500 text-white",
-                bannerBg: "bg-rose-950/80 hover:bg-rose-900/90 border-rose-500/30 text-rose-100",
-                bannerIconBox: "bg-rose-500/20 text-rose-300 border-rose-400/30",
-                bannerTitle: "text-rose-300",
-                badgeBg: "bg-rose-900/90 border-rose-400/30 text-rose-200",
-                activeTabBg: "bg-slate-900 text-rose-300 border-slate-800",
-                activeTabDot: "text-rose-400",
-                iconColor: "text-rose-400",
-                navIconColor: "text-rose-600",
-                dayCardHeaderBg: "bg-gradient-to-br from-slate-900 via-rose-950 to-slate-900 text-white border-rose-900/50",
-                dayCardNumberBox: "bg-rose-500/20 text-rose-300 border-rose-400/30",
-                dayCardSubBadge: "bg-slate-800 text-slate-300 border-slate-700",
-                dayCardWeatherBox: "bg-slate-800/80 border-slate-700/70 text-slate-200",
-                dayCardCostBox: "bg-slate-800/80 hover:bg-slate-700/90 border-slate-700/70 text-white",
-                dayCardCostText: "text-rose-300",
-                dayCardClothesBanner: "bg-rose-950/60 border-rose-500/30 text-rose-200",
-                dayCardClothesTitle: "text-rose-300",
-                spotLocBtn: "bg-rose-50 hover:bg-rose-100/80 text-slate-900 border-rose-200/60",
-                spotLocIcon: "text-rose-600"
+                borderCol: "border-zinc-700",
+                primaryBtnBg: "bg-blue-600 hover:bg-blue-500 text-white",
+                bannerBg: "bg-white border-zinc-200 text-zinc-800 shadow-sm",
+                bannerIconBox: "bg-zinc-100 text-blue-600 border-zinc-200",
+                bannerTitle: "text-zinc-900 font-bold",
+                badgeBg: "bg-zinc-100 border-zinc-200 text-zinc-700",
+                activeTabBg: "bg-zinc-900 text-white border-zinc-900",
+                activeTabDot: "text-blue-400",
+                iconColor: "text-blue-600",
+                navIconColor: "text-zinc-600",
+                // 每日卡片連動
+                dayCardHeaderBg: "bg-white text-zinc-900 border-zinc-200 shadow-sm",
+                dayCardNumberBox: "bg-zinc-900 text-white border-zinc-900",
+                dayCardSubBadge: "bg-zinc-100 text-zinc-700 border-zinc-200",
+                dayCardWeatherBox: "bg-zinc-50 border-zinc-200 text-zinc-800",
+                dayCardCostBox: "bg-zinc-50 hover:bg-zinc-100 border-zinc-200 text-zinc-900",
+                dayCardCostText: "text-blue-600 font-bold",
+                dayCardClothesBanner: "bg-blue-50/50 border-blue-100 text-zinc-800",
+                dayCardClothesTitle: "text-blue-900",
+                spotLocBtn: "bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border-zinc-200",
+                spotLocIcon: "text-blue-600"
             },
-            "溫暖琥珀": {
-                name: "溫暖琥珀",
-                isLightMode: false,
-                bodyBg: "bg-slate-50",
-                headerGradient: "from-slate-950 via-amber-950 to-slate-900",
-                headerText: "text-white",
-                borderCol: "border-amber-900/50",
-                primaryBtnBg: "bg-amber-600 hover:bg-amber-500 text-slate-950",
-                bannerBg: "bg-amber-950/80 hover:bg-amber-900/90 border-amber-500/30 text-amber-100",
-                bannerIconBox: "bg-amber-500/20 text-amber-300 border-amber-400/30",
-                bannerTitle: "text-amber-300",
-                badgeBg: "bg-amber-900/90 border-amber-400/30 text-amber-200",
-                activeTabBg: "bg-slate-900 text-amber-300 border-slate-800",
-                activeTabDot: "text-amber-400",
-                iconColor: "text-amber-400",
-                navIconColor: "text-amber-600",
-                dayCardHeaderBg: "bg-gradient-to-br from-slate-900 via-amber-950 to-slate-900 text-white border-amber-900/50",
-                dayCardNumberBox: "bg-amber-500/20 text-amber-300 border-amber-400/30",
-                dayCardSubBadge: "bg-slate-800 text-slate-300 border-slate-700",
-                dayCardWeatherBox: "bg-slate-800/80 border-slate-700/70 text-slate-200",
-                dayCardCostBox: "bg-slate-800/80 hover:bg-slate-700/90 border-slate-700/70 text-white",
-                dayCardCostText: "text-amber-300",
-                dayCardClothesBanner: "bg-amber-950/60 border-amber-500/30 text-amber-200",
-                dayCardClothesTitle: "text-amber-300",
-                spotLocBtn: "bg-amber-50 hover:bg-amber-100/80 text-slate-900 border-amber-200/60",
-                spotLocIcon: "text-amber-600"
-            },
-            "紫羅蘭": {
-                name: "紫羅蘭",
-                isLightMode: false,
-                bodyBg: "bg-slate-50",
-                headerGradient: "from-slate-950 via-purple-950 to-slate-900",
-                headerText: "text-white",
-                borderCol: "border-purple-900/50",
-                primaryBtnBg: "bg-purple-600 hover:bg-purple-500 text-white",
-                bannerBg: "bg-purple-950/80 hover:bg-purple-900/90 border-purple-500/30 text-purple-100",
-                bannerIconBox: "bg-purple-500/20 text-purple-300 border-purple-400/30",
-                bannerTitle: "text-purple-300",
-                badgeBg: "bg-purple-900/90 border-purple-400/30 text-purple-200",
-                activeTabBg: "bg-slate-900 text-purple-300 border-slate-800",
-                activeTabDot: "text-purple-400",
-                iconColor: "text-purple-400",
-                navIconColor: "text-purple-600",
-                dayCardHeaderBg: "bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 text-white border-purple-900/50",
-                dayCardNumberBox: "bg-purple-500/20 text-purple-300 border-purple-400/30",
-                dayCardSubBadge: "bg-slate-800 text-slate-300 border-slate-700",
-                dayCardWeatherBox: "bg-slate-800/80 border-slate-700/70 text-slate-200",
-                dayCardCostBox: "bg-slate-800/80 hover:bg-slate-700/90 border-slate-700/70 text-white",
-                dayCardCostText: "text-purple-300",
-                dayCardClothesBanner: "bg-purple-950/60 border-purple-500/30 text-purple-200",
-                dayCardClothesTitle: "text-purple-300",
-                spotLocBtn: "bg-purple-50 hover:bg-purple-100/80 text-slate-900 border-purple-200/60",
-                spotLocIcon: "text-purple-600"
-            },
-            // 別名相容對應
-            "米白溫馨": "米白暖調",
-            "米黃暖調": "奶油米黃",
+            // 別名相容
             emerald: "海洋綠",
-            indigo: "優雅靛藍",
-            rose: "玫瑰粉紅",
-            amber: "溫暖琥珀",
-            violet: "紫羅蘭"
+            spacegray: "太空灰",
+            silver: "銀白光感"
         };
 
         // 🎨 30 色高辨識度調色盤
@@ -736,7 +621,7 @@
 
             const theme = getActiveTheme();
             const activeClass = `px-2 py-1 rounded-lg font-bold transition ${theme.primaryBtnBg} shadow`;
-            const inactiveClass = "px-2 py-1 rounded-lg font-bold transition text-slate-400 hover:text-white";
+            const inactiveClass = "px-2 py-1 rounded-lg font-bold transition opacity-60 hover:opacity-100";
 
             btnGoogle.className = providerKey === 'google' ? activeClass : inactiveClass;
             btnAmap.className = providerKey === 'amap' ? activeClass : inactiveClass;
@@ -825,7 +710,7 @@
             const theme = getActiveTheme();
 
             // Whole Body Background
-            document.getElementById('app-body').className = `${theme.bodyBg} text-slate-800 antialiased min-h-screen flex flex-col transition-colors duration-300`;
+            document.getElementById('app-body').className = `${theme.bodyBg} antialiased min-h-screen flex flex-col transition-colors duration-300`;
 
             // Header Background & Text
             const header = document.getElementById('main-header');
@@ -1122,12 +1007,12 @@
 
             const container = document.getElementById('trip-budget-summary');
             let html = `
-                <div onclick="openCostDetailModal('ALL')" class="flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-2.5 px-3.5 shadow-sm cursor-pointer transition transform hover:-translate-y-0.5">
+                <div onclick="openCostDetailModal('ALL')" class="flex items-center gap-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl p-2.5 px-3.5 shadow-sm cursor-pointer transition transform hover:-translate-y-0.5">
                     <div class="w-8 h-8 rounded-lg ${theme.bannerIconBox} flex items-center justify-center font-bold text-sm border"><i class="fa-solid fa-wallet"></i></div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between">
-                            <p class="text-[11px] opacity-70 uppercase font-semibold">整趟行程預估總額</p>
-                            <i class="fa-solid fa-angle-right text-[10px] opacity-50"></i>
+                            <p class="text-[11px] opacity-80 uppercase font-semibold">整趟行程預估總額</p>
+                            <i class="fa-solid fa-angle-right text-[10px] opacity-60"></i>
                         </div>
                         <p class="text-xs font-bold ${theme.bannerTitle} truncate">NT$ ${Math.round(totalTWD).toLocaleString()} 元</p>
                     </div>
@@ -1139,12 +1024,12 @@
                 if (twdAmt > 0) {
                     const meta = categoryMeta[catKey] || categoryMeta["景點"];
                     html += `
-                        <div onclick="openCostDetailModal('${catKey}')" class="flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-2.5 px-3.5 shadow-sm cursor-pointer transition transform hover:-translate-y-0.5">
+                        <div onclick="openCostDetailModal('${catKey}')" class="flex items-center gap-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl p-2.5 px-3.5 shadow-sm cursor-pointer transition transform hover:-translate-y-0.5">
                             <div class="w-8 h-8 rounded-lg ${meta.bg} ${meta.text} flex items-center justify-center font-bold text-sm"><i class="fa-solid ${meta.icon}"></i></div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between">
-                                    <p class="text-[11px] opacity-70 uppercase font-semibold truncate">${meta.name}</p>
-                                    <i class="fa-solid fa-angle-right text-[10px] opacity-50"></i>
+                                    <p class="text-[11px] opacity-80 uppercase font-semibold truncate">${meta.name}</p>
+                                    <i class="fa-solid fa-angle-right text-[10px] opacity-60"></i>
                                 </div>
                                 <p class="text-xs font-bold ${meta.text} truncate">NT$ ${Math.round(twdAmt).toLocaleString()} 元</p>
                             </div>
@@ -1408,7 +1293,7 @@
                 btn.className = `px-3.5 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 flex items-center space-x-2 border ${
                     isActive ? `${theme.activeTabBg} shadow-md scale-[1.02]` : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
                 }`;
-                btn.innerHTML = `<span class="${isActive ? `${theme.activeTabDot} font-extrabold` : 'text-slate-500'}">D${day.dayNum}</span><span>•</span><span class="${isActive ? 'text-white' : 'text-slate-800'}">${day.theme}</span>`;
+                btn.innerHTML = `<span class="${isActive ? `${theme.activeTabDot} font-extrabold` : 'opacity-60'}">D${day.dayNum}</span><span>•</span><span>${day.theme}</span>`;
                 container.appendChild(btn);
             });
 
@@ -1464,7 +1349,7 @@
                 <div class="${theme.dayCardHeaderBg} rounded-2xl p-5 shadow-lg border space-y-4 transition-colors">
                     <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-black/10">
                         <div class="flex items-center space-x-3.5">
-                            <div class="w-12 h-12 rounded-2xl ${theme.dayCardNumberBox} flex items-center justify-center text-xl font-black shadow-sm">D${day.dayNum}</div>
+                            <div class="w-12 h-12 rounded-2xl ${theme.dayCardNumberBox} flex items-center justify-center text-xl font-black shadow-sm border">D${day.dayNum}</div>
                             <div>
                                 <h3 class="text-lg md:text-xl font-bold flex items-center gap-2">${day.theme} ${day.area ? `<span class="text-xs ${theme.dayCardSubBadge} font-semibold px-2.5 py-0.5 rounded-full border">${day.area}</span>` : ''}</h3>
                                 <p class="text-xs opacity-80 mt-0.5"><i class="fa-regular fa-calendar me-1"></i>${day.date}</p>
@@ -1474,24 +1359,24 @@
 
                     <div class="grid grid-cols-2 gap-2.5 text-xs">
                         <div class="${theme.dayCardWeatherBox} rounded-xl p-2 px-3 border flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-700 flex items-center justify-center text-sm"><i class="fa-solid ${weather.icon}"></i></div>
-                            <div><p class="text-[10px] opacity-70 font-medium">氣象預報</p><p class="font-bold">${weather.status} • ${weather.temp}</p></div>
+                            <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-600 flex items-center justify-center text-sm"><i class="fa-solid ${weather.icon}"></i></div>
+                            <div><p class="text-[10px] opacity-75 font-medium">氣象預報</p><p class="font-bold">${weather.status} • ${weather.temp}</p></div>
                         </div>
                         <div class="${theme.dayCardWeatherBox} rounded-xl p-2 px-3 border flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-700 flex items-center justify-center text-sm"><i class="fa-solid fa-sun"></i></div>
-                            <div><p class="text-[10px] opacity-70 font-medium">日出 / 日落</p><p class="font-bold">${weather.sunrise === '尚未預測' ? '尚未預測' : `🌅 ${weather.sunrise} / 🌇 ${weather.sunset}`}</p></div>
+                            <div class="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-600 flex items-center justify-center text-sm"><i class="fa-solid fa-sun"></i></div>
+                            <div><p class="text-[10px] opacity-75 font-medium">日出 / 日落</p><p class="font-bold">${weather.sunrise === '尚未預測' ? '尚未預測' : `🌅 ${weather.sunrise} / 🌇 ${weather.sunset}`}</p></div>
                         </div>
                         <div class="${theme.dayCardWeatherBox} rounded-xl p-2 px-3 border flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-700 flex items-center justify-center text-sm"><i class="fa-solid fa-cloud-showers-heavy"></i></div>
-                            <div><p class="text-[10px] opacity-70 font-medium">降雨機率</p><p class="font-bold">${weather.rainProb === '尚未預測' ? '尚未預測' : `💧 ${weather.rainProb}`}</p></div>
+                            <div class="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-600 flex items-center justify-center text-sm"><i class="fa-solid fa-cloud-showers-heavy"></i></div>
+                            <div><p class="text-[10px] opacity-75 font-medium">降雨機率</p><p class="font-bold">${weather.rainProb === '尚未預測' ? '尚未預測' : `💧 ${weather.rainProb}`}</p></div>
                         </div>
 
                         <!-- 💡 點擊可觸發當日花費彈窗 (與主題連動) -->
                         <div onclick="openDayCostModal(${day.dayNum})" class="${theme.dayCardCostBox} cursor-pointer transition transform hover:-translate-y-0.5 rounded-xl p-2 px-3 border flex items-center justify-between space-x-2 text-xs">
                             <div class="flex items-center space-x-2.5 min-w-0">
-                                <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-800 flex items-center justify-center text-sm flex-shrink-0"><i class="fa-solid fa-wallet"></i></div>
+                                <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-600 flex items-center justify-center text-sm flex-shrink-0"><i class="fa-solid fa-wallet"></i></div>
                                 <div class="min-w-0">
-                                    <p class="text-[10px] opacity-70 font-medium">當日花費總額 (折合)</p>
+                                    <p class="text-[10px] opacity-75 font-medium">當日花費總額 (折合)</p>
                                     <p class="font-extrabold ${theme.dayCardCostText} text-xs truncate">NT$ ${Math.round(dayTotalTWD).toLocaleString()}</p>
                                 </div>
                             </div>
@@ -1506,7 +1391,7 @@
                         </div>
                         <div class="flex-1">
                             <span class="font-bold me-1.5 ${theme.dayCardClothesTitle}">當日穿著建議：</span>
-                            <span class="opacity-90">${weather.clothingAdvice}</span>
+                            <span class="opacity-95">${weather.clothingAdvice}</span>
                         </div>
                     </div>
                 </div>
@@ -1557,7 +1442,7 @@
 
                 return `
                     <div id="spot-card-${spot.id}" class="relative flex items-start space-x-3 group transition-all duration-200">
-                        <div class="relative z-10 flex-shrink-0 w-8 h-8 md:w-9 md:h-9 rounded-full bg-slate-900 text-amber-200 font-extrabold text-xs flex items-center justify-center shadow-md border-2 border-white group-hover:scale-110 transition">${index + 1}</div>
+                        <div class="relative z-10 flex-shrink-0 w-8 h-8 md:w-9 md:h-9 rounded-full bg-slate-900 text-white font-extrabold text-xs flex items-center justify-center shadow-md border-2 border-white group-hover:scale-110 transition">${index + 1}</div>
 
                         <div class="flex-1 bg-white hover:bg-slate-50/90 rounded-2xl p-4 border border-slate-200/90 shadow-sm hover:shadow-md transition">
                             <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
@@ -1568,7 +1453,7 @@
                                         ${costDisplay}
                                     </div>
 
-                                    <h4 class="font-extrabold text-slate-900 text-base md:text-lg mt-2 group-hover:text-amber-800 transition cursor-pointer" onclick="focusMapSpot('${spot.id}', ${day.dayNum})">${spot.title}</h4>
+                                    <h4 class="font-extrabold text-slate-900 text-base md:text-lg mt-2 group-hover:text-teal-700 transition cursor-pointer" onclick="focusMapSpot('${spot.id}', ${day.dayNum})">${spot.title}</h4>
 
                                     ${notesHtml}
 
@@ -1619,7 +1504,7 @@
                     const cleanPopupContent = `
                         <div class="p-2 space-y-1.5 max-w-[210px]">
                             <div class="flex items-center justify-between">
-                                <span class="text-[10px] bg-slate-900 text-amber-200 px-2 py-0.5 rounded font-extrabold">DAY ${day.dayNum} • 第 ${index + 1} 站</span>
+                                <span class="text-[10px] bg-slate-900 text-white px-2 py-0.5 rounded font-extrabold">DAY ${day.dayNum} • 第 ${index + 1} 站</span>
                                 <span class="text-[10px] font-bold text-slate-500">${meta.name}</span>
                             </div>
                             <h4 class="font-extrabold text-xs text-slate-900 leading-snug pt-0.5">${spot.title}</h4>
