@@ -82,7 +82,7 @@
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
 
     <!-- Top Hero Banner Header -->
-    <header class="relative bg-gradient-to-r from-slate-950 via-teal-950 to-slate-900 text-white overflow-hidden pb-8 pt-6 px-4 md:px-8 border-b border-teal-900/50 shadow-2xl">
+    <header id="main-header" class="relative bg-gradient-to-r from-slate-950 via-teal-950 to-slate-900 text-white overflow-hidden pb-8 pt-6 px-4 md:px-8 border-b border-teal-900/50 shadow-2xl transition-all duration-500">
         <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#14b8a6_1px,transparent_1px)] [background-size:16px_16px]"></div>
         
         <div class="max-w-7xl mx-auto relative z-10 space-y-6">
@@ -99,7 +99,7 @@
                         行程規劃
                     </h1>
                     <p class="text-sm md:text-base text-slate-300 mt-2 flex items-center gap-3 font-medium">
-                        <span><i class="fa-regular fa-calendar text-teal-400 me-1.5"></i><span id="header-date-range">行程動態載入中</span></span>
+                        <span><i id="header-calendar-icon" class="fa-regular fa-calendar text-teal-400 me-1.5"></i><span id="header-date-range">行程動態載入中</span></span>
                         <span class="text-slate-600">•</span>
                         <span><i class="fa-solid fa-location-dot text-rose-400 me-1.5"></i><span id="header-locations">載入中...</span></span>
                     </p>
@@ -107,21 +107,21 @@
 
                 <!-- Refresh Sheet Button -->
                 <div class="flex items-center gap-2">
-                    <button onclick="fetchAllGoogleSheetData()" class="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-1.5">
+                    <button id="refresh-btn" onclick="fetchAllGoogleSheetData()" class="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-1.5">
                         <i class="fa-solid fa-arrows-rotate" id="refresh-icon"></i> 從 Google Sheet 重新同步
                     </button>
                 </div>
             </div>
 
             <!-- 👔 頂部行程總覽：整趟行程綜合穿著建議 Banner -->
-            <div onclick="openWeatherOverviewModal()" class="bg-teal-950/80 hover:bg-teal-900/90 border border-teal-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3.5 shadow-xl text-xs md:text-sm text-teal-100 cursor-pointer transition transform hover:-translate-y-0.5">
-                <div class="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-300 border border-teal-400/30 flex items-center justify-center text-lg font-bold flex-shrink-0">
+            <div id="overall-weather-banner" onclick="openWeatherOverviewModal()" class="bg-teal-950/80 hover:bg-teal-900/90 border border-teal-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3.5 shadow-xl text-xs md:text-sm text-teal-100 cursor-pointer transition transform hover:-translate-y-0.5">
+                <div id="overall-weather-icon-box" class="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-300 border border-teal-400/30 flex items-center justify-center text-lg font-bold flex-shrink-0">
                     <i class="fa-solid fa-shirt"></i>
                 </div>
                 <div class="flex-1 space-y-1">
                     <div class="flex items-center justify-between font-bold text-teal-300 text-xs md:text-sm">
                         <div class="flex items-center gap-2">
-                            <span>整趟行程打包與穿著建議</span>
+                            <span id="overall-weather-label">整趟行程打包與穿著建議</span>
                             <span id="overall-weather-temp-badge" class="text-[10px] bg-teal-900/90 border border-teal-400/30 px-2 py-0.5 rounded-full text-teal-200 font-medium">氣象載入中...</span>
                         </div>
                         <span class="text-[11px] text-teal-300/80 flex items-center gap-1 bg-teal-900/50 px-2.5 py-1 rounded-lg border border-teal-500/20"><i class="fa-solid fa-arrow-up-right-from-square"></i> 查看每日預報</span>
@@ -146,7 +146,7 @@
         <div class="sticky top-3 z-30 bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-2xl p-3 shadow-lg shadow-slate-200/50">
             <div class="flex items-center justify-between px-2 mb-2">
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                    <i class="fa-solid fa-calendar-days text-teal-600"></i> 天數快速導覽
+                    <i id="day-nav-icon" class="fa-solid fa-calendar-days text-teal-600"></i> 天數快速導覽
                 </span>
                 <span id="active-day-subtitle" class="text-xs bg-teal-50 text-teal-700 px-3 py-0.5 rounded-full font-bold border border-teal-200">--</span>
             </div>
@@ -169,7 +169,7 @@
             <section id="map-section" class="lg:col-span-5 lg:sticky lg:top-20 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden flex flex-col">
                 <div class="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800 gap-2 flex-wrap">
                     <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-teal-500/20 text-teal-300 border border-teal-400/30 flex items-center justify-center">
+                        <div id="map-icon-box" class="w-9 h-9 rounded-xl bg-teal-500/20 text-teal-300 border border-teal-400/30 flex items-center justify-center">
                             <i class="fa-solid fa-map-location-dot"></i>
                         </div>
                         <div>
@@ -321,6 +321,115 @@
             TWD: 1.0
         };
 
+        // 🎨 支援的中英文主題配色配置（包含全新米白、米黃溫馨淺色調）
+        const THEMES = {
+            "米白溫馨": {
+                name: "米白溫馨",
+                headerGradient: "from-stone-900 via-stone-800 to-neutral-900",
+                borderCol: "border-amber-200/30",
+                primaryBtnBg: "bg-amber-100 hover:bg-amber-50 text-stone-900",
+                bannerBg: "bg-stone-900/9عة hover:bg-stone-900 border-amber-200/30 text-amber-100",
+                bannerBg: "bg-stone-900/90 hover:bg-stone-900 border-amber-200/20 text-amber-100",
+                bannerIconBox: "bg-amber-100/20 text-amber-200 border-amber-200/30",
+                bannerTitle: "text-amber-200",
+                badgeBg: "bg-stone-800 border-amber-200/30 text-amber-100",
+                activeTabBg: "bg-stone-900 text-amber-200 border-stone-700",
+                activeTabDot: "text-amber-300",
+                iconColor: "text-amber-300",
+                navIconColor: "text-amber-600"
+            },
+            "米黃暖調": {
+                name: "米黃暖調",
+                headerGradient: "from-amber-950 via-stone-900 to-yellow-950",
+                borderCol: "border-yellow-400/30",
+                primaryBtnBg: "bg-yellow-400 hover:bg-yellow-300 text-stone-950",
+                bannerBg: "bg-amber-950/80 hover:bg-amber-900/90 border-yellow-400/30 text-yellow-100",
+                bannerIconBox: "bg-yellow-400/20 text-yellow-300 border-yellow-400/30",
+                bannerTitle: "text-yellow-300",
+                badgeBg: "bg-amber-900/90 border-yellow-400/30 text-yellow-200",
+                activeTabBg: "bg-amber-950 text-yellow-300 border-amber-800",
+                activeTabDot: "text-yellow-400",
+                iconColor: "text-yellow-400",
+                navIconColor: "text-amber-600"
+            },
+            "海洋綠": {
+                name: "海洋綠",
+                headerGradient: "from-slate-950 via-teal-950 to-slate-900",
+                borderCol: "border-teal-900/50",
+                primaryBtnBg: "bg-teal-500 hover:bg-teal-400 text-slate-950",
+                bannerBg: "bg-teal-950/80 hover:bg-teal-900/90 border-teal-500/30 text-teal-100",
+                bannerIconBox: "bg-teal-500/20 text-teal-300 border-teal-400/30",
+                bannerTitle: "text-teal-300",
+                badgeBg: "bg-teal-900/90 border-teal-400/30 text-teal-200",
+                activeTabBg: "bg-slate-900 text-teal-300 border-slate-800",
+                activeTabDot: "text-teal-400",
+                iconColor: "text-teal-400",
+                navIconColor: "text-teal-600"
+            },
+            "優雅靛藍": {
+                name: "優雅靛藍",
+                headerGradient: "from-slate-950 via-indigo-950 to-slate-900",
+                borderCol: "border-indigo-900/50",
+                primaryBtnBg: "bg-indigo-600 hover:bg-indigo-500 text-white",
+                bannerBg: "bg-indigo-950/80 hover:bg-indigo-900/90 border-indigo-500/30 text-indigo-100",
+                bannerIconBox: "bg-indigo-500/20 text-indigo-300 border-indigo-400/30",
+                bannerTitle: "text-indigo-300",
+                badgeBg: "bg-indigo-900/90 border-indigo-400/30 text-indigo-200",
+                activeTabBg: "bg-slate-900 text-indigo-300 border-slate-800",
+                activeTabDot: "text-indigo-400",
+                iconColor: "text-indigo-400",
+                navIconColor: "text-indigo-600"
+            },
+            "玫瑰粉紅": {
+                name: "玫瑰粉紅",
+                headerGradient: "from-slate-950 via-rose-950 to-slate-900",
+                borderCol: "border-rose-900/50",
+                primaryBtnBg: "bg-rose-600 hover:bg-rose-500 text-white",
+                bannerBg: "bg-rose-950/80 hover:bg-rose-900/90 border-rose-500/30 text-rose-100",
+                bannerIconBox: "bg-rose-500/20 text-rose-300 border-rose-400/30",
+                bannerTitle: "text-rose-300",
+                badgeBg: "bg-rose-900/90 border-rose-400/30 text-rose-200",
+                activeTabBg: "bg-slate-900 text-rose-300 border-slate-800",
+                activeTabDot: "text-rose-400",
+                iconColor: "text-rose-400",
+                navIconColor: "text-rose-600"
+            },
+            "溫暖琥珀": {
+                name: "溫暖琥珀",
+                headerGradient: "from-slate-950 via-amber-950 to-slate-900",
+                borderCol: "border-amber-900/50",
+                primaryBtnBg: "bg-amber-600 hover:bg-amber-500 text-slate-950",
+                bannerBg: "bg-amber-950/80 hover:bg-amber-900/90 border-amber-500/30 text-amber-100",
+                bannerIconBox: "bg-amber-500/20 text-amber-300 border-amber-400/30",
+                bannerTitle: "text-amber-300",
+                badgeBg: "bg-amber-900/90 border-amber-400/30 text-amber-200",
+                activeTabBg: "bg-slate-900 text-amber-300 border-slate-800",
+                activeTabDot: "text-amber-400",
+                iconColor: "text-amber-400",
+                navIconColor: "text-amber-600"
+            },
+            "紫羅蘭": {
+                name: "紫羅蘭",
+                headerGradient: "from-slate-950 via-purple-950 to-slate-900",
+                borderCol: "border-purple-900/50",
+                primaryBtnBg: "bg-purple-600 hover:bg-purple-500 text-white",
+                bannerBg: "bg-purple-950/80 hover:bg-purple-900/90 border-purple-500/30 text-purple-100",
+                bannerIconBox: "bg-purple-500/20 text-purple-300 border-purple-400/30",
+                bannerTitle: "text-purple-300",
+                badgeBg: "bg-purple-900/90 border-purple-400/30 text-purple-200",
+                activeTabBg: "bg-slate-900 text-purple-300 border-slate-800",
+                activeTabDot: "text-purple-400",
+                iconColor: "text-purple-400",
+                navIconColor: "text-purple-600"
+            },
+            // Fallback English aliases
+            emerald: "海洋綠",
+            indigo: "優雅靛藍",
+            rose: "玫瑰粉紅",
+            amber: "溫暖琥珀",
+            violet: "紫羅蘭"
+        };
+
         // 🎨 30 色高辨識度調色盤
         const DAY_COLORS = [
             "#059669", "#2563eb", "#d97706", "#9333ea", "#e11d48", "#4f46e5",
@@ -435,6 +544,7 @@
             title: "行程規劃",
             locations: "各景點",
             dateRange: "",
+            colorTheme: "海洋綠", // 預設配色
             days: []
         };
 
@@ -508,6 +618,18 @@
             L.control.zoom({ position: 'bottomright' }).addTo(map);
         }
 
+        function getActiveTheme() {
+            let key = tripData.colorTheme;
+            if (THEMES[key]) {
+                // Check if it's an alias string pointing to another theme
+                if (typeof THEMES[key] === 'string') {
+                    key = THEMES[key];
+                }
+                return THEMES[key];
+            }
+            return THEMES["海洋綠"];
+        }
+
         function applyTileLayer(providerKey) {
             if (currentTileLayer) {
                 map.removeLayer(currentTileLayer);
@@ -529,7 +651,8 @@
             const btnAmap = document.getElementById('btn-map-amap');
             const btnNaver = document.getElementById('btn-map-naver');
 
-            const activeClass = "px-2 py-1 rounded-lg font-bold transition bg-teal-500 text-slate-950 shadow";
+            const theme = getActiveTheme();
+            const activeClass = `px-2 py-1 rounded-lg font-bold transition ${theme.primaryBtnBg} shadow`;
             const inactiveClass = "px-2 py-1 rounded-lg font-bold transition text-slate-400 hover:text-white";
 
             btnGoogle.className = providerKey === 'google' ? activeClass : inactiveClass;
@@ -588,6 +711,8 @@
                 document.getElementById('footer-title-text').textContent = tripData.title;
                 document.getElementById('header-locations').textContent = tripData.locations;
 
+                applyThemeStyles();
+
                 if (tripData.days.length > 0) {
                     const firstDate = tripData.days[0].date || "";
                     const lastDate = tripData.days[tripData.days.length - 1].date || "";
@@ -598,9 +723,9 @@
                 autoDetectAndSetMapProvider(tripData.locations, tripData.title);
 
                 document.getElementById('sheet-sync-status').className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold";
-                document.getElementById('sheet-sync-status').innerHTML = '<i class="fa-solid fa-file-excel"></i> <span>已從 Google Sheet 同步主題與行程</span>';
+                document.getElementById('sheet-sync-status').innerHTML = '<i class="fa-solid fa-file-excel"></i> <span>已從 Google Sheet 同步主題與配色</span>';
 
-                showToast("已成功同步最新主題與行程！", "success");
+                showToast("已成功同步最新主題與配色！", "success");
             } catch (error) {
                 console.warn("無法從 Google Sheet 抓取資料：", error);
                 document.getElementById('sheet-sync-status').className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-xs font-semibold";
@@ -611,6 +736,39 @@
                 renderApp();
                 await fetchDateMatchedWeather();
             }
+        }
+
+        function applyThemeStyles() {
+            const theme = getActiveTheme();
+
+            // Header Background & Border
+            const header = document.getElementById('main-header');
+            header.className = `relative bg-gradient-to-r ${theme.headerGradient} text-white overflow-hidden pb-8 pt-6 px-4 md:px-8 border-b ${theme.borderCol} shadow-2xl transition-all duration-500`;
+
+            // Refresh Button
+            const refreshBtn = document.getElementById('refresh-btn');
+            refreshBtn.className = `px-4 py-2 ${theme.primaryBtnBg} font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-1.5`;
+
+            // Overall Weather Banner
+            const weatherBanner = document.getElementById('overall-weather-banner');
+            weatherBanner.className = `${theme.bannerBg} rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3.5 shadow-xl text-xs md:text-sm cursor-pointer transition transform hover:-translate-y-0.5 border`;
+
+            const iconBox = document.getElementById('overall-weather-icon-box');
+            iconBox.className = `w-10 h-10 rounded-xl ${theme.bannerIconBox} flex items-center justify-center text-lg font-bold flex-shrink-0 border`;
+
+            const weatherLabel = document.getElementById('overall-weather-label');
+            weatherLabel.className = `font-bold ${theme.bannerTitle} text-xs md:text-sm`;
+
+            const tempBadge = document.getElementById('overall-weather-temp-badge');
+            tempBadge.className = `text-[10px] ${theme.badgeBg} px-2 py-0.5 rounded-full font-medium border`;
+
+            // Map Section Icon
+            const mapIconBox = document.getElementById('map-icon-box');
+            mapIconBox.className = `w-9 h-9 rounded-xl ${theme.bannerIconBox} flex items-center justify-center border`;
+
+            // Calendar & Nav Icons
+            document.getElementById('header-calendar-icon').className = `fa-regular fa-calendar ${theme.iconColor} me-1.5`;
+            document.getElementById('day-nav-icon').className = `fa-solid fa-calendar-days ${theme.navIconColor}`;
         }
 
         function parseCSVRows(text) {
@@ -666,10 +824,22 @@
             for (let i = 1; i < rows.length; i++) {
                 const cols = rows[i];
                 if (!cols || cols.length < 2) continue;
-                const key = cols[0] ? cols[0].trim() : "";
+                const key = cols[0] ? cols[0].trim().toLowerCase() : "";
                 const val = cols[1] ? cols[1].trim() : "";
                 if (key === "main_title" && val) tripData.title = val;
                 if (key === "locations" && val) tripData.locations = val;
+                if ((key === "color" || key === "color_theme") && val) {
+                    const themeInput = val.trim();
+                    if (THEMES[themeInput]) {
+                        tripData.colorTheme = themeInput;
+                    } else {
+                        // Case-insensitive match fallback
+                        const found = Object.keys(THEMES).find(k => k.toLowerCase() === themeInput.toLowerCase());
+                        if (found) {
+                            tripData.colorTheme = found;
+                        }
+                    }
+                }
             }
         }
 
@@ -860,16 +1030,18 @@
                 }
             });
 
+            const theme = getActiveTheme();
+
             const container = document.getElementById('trip-budget-summary');
             let html = `
                 <div onclick="openCostDetailModal('ALL')" class="flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-2.5 px-3.5 shadow-sm cursor-pointer transition transform hover:-translate-y-0.5">
-                    <div class="w-8 h-8 rounded-lg bg-teal-500/20 text-teal-300 flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-wallet"></i></div>
+                    <div class="w-8 h-8 rounded-lg ${theme.bannerIconBox} flex items-center justify-center font-bold text-sm border"><i class="fa-solid fa-wallet"></i></div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between">
                             <p class="text-[11px] text-slate-400 uppercase font-semibold">整趟行程預估總額</p>
                             <i class="fa-solid fa-angle-right text-[10px] text-slate-500"></i>
                         </div>
-                        <p class="text-xs font-bold text-teal-300 truncate">NT$ ${Math.round(totalTWD).toLocaleString()} 元</p>
+                        <p class="text-xs font-bold ${theme.bannerTitle} truncate">NT$ ${Math.round(totalTWD).toLocaleString()} 元</p>
                     </div>
                 </div>
             `;
@@ -1130,13 +1302,15 @@
             const container = document.getElementById('day-tabs-container');
             container.innerHTML = '';
 
+            const theme = getActiveTheme();
             const isAll = selectedDayFilter === "ALL";
+
             const allBtn = document.createElement('button');
             allBtn.onclick = () => switchDayFilter("ALL");
             allBtn.className = `px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 flex items-center space-x-1.5 border ${
-                isAll ? 'bg-slate-900 text-teal-300 border-slate-800 shadow-md scale-[1.02]' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+                isAll ? `${theme.activeTabBg} shadow-md scale-[1.02]` : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
             }`;
-            allBtn.innerHTML = `<i class="fa-solid fa-layer-group text-teal-500"></i> <span>全部行程 (DAY 1-${tripData.days.length})</span>`;
+            allBtn.innerHTML = `<i class="fa-solid fa-layer-group ${theme.iconColor}"></i> <span>全部行程 (DAY 1-${tripData.days.length})</span>`;
             container.appendChild(allBtn);
 
             tripData.days.forEach((day) => {
@@ -1144,9 +1318,9 @@
                 const btn = document.createElement('button');
                 btn.onclick = () => switchDayFilter(day.dayNum);
                 btn.className = `px-3.5 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 flex items-center space-x-2 border ${
-                    isActive ? 'bg-slate-900 text-teal-300 border-slate-800 shadow-md scale-[1.02]' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+                    isActive ? `${theme.activeTabBg} shadow-md scale-[1.02]` : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
                 }`;
-                btn.innerHTML = `<span class="${isActive ? 'text-teal-400 font-extrabold' : 'text-slate-500'}">D${day.dayNum}</span><span>•</span><span class="${isActive ? 'text-white' : 'text-slate-800'}">${day.theme}</span>`;
+                btn.innerHTML = `<span class="${isActive ? `${theme.activeTabDot} font-extrabold` : 'text-slate-500'}">D${day.dayNum}</span><span>•</span><span class="${isActive ? 'text-white' : 'text-slate-800'}">${day.theme}</span>`;
                 container.appendChild(btn);
             });
 
